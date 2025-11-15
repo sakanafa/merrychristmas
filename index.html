@@ -2,46 +2,73 @@
 <html lang="zh-HK">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>🎄 聖誕種蘿蔔 🥕</title>
 <style>
-body{margin:0;font-family:"Nunito",sans-serif;background:linear-gradient(#b4e4ff,#ffffff);text-align:center;overflow:hidden;}
-.snowflake{position:fixed;top:-10px;color:white;font-size:1em;animation:fall linear infinite;z-index:5;}
+body{
+  margin:0;
+  font-family:"Nunito",sans-serif;
+  background:linear-gradient(#b4e4ff,#fff);
+  text-align:center;
+  overflow-x:hidden;
+}
+
+.snowflake{position:fixed;top:-10px;color:white;animation:fall linear infinite;z-index:5;}
 @keyframes fall{to{transform:translateY(110vh);}}
 
-/* 音樂掣 */
+/* 音樂按鈕 */
 #music-control{
- position:fixed;top:15px;right:15px;width:48px;height:48px;border-radius:50%;
- background:rgba(255,255,255,0.8);display:flex;justify-content:center;align-items:center;
- font-size:26px;cursor:pointer;box-shadow:0 0 8px rgba(0,0,0,0.3);z-index:100;
+ position:fixed;top:10px;right:10px;width:46px;height:46px;border-radius:50%;
+ background:rgba(255,255,255,0.85);display:flex;justify-content:center;align-items:center;
+ font-size:24px;cursor:pointer;box-shadow:0 0 8px rgba(0,0,0,0.3);z-index:100;
 }
-#music-control:hover{transform:scale(1.1);}
+#music-control:hover{transform:scale(1.08);}
 
 /* 登入頁 */
-#lockscreen{position:relative;z-index:10;margin:auto;margin-top:90px;
- background:rgba(255,255,255,0.93);border-radius:15px;box-shadow:0 0 10px rgba(0,0,0,.1);
- padding:25px;width:90%;max-width:400px;text-align:center;}
+#lockscreen{
+ position:relative;z-index:10;
+ background:rgba(255,255,255,0.95);
+ border-radius:15px;box-shadow:0 0 10px rgba(0,0,0,.1);
+ margin:80px auto;padding:25px;width:90%;max-width:380px;text-align:center;
+}
 input[type=password]{padding:10px;width:80%;border-radius:8px;border:1.8px solid #88c;}
 button{
- padding:9px 14px;margin:5px;border:none;border-radius:8px;background:#ff9999;
- color:white;font-size:15px;cursor:pointer;transition:opacity .2s;
+ padding:10px 14px;margin:6px 5px;border:none;border-radius:8px;background:#ff9999;
+ color:white;font-size:16px;cursor:pointer;transition:filter .2s;
 }
-button:hover{background:#ff7777;}
+button:hover{filter:brightness(1.1);}
 button:disabled{opacity:0.5;cursor:not-allowed;}
 #msg{color:red;height:1.2em;margin-top:6px;}
 
 /* 遊戲畫面 */
 #game{display:none;}
-.container{max-width:500px;margin:0 auto;background:rgba(255,255,255,0.9);
- border-radius:15px;box-shadow:0 0 10px rgba(0,0,0,0.1);padding:15px;margin-top:20px;}
+.container{
+ max-width:500px;margin:10px auto;background:rgba(255,255,255,0.9);
+ border-radius:15px;box-shadow:0 0 10px rgba(0,0,0,0.1);
+ padding:15px;
+}
 .value{font-size:18px;margin:4px 0;}
-.progress-container{background:#eee;border-radius:10px;margin:8px auto;width:80%;height:16px;}
-.progress-bar{background:linear-gradient(45deg,#ffcc00,#ffaa00);height:100%;width:0%;}
-#field{position:relative;width:100%;height:240px;
- background:linear-gradient(#4ae,#3b9);border-radius:10px;overflow:hidden;margin-top:10px;}
+.progress-container{
+ background:#eee;border-radius:10px;margin:8px auto;width:90%;height:16px;
+}
+.progress-bar{
+ background:linear-gradient(45deg,#ffcc00,#ffaa00);
+ height:100%;width:0%;
+ transition:width 0.4s ease;
+}
+
+/* 田地 */
+#field{
+ position:relative;width:100%;height:200px;
+ background:linear-gradient(#4ae,#3b9);
+ border-radius:10px;overflow:hidden;margin-top:10px;
+}
+@media (max-width:480px){
+  #field{height:160px;}
+}
 .ground{position:absolute;bottom:0;width:100%;height:60%;
  background:repeating-linear-gradient(45deg,#784,#693 12px);}
-.plant{position:absolute;transition:all .5s ease;font-size:2em;opacity:0;transform:translateY(10px);}
+.plant{position:absolute;transition:all .5s;font-size:2em;opacity:0;transform:translateY(10px);}
 .plant.show{opacity:1;transform:translateY(0);}
 .icon{position:absolute;font-size:2em;opacity:0;}
 #rabbit,#cat{bottom:40px;}
@@ -49,17 +76,31 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 #cat.run{animation:cat 4s linear;}
 @keyframes rabbit{0%{left:-50px;opacity:1;}100%{left:110%;opacity:0;}}
 @keyframes cat{0%{left:110%;opacity:1;}100%{left:-50px;opacity:0;}}
-#message{min-height:22px;margin-top:6px;}
+
+#message{min-height:22px;margin-top:8px;}
 #timer{margin-top:6px;font-weight:bold;color:#333;}
+
+/* 操作區：按鈕適應不同寬度 */
+.controls{
+ display:flex;flex-wrap:wrap;justify-content:center;
+ gap:6px;margin-top:10px;
+}
+.controls button{
+ flex:1 1 45%;
+ min-width:130px;
+}
+@media (max-width:420px){
+  .controls button{flex:1 1 100%;width:90%;}
+}
 </style>
 </head>
 <body>
 
 <!-- 飄雪 -->
 <script>
-for(let i=0;i<40;i++){
+for(let i=0;i<35;i++){
  const s=document.createElement("div");
- s.className="snowflake";s.textContent="❄";
+ s.className="snowflake";s.textContent="❄️";
  s.style.left=Math.random()*100+"%";
  s.style.fontSize=(10+Math.random()*10)+"px";
  s.style.animationDuration=(5+Math.random()*5)+"s";
@@ -73,7 +114,7 @@ for(let i=0;i<40;i++){
  <source src="bgm.mp3" type="audio/mpeg">
 </audio>
 
-<!-- 登入頁 -->
+<!-- 登入 -->
 <div id="lockscreen">
  <h2>🎄 聖誕種蘿蔔 🥕</h2>
  <p id="welcomeText">請輸入活動密碼 🎅</p>
@@ -85,7 +126,7 @@ for(let i=0;i<40;i++){
 <!-- 遊戲畫面 -->
 <div id="game">
 <div class="container">
-  <h3>👨‍🌾 聖誕種蘿蔔（多蘿蔔田）🥕</h3>
+  <h3>👨‍🌾 聖誕種蘿蔔（多蘿蔔田）🌱</h3>
   <div class="value" id="wild">野生蘿蔔🥕：0</div>
   <div class="value" id="safe">安全蘿蔔🌟：0</div>
   <div class="value" id="total">總收成：0 根</div>
@@ -98,10 +139,12 @@ for(let i=0;i<40;i++){
     <div class="icon" id="cat">🐱</div>
   </div>
 
-  <button id="plantBtn">種蘿蔔 🌰 (20/20)</button>
-  <button id="waterBtn">淋水 💧 (1/1)</button>
-  <button id="bankBtn">存入農場銀行 💳</button>
-  <button id="resetBtn" style="background:#77bb77;">🔄 重新開始</button>
+  <div class="controls">
+    <button id="plantBtn">種蘿蔔 🌰 (20/20)</button>
+    <button id="waterBtn">淋水 💧 (1/1)</button>
+    <button id="bankBtn">存入銀行 💳</button>
+    <button id="resetBtn" style="background:#77bb77;">🔄 重新開始</button>
+  </div>
 
   <div id="message"></div>
   <div id="timer"></div>
@@ -119,35 +162,31 @@ document.getElementById('music-control').addEventListener("click",(e)=>{
 });
 
 // === 登入 ===
-const PASSWORD="600";
-document.getElementById("loginBtn").addEventListener("click",login);
-function login(){
+const PASSWORD="carrot2025";
+const screen=document.getElementById("lockscreen");
+document.getElementById("loginBtn").addEventListener("click",()=>{
  const v=document.getElementById("pwd").value.trim();
  if(v===PASSWORD){
-   document.getElementById("lockscreen").style.display="none";
+   screen.style.display="none";
    document.getElementById("game").style.display="block";
-   triggerLoginEvent();
+   randomWelcome();
  }else document.getElementById("msg").textContent="❌ 密碼錯誤，請再試 🎁";
-}
-function triggerLoginEvent(){
- const ev=[
-   "🎁 歡迎嚟到聖誕農場～快啲種第一條蘿蔔啦！",
-   "☀️ 今日氣溫啱啱好～",
-   "❄️ 飄雪令蘿蔔更加甜美～",
-   "🐱 貓貓喵喵幫你睇住田！",
-   "🐇 小兔幫手鬆泥～"
+});
+function randomWelcome(){
+ const arr=[
+   "🎁 歡迎返嚟～快啲種第一條蘿蔔！",
+   "🌤️ 天朗氣清，適合耕田～",
+   "❄️ 飄雪令蘿蔔更甜呢～",
+   "🐱 小貓出現喇！",
+   "🐇 小兔幫你鬆泥～"
  ];
- msg.textContent=ev[Math.floor(Math.random()*ev.length)];
- setTimeout(()=>msg.textContent="",4000);
+ message.textContent=arr[Math.floor(Math.random()*arr.length)];
+ setTimeout(()=>message.textContent="",4000);
 }
 
-// === 遊戲數據 ===
+// === 游戏变量 ===
 let seeds=[],grown=0,safeCarrot=0;
-const LIMIT_PER_DAY=20;
-let plantLimit=LIMIT_PER_DAY;
-let waterLimit=1;
-
-const field=document.getElementById("field");
+const LIMIT=20;let plantLimit=LIMIT;let waterLimit=1;
 const msg=document.getElementById("message");
 const bar=document.getElementById("bar");
 const wildEl=document.getElementById("wild");
@@ -155,99 +194,95 @@ const safeEl=document.getElementById("safe");
 const totalEl=document.getElementById("total");
 const rateEl=document.getElementById("rate");
 const timerText=document.getElementById("timer");
+const field=document.getElementById("field");
 const plantBtn=document.getElementById("plantBtn");
 const waterBtn=document.getElementById("waterBtn");
-const resetBtn=document.getElementById("resetBtn");
 
-// 🕛 每天重置
-function checkDailyReset(){
+// === 每日重置 ===
+function dailyReset(){
  const today=new Date().toDateString();
  const last=localStorage.getItem("lastReset");
  if(last!==today){
-   plantLimit=LIMIT_PER_DAY;
-   waterLimit=1;
-   localStorage.setItem("plantLimit",plantLimit);
-   localStorage.setItem("waterLimit",waterLimit);
-   localStorage.setItem("lastReset",today);
+  localStorage.clear();
+  localStorage.setItem("lastReset",today);
+  plantLimit=LIMIT;waterLimit=1;
+ }else{
+  const pl=localStorage.getItem("plantLimit");
+  const wl=localStorage.getItem("waterLimit");
+  if(pl)plantLimit=parseInt(pl);
+  if(wl)waterLimit=parseInt(wl);
  }
- const s1=localStorage.getItem("plantLimit");
- const s2=localStorage.getItem("waterLimit");
- if(s1)plantLimit=parseInt(s1);
- if(s2)waterLimit=parseInt(s2);
 }
-checkDailyReset();
+dailyReset();
 
-// 🌰 種
+// === 種蘿蔔 ===
 plantBtn.addEventListener("click",()=>{
- if(plantLimit<=0){msg.textContent="😅 今日 20 次機會用晒啦，凌晨重置～";return;}
- plantLimit--; localStorage.setItem("plantLimit",plantLimit);
- const p={start:Date.now(),status:'seed'};
+ if(plantLimit<=0){msg.textContent="🚫 今日20次用晒喇，等聽日再嚟～";return;}
+ plantLimit--;localStorage.setItem("plantLimit",plantLimit);
  const el=document.createElement("div");
  el.className="plant show";el.textContent="🌰";
  el.style.left=Math.random()*80+5+"%";
  el.style.bottom=Math.random()*10+25+"%";
  field.appendChild(el);
- p.el=el; seeds.push(p);
- msg.textContent="🌰 種下一粒蘿蔔種子！（3小時長大)";
+ seeds.push({start:Date.now(),status:"seed",el});
+ msg.textContent="🌱 種下蘿蔔種子！(3小時長大)";
  updateUI();
 });
 
-// 💧 淋水（每天一次）
+// === 淋水 (每日一次) ===
 waterBtn.addEventListener("click",()=>{
  if(waterLimit<=0){msg.textContent="💧 今日已經淋過啦～";return;}
- waterLimit--; localStorage.setItem("waterLimit",waterLimit);
- const seedCount=seeds.filter(p=>p.status==='seed').length;
- const grownCount=seeds.filter(p=>p.status==='grown').length;
+ waterLimit--;localStorage.setItem("waterLimit",waterLimit);
+ const seedCount=seeds.filter(s=>s.status==='seed').length;
+ const grownCount=seeds.filter(s=>s.status==='grown').length;
  let add=0;
  if(seedCount>0){
    for(let i=0;i<seedCount*2;i++){
-     const p={start:Date.now(),status:'seed'};
      const el=document.createElement("div");
      el.className="plant show";el.textContent="🌰";
      el.style.left=Math.random()*80+5+"%";
      el.style.bottom=Math.random()*10+25+"%";
      field.appendChild(el);
-     p.el=el;seeds.push(p);
+     seeds.push({start:Date.now(),status:'seed',el});
    }
    add+=seedCount*2;
  }
  if(grownCount>0){grown+=grownCount*2;add+=grownCount*2;}
- msg.textContent=`💧 淋水成功！加成 +${add} 🌱`;
+ msg.textContent=`💧 淋水成功，增加 ${add} 蘿蔔 🌿`;
  updateUI();
 });
 
-// 💳 存入銀行
+// === 存入銀行 ===
 document.getElementById("bankBtn").addEventListener("click",()=>{
- if(grown===0){msg.textContent="冇成熟蘿蔔可以存～";return;}
+ if(grown===0){msg.textContent="冇成熟蘿蔔可存～";return;}
  safeCarrot+=grown;grown=0;
- msg.textContent="💳 全部成熟蘿蔔已存入農場銀行 🌟";
+ msg.textContent="💳 已存入農場銀行 🌟";
  updateUI();
 });
 
-// 🔄 重新開始（清除所有數據）
-resetBtn.addEventListener("click",()=>{
- if(confirm("確定要重新開始嗎？會清除所有紀錄喔！🌱")){
-   localStorage.clear();
-   seeds=[];grown=0;safeCarrot=0;
-   plantLimit=LIMIT_PER_DAY;
-   waterLimit=1;
-   field.querySelectorAll(".plant").forEach(p=>p.remove());
-   msg.textContent="🔄 已重置遊戲！一切重新開始！";
-   updateUI();
+// === 重置 ===
+document.getElementById("resetBtn").addEventListener("click",()=>{
+ if(confirm("確定要重新開始？會清除所有紀錄喔！🌱")){
+  localStorage.clear();
+  seeds=[];grown=0;safeCarrot=0;
+  plantLimit=LIMIT;waterLimit=1;
+  field.querySelectorAll(".plant").forEach(p=>p.remove());
+  msg.textContent="🔄 已重置遊戲，一切重新開始！";
+  updateUI();
  }
 });
 
-// 🕒 成長檢查
+// === 成長檢查 ===
 setInterval(()=>{
  const now=Date.now();
  seeds.forEach(p=>{
    const diff=(now-p.start)/1000;
-   if(diff>=10800 && p.status==='seed'){p.status='grown';p.el.textContent="🥕";grown++;}
+   if(p.status==='seed'&&diff>=10800){p.status='grown';p.el.textContent="🥕";grown++;}
  });
  updateUI();
 },60000);
 
-// 更新畫面
+// === 更新畫面 ===
 function updateUI(){
  const wild=seeds.filter(p=>p.status==='seed').length;
  const total=wild+grown+safeCarrot;
@@ -256,7 +291,7 @@ function updateUI(){
  safeEl.textContent="安全蘿蔔🌟："+safeCarrot;
  totalEl.textContent="總收成："+total+" 根";
  rateEl.textContent="VIP 安全率："+rate+"%";
- bar.style.width=Math.min(100,rate)+"%";
+ bar.style.width=Math.min(rate,100)+"%";
  plantBtn.textContent=`種蘿蔔 🌰 (${plantLimit}/20)`;
  waterBtn.textContent=`淋水 💧 (${waterLimit}/1)`;
  plantBtn.disabled=plantLimit<=0;
@@ -264,29 +299,27 @@ function updateUI(){
  updateTimer();
 }
 
-// 計時顯示
+// === 倒數時間 ===
 function updateTimer(){
- if(!seeds.length){timerText.textContent="";}
- else{
-   const now=Date.now();let soonest=null;
-   seeds.forEach(p=>{
-     if(p.status==='seed'){
-       const left=10800-(now-p.start)/1000;
-       if(left>0&&(soonest===null||left<soonest))soonest=left;
-     }
-   });
-   if(soonest)timerText.textContent="⏳ 下一顆蘿蔔剩餘 "+Math.ceil(soonest/60)+" 分鐘";
-   else timerText.textContent="";
- }
+ if(!seeds.length){timerText.textContent="";return;}
+ const now=Date.now();let minLeft=null;
+ seeds.forEach(p=>{
+   if(p.status==='seed'){
+     const left=10800-(now-p.start)/1000;
+     if(left>0&&(minLeft==null||left<minLeft))minLeft=left;
+   }
+ });
+ if(minLeft){timerText.textContent="⏳ 下一顆蘿蔔剩餘 "+Math.ceil(minLeft/60)+" 分鐘";}
+ else timerText.textContent="";
 }
 
-// 🐇🐱 動物動畫
+// === 小動物 ===
 setInterval(()=>{
  const r=Math.random();
- if(r<0.1){document.getElementById("rabbit").classList.add("run");
-   setTimeout(()=>document.getElementById("rabbit").classList.remove("run"),4000);}
- else if(r<0.2){document.getElementById("cat").classList.add("run");
-   setTimeout(()=>document.getElementById("cat").classList.remove("run"),4000);}
+ const rabbit=document.getElementById("rabbit");
+ const cat=document.getElementById("cat");
+ if(r<0.1){rabbit.classList.add("run");setTimeout(()=>rabbit.classList.remove("run"),4000);}
+ else if(r<0.2){cat.classList.add("run");setTimeout(()=>cat.classList.remove("run"),4000);}
 },60000);
 
 updateUI();
