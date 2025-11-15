@@ -9,7 +9,7 @@ body{margin:0;font-family:"Nunito",sans-serif;background:linear-gradient(#b4e4ff
 .snowflake{position:fixed;top:-10px;color:white;font-size:1em;animation:fall linear infinite;z-index:5;}
 @keyframes fall{to{transform:translateY(110vh);}}
 
-/* 音樂Button */
+/* 音樂掣 */
 #music-control{
  position:fixed;top:15px;right:15px;width:48px;height:48px;border-radius:50%;
  background:rgba(255,255,255,0.8);display:flex;justify-content:center;align-items:center;
@@ -99,7 +99,7 @@ for(let i=0;i<40;i++){
   </div>
 
   <button id="plantBtn">種蘿蔔 🌰 (20/20)</button>
-  <button id="waterBtn">淋水 💧</button>
+  <button id="waterBtn">淋水 💧 (1/1)</button>
   <button id="bankBtn">存入農場銀行 💳</button>
   <div id="message"></div>
   <div id="timer"></div>
@@ -109,46 +109,41 @@ for(let i=0;i<40;i++){
 <script defer>
 document.addEventListener("DOMContentLoaded",()=>{
 // === 音樂控制 ===
-let playing=false;
 const bgm=document.getElementById('bgm');
+let playing=false;
 document.getElementById('music-control').addEventListener("click",(e)=>{
  if(!playing){bgm.play();playing=true;e.target.textContent='🔈';}
  else{bgm.pause();playing=false;e.target.textContent='🔇';}
 });
 
-// === 登入邏輯（立即可開始） ===
+// === 登入 ===
 const PASSWORD="600";
 document.getElementById("loginBtn").addEventListener("click",login);
-
 function login(){
  const v=document.getElementById("pwd").value.trim();
  if(v===PASSWORD){
-   // 立刻開啟遊戲
    document.getElementById("lockscreen").style.display="none";
    document.getElementById("game").style.display="block";
    triggerLoginEvent();
- }else{
-   document.getElementById("msg").textContent="❌ 密碼錯誤，請再試 🎁";
- }
+ }else document.getElementById("msg").textContent="❌ 密碼錯誤，請再試 🎁";
 }
-
-// 🎲 登入隨機事件
 function triggerLoginEvent(){
  const ev=[
    "🎁 歡迎嚟到聖誕農場～快啲種第一條蘿蔔啦！",
    "☀️ 今天天氣好適合耕田！",
-   "❄️ 飄雪中～蘿蔔更甜美啦～",
-   "🐱 小貓喵喵出現！拍張照吧～",
-   "🐇 小兔幫忙翻泥土，好幫手呀！"
+   "❄️ 飄雪令蘿蔔更甜美～",
+   "🐱 小貓圍著你嗅～",
+   "🐇 小兔幫你翻泥土～"
  ];
  msg.textContent=ev[Math.floor(Math.random()*ev.length)];
  setTimeout(()=>msg.textContent="",4000);
 }
 
-// === 資料 ===
-let seeds=[], grown=0, safeCarrot=0;
+// === 遊戲數據 ===
+let seeds=[],grown=0,safeCarrot=0;
 const LIMIT_PER_DAY=20;
 let plantLimit=LIMIT_PER_DAY;
+let waterLimit=1; // 每天只能淋一次
 
 const field=document.getElementById("field");
 const msg=document.getElementById("message");
@@ -159,18 +154,23 @@ const totalEl=document.getElementById("total");
 const rateEl=document.getElementById("rate");
 const timerText=document.getElementById("timer");
 const plantBtn=document.getElementById("plantBtn");
+const waterBtn=document.getElementById("waterBtn");
 
-// 🕛 每天 00:00 重置次數
+// 🕛 每天重置種植&淋水次數
 function checkDailyReset(){
  const today=new Date().toDateString();
  const last=localStorage.getItem("lastReset");
  if(last!==today){
    plantLimit=LIMIT_PER_DAY;
+   waterLimit=1;
    localStorage.setItem("plantLimit",plantLimit);
+   localStorage.setItem("waterLimit",waterLimit);
    localStorage.setItem("lastReset",today);
  }
- const saved=localStorage.getItem("plantLimit");
- if(saved)plantLimit=parseInt(saved);
+ const s1=localStorage.getItem("plantLimit");
+ const s2=localStorage.getItem("waterLimit");
+ if(s1)plantLimit=parseInt(s1);
+ if(s2)waterLimit=parseInt(s2);
 }
 checkDailyReset();
 
@@ -184,34 +184,56 @@ plantBtn.addEventListener("click",()=>{
  el.style.left=Math.random()*80+5+"%";
  el.style.bottom=Math.random()*10+25+"%";
  field.appendChild(el);
- p.el=el;seeds.push(p);
- msg.textContent="🌰 種咗一粒蘿蔔種子！（3小時長大）";
+ p.el=el; seeds.push(p);
+ msg.textContent="🌰 種下一粒蘿蔔種子！（3小時長大)";
  updateUI();
 });
 
-// 💧 淋水
-document.getElementById("waterBtn").addEventListener("click",()=>{
- if(grown>0){grown--;safeCarrot++;msg.textContent="💧 淋水成功，一條變安全蘿蔔 🌟";}
- else msg.textContent="😅 暫時冇成熟蘿蔔～";
+// 💧 淋水：每天一次（種子期+2、成熟期+2）
+waterBtn.addEventListener("click",()=>{
+ if(waterLimit<=0){msg.textContent="💧 今日已經淋過啦～等明日再淋吧！";return;}
+ waterLimit--; localStorage.setItem("waterLimit",waterLimit);
+
+ const seedCount=seeds.filter(p=>p.status==='seed').length;
+ const grownCount=seeds.filter(p=>p.status==='grown').length;
+ let add=0;
+
+ // 種子期 +2 新種子
+ if(seedCount>0){
+   for(let i=0;i<seedCount*2;i++){
+     const p={start:Date.now(),status:'seed'};
+     const el=document.createElement("div");
+     el.className="plant show";el.textContent="🌰";
+     el.style.left=Math.random()*80+5+"%";
+     el.style.bottom=Math.random()*10+25+"%";
+     field.appendChild(el);
+     p.el=el; seeds.push(p);
+   }
+   add+=seedCount*2;
+ }
+ // 成熟期 +2 成熟蘿蔔
+ if(grownCount>0){
+   grown+=grownCount*2; add+=grownCount*2;
+ }
+
+ msg.textContent=`💧 淋水成功！共令蘿蔔產量 +${add} 🌱`;
  updateUI();
 });
 
-// 💳 農場銀行
+// 💳 存入農場銀行
 document.getElementById("bankBtn").addEventListener("click",()=>{
- if(grown===0){msg.textContent="冇成熟蘿蔔可以存入～";return;}
+ if(grown===0){msg.textContent="冇成熟蘿蔔可以存～";return;}
  safeCarrot+=grown;grown=0;
  msg.textContent="💳 全部成熟蘿蔔已存入農場銀行 🌟";
  updateUI();
 });
 
-// 🕒 成長（3 小時→🥕）
+// 🕒 成長（3小時）
 setInterval(()=>{
  const now=Date.now();
  seeds.forEach(p=>{
    const diff=(now-p.start)/1000;
-   if(diff>=10800 && p.status==='seed'){
-     p.status='grown'; p.el.textContent="🥕"; grown++;
-   }
+   if(diff>=10800 && p.status==='seed'){p.status='grown';p.el.textContent="🥕";grown++;}
  });
  updateUI();
 },60000);
@@ -226,34 +248,38 @@ function updateUI(){
  totalEl.textContent="總收成："+total+" 根";
  rateEl.textContent="VIP 安全率："+rate+"%";
  bar.style.width=Math.min(100,rate)+"%";
+
  plantBtn.textContent=`種蘿蔔 🌰 (${plantLimit}/20)`;
+ waterBtn.textContent=`淋水 💧 (${waterLimit}/1)`;
  plantBtn.disabled=plantLimit<=0;
+ waterBtn.disabled=waterLimit<=0;
+
  updateTimer();
 }
 
-// 顯示剩餘時間
+// 顯示剩餘計時
 function updateTimer(){
  if(!seeds.length){timerText.textContent="";}
  else{
-   const now=Date.now(); let soonest=null;
+   const now=Date.now();let soonest=null;
    seeds.forEach(p=>{
      if(p.status==='seed'){
        const left=10800-(now-p.start)/1000;
-       if(left>0 && (soonest===null||left<soonest))soonest=left;
+       if(left>0&&(soonest===null||left<soonest))soonest=left;
      }
    });
-   if(soonest){timerText.textContent="⏳ 下一顆蘿蔔剩餘 "+Math.ceil(soonest/60)+" 分鐘";}
+   if(soonest)timerText.textContent="⏳ 下一顆蘿蔔剩餘 "+Math.ceil(soonest/60)+" 分鐘";
    else timerText.textContent="";
  }
 }
 
-// 🐇🐱 小動物動畫
+// 🐇🐱 動物動畫
 setInterval(()=>{
  const r=Math.random();
  if(r<0.1){document.getElementById("rabbit").classList.add("run");
-  setTimeout(()=>document.getElementById("rabbit").classList.remove("run"),4000);}
+   setTimeout(()=>document.getElementById("rabbit").classList.remove("run"),4000);}
  else if(r<0.2){document.getElementById("cat").classList.add("run");
-  setTimeout(()=>document.getElementById("cat").classList.remove("run"),4000);}
+   setTimeout(()=>document.getElementById("cat").classList.remove("run"),4000);}
 },60000);
 
 updateUI();
