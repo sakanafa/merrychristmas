@@ -6,7 +6,6 @@
 <title>🎄 聖誕種蘿蔔 🥕</title>
 <style>
 body{margin:0;font-family:"Nunito",sans-serif;background:linear-gradient(#b4e4ff,#ffffff);text-align:center;overflow:hidden;}
-/* 飄雪 */
 .snowflake{position:fixed;top:-10px;color:white;font-size:1em;animation:fall linear infinite;z-index:5;}
 @keyframes fall{to{transform:translateY(110vh);}}
 
@@ -79,7 +78,7 @@ for(let i=0;i<40;i++){
  <h2>🎄 聖誕種蘿蔔 🥕</h2>
  <p id="welcomeText">請輸入活動密碼 🎅</p>
  <input type="password" id="pwd" placeholder="輸入密碼"><br>
- <button onclick="login()">登入</button>
+ <button id="loginBtn">登入</button>
  <p id="msg"></p>
 </div>
 
@@ -107,17 +106,20 @@ for(let i=0;i<40;i++){
 </div>
 </div>
 
-<script>
-// 🎵 音樂控制
+<script defer>
+document.addEventListener("DOMContentLoaded",()=>{
+// === 音樂控制 ===
 let playing=false;
 const bgm=document.getElementById('bgm');
-document.getElementById('music-control').onclick=()=>{
- if(!playing){bgm.play();playing=true;event.target.textContent='🔈';}
- else{bgm.pause();playing=false;event.target.textContent='🔇';}
-};
+document.getElementById('music-control').addEventListener("click",(e)=>{
+ if(!playing){bgm.play();playing=true;e.target.textContent='🔈';}
+ else{bgm.pause();playing=false;e.target.textContent='🔇';}
+});
 
-// 🔐 登入邏輯
+// === 登入邏輯 ===
 const PASSWORD="carrot2025";
+document.getElementById("loginBtn").addEventListener("click",login);
+
 function login(){
  const v=document.getElementById("pwd").value.trim();
  if(v===PASSWORD){
@@ -129,23 +131,24 @@ function login(){
  }
 }
 
-// 🎲 登入隨機事件 (只發生一次)
+// 🎲 登入隨機事件
 function triggerLoginEvent(){
  const ev=[
-   "🎁 聖誕奇蹟！今日蘿蔔更容易長大！",
-   "☀️ 陽光正好，氣溫適中，適合種植～",
-   "❄️ 飄雪令土壤濕潤～",
-   "🐱 小貓在田裡打滾！可愛但小心～",
-   "🐇 小兔幫你翻鬆泥土！"
+   "🎁 聖誕奇蹟！今日蘿蔔更容易長大！",
+   "☀️ 陽光正好，氣溫適中，適合種植～",
+   "❄️ 飄雪令土壤濕潤～",
+   "🐱 小貓在田裡打滾！好可愛～",
+   "🐇 小兔幫你翻鬆泥土！"
  ];
  msg.textContent=ev[Math.floor(Math.random()*ev.length)];
  setTimeout(()=>msg.textContent="",4000);
 }
 
-// === 主要資料 ===
+// === 資料 ===
 let seeds=[], grown=0, safeCarrot=0;
-let plantLimit=20;
-const PLANT_LIMIT_PER_DAY=20;
+const LIMIT_PER_DAY=20;
+let plantLimit=LIMIT_PER_DAY;
+
 const field=document.getElementById("field");
 const msg=document.getElementById("message");
 const bar=document.getElementById("bar");
@@ -156,41 +159,24 @@ const rateEl=document.getElementById("rate");
 const timerText=document.getElementById("timer");
 const plantBtn=document.getElementById("plantBtn");
 
-// 🔁 每日凌晨重置次數
+// 🕛 每天 00:00 自動重置次數
 function checkDailyReset(){
  const today=new Date().toDateString();
- const last=localStorage.getItem("lastPlantDay");
+ const last=localStorage.getItem("lastReset");
  if(last!==today){
-   localStorage.setItem("lastPlantDay",today);
-   plantLimit=PLANT_LIMIT_PER_DAY;
+   plantLimit=LIMIT_PER_DAY;
    localStorage.setItem("plantLimit",plantLimit);
+   localStorage.setItem("lastReset",today);
  }
  const saved=localStorage.getItem("plantLimit");
  if(saved)plantLimit=parseInt(saved);
 }
 checkDailyReset();
 
-// 💧 淋水：提升安全性（加安全蘿蔔）
-document.getElementById("waterBtn").onclick=()=>{
- if(grown>0){ safeCarrot++; grown=Math.max(grown-1,0);
-  msg.textContent="💧 淋水後，有一條蘿蔔成功安全儲存 🌟";
-  updateUI();
- }else msg.textContent="😅 目前冇成熟蘿蔔要淋水呀～";
-};
-
-// 💳 存入農場銀行：全部已成熟的蘿蔔入安全區
-document.getElementById("bankBtn").onclick=()=>{
- if(grown===0){msg.textContent="冇成熟蘿蔔可以存入～";return;}
- safeCarrot+=grown; grown=0;
- msg.textContent="💳 已將成熟蘿蔔全部存入農場銀行 🌟";
- updateUI();
-};
-
 // 🌰 種蘿蔔（每日最多20次）
-plantBtn.onclick=()=>{
- if(plantLimit<=0){msg.textContent="😅 今日20次用晒啦，明日凌晨會重置～";return;}
- plantLimit--;
- localStorage.setItem("plantLimit",plantLimit);
+plantBtn.addEventListener("click",()=>{
+ if(plantLimit<=0){msg.textContent="😅 今日 20 次機會用晒啦，凌晨重置～";return;}
+ plantLimit--; localStorage.setItem("plantLimit",plantLimit);
  const p={start:Date.now(),status:'seed'};
  const el=document.createElement("div");
  el.className="plant show";el.textContent="🌰";
@@ -198,23 +184,40 @@ plantBtn.onclick=()=>{
  el.style.bottom=Math.random()*10+25+"%";
  field.appendChild(el);
  p.el=el;seeds.push(p);
- msg.textContent="🌰 種下咗一粒蘿蔔種子！";
+ msg.textContent="🌰 種下咗一粒蘿蔔種子！（3 小時長大)";
  updateUI();
-};
+});
 
-// 🕒 成長檢查（3小時→成熟）
+// 💧 淋水（將 1 條成熟🥕 變安全🌟）
+document.getElementById("waterBtn").addEventListener("click",()=>{
+ if(grown>0){
+   grown--;safeCarrot++;
+   msg.textContent="💧 淋水成功，一條蘿蔔已變成安全蘿蔔 🌟";
+ }else msg.textContent="😅 暫時冇成熟蘿蔔～";
+ updateUI();
+});
+
+// 💳 存入農場銀行（全部成熟🥕->🌟）
+document.getElementById("bankBtn").addEventListener("click",()=>{
+ if(grown===0){msg.textContent="冇成熟蘿蔔可以存入～";return;}
+ safeCarrot+=grown;grown=0;
+ msg.textContent="💳 全部成熟蘿蔔已存入農場銀行 🌟";
+ updateUI();
+});
+
+// 🕒 成長：3 小時變 🥕
 setInterval(()=>{
  const now=Date.now();
  seeds.forEach(p=>{
    const diff=(now-p.start)/1000;
-   if(diff>=10800 && p.status==='seed'){ // 3小時
-      p.status='grown'; p.el.textContent="🥕"; grown++;
+   if(diff>=10800 && p.status==='seed'){
+     p.status='grown'; p.el.textContent="🥕"; grown++;
    }
  });
  updateUI();
 },60000);
 
-// 🔄 更新畫面
+// 更新畫面
 function updateUI(){
  const wild=seeds.filter(p=>p.status==='seed').length;
  const total=wild+grown+safeCarrot;
@@ -225,11 +228,11 @@ function updateUI(){
  rateEl.textContent="VIP 安全率："+rate+"%";
  bar.style.width=Math.min(100,rate)+"%";
  plantBtn.textContent=`種蘿蔔 🌰 (${plantLimit}/20)`;
- if(plantLimit<=0)plantBtn.disabled=true; else plantBtn.disabled=false;
+ plantBtn.disabled=plantLimit<=0;
  updateTimer();
 }
 
-// 🕐 剩餘時間提示
+// 顯示剩餘時間
 function updateTimer(){
  if(!seeds.length){timerText.textContent="";}
  else{
@@ -240,7 +243,7 @@ function updateTimer(){
        if(left>0 && (soonest===null||left<soonest))soonest=left;
      }
    });
-   if(soonest){timerText.textContent="⏳ 下一顆蘿蔔剩餘 "+Math.ceil(soonest/60)+" 分鐘";}
+   if(soonest){timerText.textContent="⏳ 下一顆蘿蔔剩餘 "+Math.ceil(soonest/60)+" 分鐘";}
    else timerText.textContent="";
  }
 }
@@ -248,13 +251,17 @@ function updateTimer(){
 // 🐇🐱 小動物動畫
 setInterval(()=>{
  const r=Math.random();
- if(r<0.1){document.getElementById("rabbit").classList.add("run");
-  setTimeout(()=>document.getElementById("rabbit").classList.remove("run"),4000);}
- else if(r<0.2){document.getElementById("cat").classList.add("run");
-  setTimeout(()=>document.getElementById("cat").classList.remove("run"),4000);}
+ if(r<0.1){
+   document.getElementById("rabbit").classList.add("run");
+   setTimeout(()=>document.getElementById("rabbit").classList.remove("run"),4000);
+ }else if(r<0.2){
+   document.getElementById("cat").classList.add("run");
+   setTimeout(()=>document.getElementById("cat").classList.remove("run"),4000);
+ }
 },60000);
 
 updateUI();
+});
 </script>
 </body>
 </html>
