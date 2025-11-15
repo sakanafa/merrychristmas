@@ -85,7 +85,7 @@ for(let i=0;i<40;i++){
 <!-- 遊戲畫面 -->
 <div id="game">
 <div class="container">
-  <h3>👨‍🌾 聖誕種蘿蔔（多蘿蔔田）🥕</h3>
+  <h3>👨‍🌾 聖誕種蘿蔔（多蘿蔔田）🥕</h3>
   <div class="value" id="wild">野生蘿蔔🥕：0</div>
   <div class="value" id="safe">安全蘿蔔🌟：0</div>
   <div class="value" id="total">總收成：0 根</div>
@@ -101,6 +101,8 @@ for(let i=0;i<40;i++){
   <button id="plantBtn">種蘿蔔 🌰 (20/20)</button>
   <button id="waterBtn">淋水 💧 (1/1)</button>
   <button id="bankBtn">存入農場銀行 💳</button>
+  <button id="resetBtn" style="background:#77bb77;">🔄 重新開始</button>
+
   <div id="message"></div>
   <div id="timer"></div>
 </div>
@@ -130,10 +132,10 @@ function login(){
 function triggerLoginEvent(){
  const ev=[
    "🎁 歡迎嚟到聖誕農場～快啲種第一條蘿蔔啦！",
-   "☀️ 今天天氣好適合耕田！",
-   "❄️ 飄雪令蘿蔔更甜美～",
-   "🐱 小貓圍著你嗅～",
-   "🐇 小兔幫你翻泥土～"
+   "☀️ 今日氣溫啱啱好～",
+   "❄️ 飄雪令蘿蔔更加甜美～",
+   "🐱 貓貓喵喵幫你睇住田！",
+   "🐇 小兔幫手鬆泥～"
  ];
  msg.textContent=ev[Math.floor(Math.random()*ev.length)];
  setTimeout(()=>msg.textContent="",4000);
@@ -143,7 +145,7 @@ function triggerLoginEvent(){
 let seeds=[],grown=0,safeCarrot=0;
 const LIMIT_PER_DAY=20;
 let plantLimit=LIMIT_PER_DAY;
-let waterLimit=1; // 每天只能淋一次
+let waterLimit=1;
 
 const field=document.getElementById("field");
 const msg=document.getElementById("message");
@@ -155,8 +157,9 @@ const rateEl=document.getElementById("rate");
 const timerText=document.getElementById("timer");
 const plantBtn=document.getElementById("plantBtn");
 const waterBtn=document.getElementById("waterBtn");
+const resetBtn=document.getElementById("resetBtn");
 
-// 🕛 每天重置種植&淋水次數
+// 🕛 每天重置
 function checkDailyReset(){
  const today=new Date().toDateString();
  const last=localStorage.getItem("lastReset");
@@ -174,7 +177,7 @@ function checkDailyReset(){
 }
 checkDailyReset();
 
-// 🌰 種蘿蔔
+// 🌰 種
 plantBtn.addEventListener("click",()=>{
  if(plantLimit<=0){msg.textContent="😅 今日 20 次機會用晒啦，凌晨重置～";return;}
  plantLimit--; localStorage.setItem("plantLimit",plantLimit);
@@ -189,16 +192,13 @@ plantBtn.addEventListener("click",()=>{
  updateUI();
 });
 
-// 💧 淋水：每天一次（種子期+2、成熟期+2）
+// 💧 淋水（每天一次）
 waterBtn.addEventListener("click",()=>{
- if(waterLimit<=0){msg.textContent="💧 今日已經淋過啦～等明日再淋吧！";return;}
+ if(waterLimit<=0){msg.textContent="💧 今日已經淋過啦～";return;}
  waterLimit--; localStorage.setItem("waterLimit",waterLimit);
-
  const seedCount=seeds.filter(p=>p.status==='seed').length;
  const grownCount=seeds.filter(p=>p.status==='grown').length;
  let add=0;
-
- // 種子期 +2 新種子
  if(seedCount>0){
    for(let i=0;i<seedCount*2;i++){
      const p={start:Date.now(),status:'seed'};
@@ -207,20 +207,16 @@ waterBtn.addEventListener("click",()=>{
      el.style.left=Math.random()*80+5+"%";
      el.style.bottom=Math.random()*10+25+"%";
      field.appendChild(el);
-     p.el=el; seeds.push(p);
+     p.el=el;seeds.push(p);
    }
    add+=seedCount*2;
  }
- // 成熟期 +2 成熟蘿蔔
- if(grownCount>0){
-   grown+=grownCount*2; add+=grownCount*2;
- }
-
- msg.textContent=`💧 淋水成功！共令蘿蔔產量 +${add} 🌱`;
+ if(grownCount>0){grown+=grownCount*2;add+=grownCount*2;}
+ msg.textContent=`💧 淋水成功！加成 +${add} 🌱`;
  updateUI();
 });
 
-// 💳 存入農場銀行
+// 💳 存入銀行
 document.getElementById("bankBtn").addEventListener("click",()=>{
  if(grown===0){msg.textContent="冇成熟蘿蔔可以存～";return;}
  safeCarrot+=grown;grown=0;
@@ -228,7 +224,20 @@ document.getElementById("bankBtn").addEventListener("click",()=>{
  updateUI();
 });
 
-// 🕒 成長（3小時）
+// 🔄 重新開始（清除所有數據）
+resetBtn.addEventListener("click",()=>{
+ if(confirm("確定要重新開始嗎？會清除所有紀錄喔！🌱")){
+   localStorage.clear();
+   seeds=[];grown=0;safeCarrot=0;
+   plantLimit=LIMIT_PER_DAY;
+   waterLimit=1;
+   field.querySelectorAll(".plant").forEach(p=>p.remove());
+   msg.textContent="🔄 已重置遊戲！一切重新開始！";
+   updateUI();
+ }
+});
+
+// 🕒 成長檢查
 setInterval(()=>{
  const now=Date.now();
  seeds.forEach(p=>{
@@ -248,16 +257,14 @@ function updateUI(){
  totalEl.textContent="總收成："+total+" 根";
  rateEl.textContent="VIP 安全率："+rate+"%";
  bar.style.width=Math.min(100,rate)+"%";
-
  plantBtn.textContent=`種蘿蔔 🌰 (${plantLimit}/20)`;
  waterBtn.textContent=`淋水 💧 (${waterLimit}/1)`;
  plantBtn.disabled=plantLimit<=0;
  waterBtn.disabled=waterLimit<=0;
-
  updateTimer();
 }
 
-// 顯示剩餘計時
+// 計時顯示
 function updateTimer(){
  if(!seeds.length){timerText.textContent="";}
  else{
