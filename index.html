@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>🎄 聖誕種蘿蔔登入 🎁</title>
+<style>
+*{box-sizing:border-box;}
+body {
+  margin:0;
+  font-family:"Noto Sans TC",sans-serif;
+  height:100vh;
+  overflow:hidden;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(180deg,#a0cfff 0%,#ffffff 100%);
+  position:relative;
+}
+
+/* 飄雪效果 */
+.snowflake {
+  position: fixed;
+  top:-10px;
+  color:white;
+  font-size:1.2em;
+  user-select:none;
+  animation: fall 10s linear infinite;
+}
+@keyframes fall {
+  0% {
+    transform:translateY(0) rotate(0deg);
+    opacity:1;
+  }
+  100% {
+    transform:translateY(100vh) rotate(360deg);
+    opacity:0;
+  }
+}
+
+/* 登入框 */
+#lockscreen {
+  background:rgba(255,255,255,0.85);
+  border-radius:20px;
+  box-shadow:0 0 30px rgba(255,255,255,0.8);
+  padding:40px 30px;
+  text-align:center;
+  z-index:2;
+  width:90%;
+  max-width:400px;
+  animation: appear 1s ease-out;
+}
+@keyframes appear{
+  from{transform:scale(0.7);opacity:0;}
+  to{transform:scale(1);opacity:1;}
+}
+
+h1 {
+  font-size:2em;
+  color:#d02525;
+  text-shadow:2px 2px 4px #fff;
+  margin-bottom:10px;
+}
+h2 {
+  color:#055;
+  margin-bottom:20px;
+}
+
+input[type=password] {
+  padding:10px;
+  font-size:16px;
+  width:80%;
+  border-radius:10px;
+  border:2px solid #d6eaff;
+  outline:none;
+  text-align:center;
+}
+input[type=password]:focus {
+  border-color:#76b2ff;
+  box-shadow:0 0 8px rgba(118,178,255,0.6);
+}
+
+button {
+  margin-top:15px;
+  padding:10px 25px;
+  font-size:16px;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(45deg,#f44336,#e91e63);
+  color:white;
+  cursor:pointer;
+  transition:transform 0.2s;
+}
+button:hover { transform:scale(1.05); }
+
+#msg{color:red;height:1.2em;margin-top:10px;}
+
+#game {
+  display:none;
+  text-align:center;
+  color:#333;
+}
+
+/* 聖誕裝飾 */
+.decoration {
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  display:flex;
+  justify-content:space-between;
+  padding:10px 40px;
+  font-size:2rem;
+  pointer-events:none;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ❄️ 飄雪 -->
+<script>
+for(let i=0;i<40;i++){
+  const snow=document.createElement("div");
+  snow.classList.add("snowflake");
+  snow.textContent=["❄️","❅","❆"][Math.floor(Math.random()*3)];
+  snow.style.left=Math.random()*100+"%";
+  snow.style.animationDuration= (6+Math.random()*5)+"s";
+  snow.style.fontSize=(12+Math.random()*16)+"px";
+  snow.style.animationDelay=Math.random()*5+"s";
+  document.body.appendChild(snow);
+}
+</script>
+
+<!-- 🎀 上方裝飾 -->
+<div class="decoration">
+  <span>🎅</span><span>🎁</span><span>🌟</span><span>🦌</span><span>🎄</span>
+</div>
+
+<!-- 🌟 密碼頁 -->
+<div id="lockscreen">
+  <h1>🎄 聖誕種蘿蔔 🥕</h1>
+  <h2>請輸入活動密碼 🎅</h2>
+  <input type="password" id="pwd" placeholder="輸入密碼" />
+  <br />
+  <button onclick="check()">登入</button>
+  <p id="msg"></p>
+</div>
+
+<!-- 🎮 遊戲內容（成功登入後顯示） -->
+<div id="game">
+  <h1>🥕 歡迎參加聖誕活動！</h1>
+  <p>密碼正確，已成功進入遊戲 🎉</p>
+  <!-- 這裡貼上你的遊戲內容 HTML -->
+</div>
+
+<script>
+const PASSWORD = "600"; // 👈 你自訂活動密碼
+function check(){
+  const v=document.getElementById("pwd").value.trim();
+  if(v===PASSWORD){
+    document.getElementById("lockscreen").style.display="none";
+    document.getElementById("game").style.display="block";
+  }else{
+    document.getElementById("msg").textContent="❌ 密碼錯誤，請再試 🎁";
+  }
+}
+</script>
+
+</body>
+</html>
