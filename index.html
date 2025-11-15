@@ -28,17 +28,11 @@ body {
   animation: fall 10s linear infinite;
 }
 @keyframes fall {
-  0% {
-    transform:translateY(0) rotate(0deg);
-    opacity:1;
-  }
-  100% {
-    transform:translateY(100vh) rotate(360deg);
-    opacity:0;
-  }
+  0% { transform:translateY(0) rotate(0deg); opacity:1;}
+  100% { transform:translateY(100vh) rotate(360deg); opacity:0;}
 }
 
-/* 登入框 */
+/* 登入框樣式 */
 #lockscreen {
   background:rgba(255,255,255,0.85);
   border-radius:20px;
@@ -94,7 +88,6 @@ button {
 button:hover { transform:scale(1.05); }
 
 #msg{color:red;height:1.2em;margin-top:10px;}
-
 #game {
   display:none;
   text-align:center;
@@ -113,6 +106,26 @@ button:hover { transform:scale(1.05); }
   font-size:2rem;
   pointer-events:none;
 }
+
+/* 🔊 音樂控制 */
+#music-control {
+  position:fixed;
+  top:15px;
+  right:15px;
+  background:rgba(255,255,255,0.8);
+  border-radius:50%;
+  width:48px;
+  height:48px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:24px;
+  cursor:pointer;
+  box-shadow:0 0 10px rgba(0,0,0,0.2);
+  z-index:100;
+  transition:transform 0.2s;
+}
+#music-control:hover{transform:scale(1.1);}
 </style>
 </head>
 
@@ -125,7 +138,7 @@ for(let i=0;i<40;i++){
   snow.classList.add("snowflake");
   snow.textContent=["❄️","❅","❆"][Math.floor(Math.random()*3)];
   snow.style.left=Math.random()*100+"%";
-  snow.style.animationDuration= (6+Math.random()*5)+"s";
+  snow.style.animationDuration=(6+Math.random()*5)+"s";
   snow.style.fontSize=(12+Math.random()*16)+"px";
   snow.style.animationDelay=Math.random()*5+"s";
   document.body.appendChild(snow);
@@ -137,25 +150,58 @@ for(let i=0;i<40;i++){
   <span>🎅</span><span>🎁</span><span>🌟</span><span>🦌</span><span>🎄</span>
 </div>
 
+<!-- 🔊 音樂控制 -->
+<div id="music-control" title="切換音樂">🔊</div>
+<audio id="bgm" loop preload="auto">
+  <!-- 📌 用戶需自行上載 MP3 到 repo，例如 bgm.mp3 -->
+  <source src="bgm.mp3" type="audio/mpeg">
+</audio>
+
 <!-- 🌟 密碼頁 -->
 <div id="lockscreen">
   <h1>🎄 聖誕種蘿蔔 🥕</h1>
-  <h2>請輸入活動密碼 🎅</h2>
+  <h2 id="welcomeText">請輸入活動密碼 🎅</h2>
   <input type="password" id="pwd" placeholder="輸入密碼" />
   <br />
   <button onclick="check()">登入</button>
   <p id="msg"></p>
 </div>
 
-<!-- 🎮 遊戲內容（成功登入後顯示） -->
+<!-- 🎮 遊戲內容（登入後顯示） -->
 <div id="game">
-  <h1>🥕 歡迎參加聖誕活動！</h1>
-  <p>密碼正確，已成功進入遊戲 🎉</p>
-  <!-- 這裡貼上你的遊戲內容 HTML -->
+  <h1>🥕 歡迎參加聖誕活動！</h1>
+  <p id="vipInfo"></p>
+  <p>密碼正確，活動將於 2025 年 12 月 1 日 開啟 🎄</p>
 </div>
 
 <script>
-const PASSWORD = "600"; // 👈 你自訂活動密碼
+// 🎵 音樂控制
+let playing=false;
+const bgm=document.getElementById("bgm");
+const control=document.getElementById("music-control");
+control.onclick=()=>{
+  if(!playing){
+    bgm.play();
+    control.textContent="🔈";
+    playing=true;
+  }else{
+    bgm.pause();
+    control.textContent="🔇";
+    playing=false;
+  }
+};
+
+// 讀取 URL 參數 vipid
+const urlParams = new URLSearchParams(window.location.search);
+const vipid = urlParams.get("vipid");
+if(vipid){
+  document.getElementById("welcomeText").innerText =
+    `VIP ${vipid} 🎅 請輸入活動密碼`;
+  document.getElementById("vipInfo").innerText = `VIP 帳號：${vipid}`;
+}
+
+// 密碼檢查
+const PASSWORD="600";
 function check(){
   const v=document.getElementById("pwd").value.trim();
   if(v===PASSWORD){
