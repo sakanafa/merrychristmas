@@ -9,7 +9,7 @@ body{margin:0;font-family:"Nunito",sans-serif;background:linear-gradient(#b4e4ff
 .snowflake{position:fixed;top:-10px;color:white;font-size:1em;animation:fall linear infinite;z-index:5;}
 @keyframes fall{to{transform:translateY(110vh);}}
 
-/* 音樂掣 */
+/* 音樂Button */
 #music-control{
  position:fixed;top:15px;right:15px;width:48px;height:48px;border-radius:50%;
  background:rgba(255,255,255,0.8);display:flex;justify-content:center;align-items:center;
@@ -116,13 +116,14 @@ document.getElementById('music-control').addEventListener("click",(e)=>{
  else{bgm.pause();playing=false;e.target.textContent='🔇';}
 });
 
-// === 登入邏輯 ===
+// === 登入邏輯（立即可開始） ===
 const PASSWORD="600";
 document.getElementById("loginBtn").addEventListener("click",login);
 
 function login(){
  const v=document.getElementById("pwd").value.trim();
  if(v===PASSWORD){
+   // 立刻開啟遊戲
    document.getElementById("lockscreen").style.display="none";
    document.getElementById("game").style.display="block";
    triggerLoginEvent();
@@ -134,11 +135,11 @@ function login(){
 // 🎲 登入隨機事件
 function triggerLoginEvent(){
  const ev=[
-   "🎁 聖誕奇蹟！今日蘿蔔更容易長大！",
-   "☀️ 陽光正好，氣溫適中，適合種植～",
-   "❄️ 飄雪令土壤濕潤～",
-   "🐱 小貓在田裡打滾！好可愛～",
-   "🐇 小兔幫你翻鬆泥土！"
+   "🎁 歡迎嚟到聖誕農場～快啲種第一條蘿蔔啦！",
+   "☀️ 今天天氣好適合耕田！",
+   "❄️ 飄雪中～蘿蔔更甜美啦～",
+   "🐱 小貓喵喵出現！拍張照吧～",
+   "🐇 小兔幫忙翻泥土，好幫手呀！"
  ];
  msg.textContent=ev[Math.floor(Math.random()*ev.length)];
  setTimeout(()=>msg.textContent="",4000);
@@ -159,7 +160,7 @@ const rateEl=document.getElementById("rate");
 const timerText=document.getElementById("timer");
 const plantBtn=document.getElementById("plantBtn");
 
-// 🕛 每天 00:00 自動重置次數
+// 🕛 每天 00:00 重置次數
 function checkDailyReset(){
  const today=new Date().toDateString();
  const last=localStorage.getItem("lastReset");
@@ -173,7 +174,7 @@ function checkDailyReset(){
 }
 checkDailyReset();
 
-// 🌰 種蘿蔔（每日最多20次）
+// 🌰 種蘿蔔
 plantBtn.addEventListener("click",()=>{
  if(plantLimit<=0){msg.textContent="😅 今日 20 次機會用晒啦，凌晨重置～";return;}
  plantLimit--; localStorage.setItem("plantLimit",plantLimit);
@@ -184,28 +185,26 @@ plantBtn.addEventListener("click",()=>{
  el.style.bottom=Math.random()*10+25+"%";
  field.appendChild(el);
  p.el=el;seeds.push(p);
- msg.textContent="🌰 種下咗一粒蘿蔔種子！（3 小時長大)";
+ msg.textContent="🌰 種咗一粒蘿蔔種子！（3小時長大）";
  updateUI();
 });
 
-// 💧 淋水（將 1 條成熟🥕 變安全🌟）
+// 💧 淋水
 document.getElementById("waterBtn").addEventListener("click",()=>{
- if(grown>0){
-   grown--;safeCarrot++;
-   msg.textContent="💧 淋水成功，一條蘿蔔已變成安全蘿蔔 🌟";
- }else msg.textContent="😅 暫時冇成熟蘿蔔～";
+ if(grown>0){grown--;safeCarrot++;msg.textContent="💧 淋水成功，一條變安全蘿蔔 🌟";}
+ else msg.textContent="😅 暫時冇成熟蘿蔔～";
  updateUI();
 });
 
-// 💳 存入農場銀行（全部成熟🥕->🌟）
+// 💳 農場銀行
 document.getElementById("bankBtn").addEventListener("click",()=>{
  if(grown===0){msg.textContent="冇成熟蘿蔔可以存入～";return;}
  safeCarrot+=grown;grown=0;
- msg.textContent="💳 全部成熟蘿蔔已存入農場銀行 🌟";
+ msg.textContent="💳 全部成熟蘿蔔已存入農場銀行 🌟";
  updateUI();
 });
 
-// 🕒 成長：3 小時變 🥕
+// 🕒 成長（3 小時→🥕）
 setInterval(()=>{
  const now=Date.now();
  seeds.forEach(p=>{
@@ -243,7 +242,7 @@ function updateTimer(){
        if(left>0 && (soonest===null||left<soonest))soonest=left;
      }
    });
-   if(soonest){timerText.textContent="⏳ 下一顆蘿蔔剩餘 "+Math.ceil(soonest/60)+" 分鐘";}
+   if(soonest){timerText.textContent="⏳ 下一顆蘿蔔剩餘 "+Math.ceil(soonest/60)+" 分鐘";}
    else timerText.textContent="";
  }
 }
@@ -251,13 +250,10 @@ function updateTimer(){
 // 🐇🐱 小動物動畫
 setInterval(()=>{
  const r=Math.random();
- if(r<0.1){
-   document.getElementById("rabbit").classList.add("run");
-   setTimeout(()=>document.getElementById("rabbit").classList.remove("run"),4000);
- }else if(r<0.2){
-   document.getElementById("cat").classList.add("run");
-   setTimeout(()=>document.getElementById("cat").classList.remove("run"),4000);
- }
+ if(r<0.1){document.getElementById("rabbit").classList.add("run");
+  setTimeout(()=>document.getElementById("rabbit").classList.remove("run"),4000);}
+ else if(r<0.2){document.getElementById("cat").classList.add("run");
+  setTimeout(()=>document.getElementById("cat").classList.remove("run"),4000);}
 },60000);
 
 updateUI();
