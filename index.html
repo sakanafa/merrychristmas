@@ -11,30 +11,25 @@ body{margin:0;font-family:"Nunito",sans-serif;text-align:center;overflow-x:hidde
 #music-control{position:fixed;top:10px;right:10px;width:46px;height:46px;border-radius:50%;
  background:rgba(255,255,255,0.85);display:flex;justify-content:center;align-items:center;
  font-size:22px;cursor:pointer;box-shadow:0 0 8px rgba(0,0,0,0.3);z-index:200;}
-
 #lockscreen{margin:60px auto;width:90%;max-width:420px;padding:25px;background:rgba(255,255,255,0.9);
  border-radius:15px;box-shadow:0 0 10px rgba(0,0,0,0.1);}
 #countdown{font-size:18px;color:#055;margin-bottom:10px;font-weight:bold;}
 .calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:10px;}
 .day{background:#fff;border-radius:6px;padding:6px;font-size:14px;box-shadow:0 0 3px rgba(0,0,0,0.2);}
 .day.checked{background:#90ee90;font-weight:bold;color:#064;}
-.day.today{border:2px solid #f33;}
 .daylabel{grid-column:span 7;text-align:left;font-size:16px;font-weight:bold;margin-top:4px;color:#333;}
 input[type=password]{padding:10px;width:80%;border-radius:8px;border:1.8px solid #88c;}
 button{padding:10px 14px;margin:6px 5px;border:none;border-radius:8px;background:#ff9999;color:white;font-size:16px;cursor:pointer;}
 button:hover{filter:brightness(1.08);}button:disabled{opacity:0.5;cursor:not-allowed;}
-
 #game{display:none;position:relative;}
 .merry{position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;font-size:2em;
  color:#ff4d4d;font-weight:bold;text-shadow:2px 2px 8px #fff;z-index:100;animation:glow 2s ease-in-out infinite alternate;}
 @keyframes glow{from{opacity:0.7;}to{opacity:1;}}
-
 .container{max-width:520px;margin:10px auto;background:rgba(255,255,255,0.95);border-radius:15px;
  box-shadow:0 0 10px rgba(0,0,0,0.1);padding:15px;}
 .value{font-size:18px;margin:4px 0;}
 .progress-container{background:#ccc;border-radius:10px;margin:8px auto;width:90%;height:16px;overflow:hidden;}
 .progress-bar{background:linear-gradient(90deg,#ffca28,#ff9100);height:100%;width:0%;transition:width 0.4s ease;}
-
 #field{position:relative;width:100%;height:200px;border-radius:10px;overflow:hidden;margin-top:10px;
  transition:background 1s;z-index:1;}
 .ground{position:absolute;bottom:0;width:100%;height:60%;background:repeating-linear-gradient(45deg,#784,#693 12px);}
@@ -46,24 +41,19 @@ button:hover{filter:brightness(1.08);}button:disabled{opacity:0.5;cursor:not-all
 #cat.run{animation:cat 4s linear;}
 @keyframes rabbit{0%{right:-50px;opacity:1;}100%{right:110%;opacity:0;}}
 @keyframes cat{0%{left:110%;opacity:1;}100%{left:-50px;opacity:0;}}
-
 .controls{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:10px;}
-.controls button{flex:1 1 45%;min-width:120px;}
+.controls button{flex:1 1 45%;min-width:110px;}
 @media(max-width:420px){.controls button{flex:1 1 100%;width:90%;}}
-
 #rule-box{background:#eef;padding:8px;border-radius:8px;margin-top:6px;font-size:15px;line-height:1.4;display:none;text-align:left;}
 #toggle-rule{background:#88aaff;border:none;border-radius:8px;padding:6px 12px;color:#fff;font-weight:bold;cursor:pointer;margin-top:6px;}
-
 #eventBox{margin-top:8px;min-height:24px;font-weight:bold;color:#333;}
 .bible-text{color:#c33;font-weight:bold;animation:shine 1s ease-in-out infinite alternate;}
 @keyframes shine{0%{color:#c33;}100%{color:#f66;}}
-
 .star{position:absolute;width:2px;height:2px;background:white;border-radius:50%;animation:twinkle 2s infinite ease-in-out;}
 @keyframes twinkle{0%,100%{opacity:0.5;}50%{opacity:1;}}
 .meteor{position:absolute;width:100px;height:2px;background:linear-gradient(90deg,white,rgba(255,255,255,0));
  transform:rotate(45deg);animation:shootLeft 3s linear;}
 @keyframes shootLeft{0%{right:-100px;top:-20px;opacity:0;}10%{opacity:1;}100%{right:110%;top:100%;opacity:0;}}
-
 .bird{position:absolute;top:20px;left:-50px;font-size:1.6em;animation:birdfly 4s linear;}
 @keyframes birdfly{0%{left:-50px;opacity:1;}100%{left:110%;opacity:0;}}
 .sun{position:absolute;top:10px;right:10px;font-size:2em;animation:shineSun 2s ease-in-out infinite alternate;}
@@ -72,19 +62,19 @@ button:hover{filter:brightness(1.08);}button:disabled{opacity:0.5;cursor:not-all
 @keyframes dropSnow{0%{top:-10px;opacity:1;}100%{top:100%;opacity:0;}}
 .rain{position:absolute;color:#00f;animation:dropRain 2s linear;}
 @keyframes dropRain{0%{top:-10px;opacity:1;}100%{top:100%;opacity:0;}}
-
-.flash{animation:flashRed 0.2s alternate 10;@keyframes flashRed{from{filter:brightness(1);}to{filter:brightness(1.5) sepia(1) hue-rotate(-20deg);} }}
+.flash{animation:flashRed 0.2s alternate 10;}
+@keyframes flashRed{from{filter:brightness(1);}to{filter:brightness(1.5) sepia(1) hue-rotate(-20deg);}}
 </style>
 </head>
 <body>
 
-<script>for(let i=0;i<25;i++){let s=document.createElement('div');s.className='snow';s.textContent='❄️';s.style.left=Math.random()*100+'%';
-s.style.fontSize=(10+Math.random()*10)+'px';s.style.animationDuration=(5+Math.random()*5)+'s';document.body.appendChild(s);}</script>
+<script>for(let i=0;i<25;i++){let s=document.createElement('div');s.className='snow';s.textContent='❄️';
+s.style.left=Math.random()*100+'%';s.style.fontSize=(10+Math.random()*10)+'px';
+s.style.animationDuration=(5+Math.random()*5)+'s';document.body.appendChild(s);}</script>
 
 <div id="music-control">🔊</div>
 <audio id="bgm" loop preload="auto"><source src="bgm.mp3" type="audio/mpeg"></audio>
 
-<!-- 登入畫面 -->
 <div id="lockscreen">
  <h2>🎄 聖誕種蘿蔔 🥕</h2>
  <div id="countdown">載入中...</div>
@@ -96,7 +86,6 @@ s.style.fontSize=(10+Math.random()*10)+'px';s.style.animationDuration=(5+Math.ra
  <p id="msg" style="color:red;"></p>
 </div>
 
-<!-- 遊戲畫面 -->
 <div id="game">
  <div class="merry">🎅 MERRY CHRISTMAS 🎁</div>
  <div class="container">
@@ -117,6 +106,7 @@ s.style.fontSize=(10+Math.random()*10)+'px';s.style.animationDuration=(5+Math.ra
    <button id="bankBtn">存入銀行 💳</button>
    <button id="resetBtn" style="background:#77bb77;">🔄 重新開始</button>
    <button id="testBtn" style="background:#59c;">🎄 聖誕測試</button>
+   <button id="growTestBtn" style="background:#ffaa00;">🧪 下一階段測試</button>
   </div>
 
   <button id="toggle-rule">🌱 種植規則</button>
@@ -124,8 +114,8 @@ s.style.fontSize=(10+Math.random()*10)+'px';s.style.animationDuration=(5+Math.ra
    🌱 <b>種植規則：</b><br>
    每棵蘿蔔限種一次、每日限淋一次水。<br>
    淋一次水的收成 +3；兩階段都淋水 +5；未淋水 +1。<br>
-   成熟蘿蔔存入 FARMLAND BANK 後變成銀行儲值💳。<br>
-   12月24日為聖誕節，所有蘿蔔變成聖誕樹／禮物，只供觀賞🎄。
+   成熟蘿蔔存入銀行後變成銀行儲值💳。<br>
+   12月24日為聖誕節，所有蘿蔔變成聖誕樹／禮物🎄。
   </div>
 
   <div id="eventBox">🌤 歡迎回來，小農夫～</div>
@@ -134,13 +124,9 @@ s.style.fontSize=(10+Math.random()*10)+'px';s.style.animationDuration=(5+Math.ra
 
 <script>
 document.addEventListener("DOMContentLoaded",()=>{
- const bgm=document.getElementById("bgm");
- document.getElementById("music-control").onclick=()=>{bgm.paused?bgm.play():bgm.pause();};
-
  const PASSWORD="carrot2025";const saveKey="checkin2025";
- let data=JSON.parse(localStorage.getItem(saveKey)||"[]");
-
  const cal=document.getElementById("calendar");
+ let data=JSON.parse(localStorage.getItem(saveKey)||"[]");
  for(let i=1;i<=24;i++){const d=document.createElement("div");d.className="day";d.textContent=i;
  if(data.includes(i))d.classList.add("checked");cal.appendChild(d);}
  document.getElementById("loginBtn").onclick=()=>{
@@ -148,23 +134,22 @@ document.addEventListener("DOMContentLoaded",()=>{
   if(pwd!==PASSWORD){document.getElementById("msg").textContent="❌ 密碼錯誤";return;}
   const now=new Date();if(now.getMonth()==11&&now.getDate()<=24){
    const day=now.getDate();if(!data.includes(day)){data.push(day);localStorage.setItem(saveKey,JSON.stringify(data));}}
-  document.getElementById("lockscreen").style.display="none";document.getElementById("game").style.display="block";initGame();
+  document.getElementById("lockscreen").style.display="none";
+  document.getElementById("game").style.display="block";initGame();
  };
 
- // 遊戲主體
  function initGame(){
- let seeds=[],safeCarrot=0,bankStored=0,plantLimit=20,waterLimit=1,xmasTest=false;
- let dailyEvents=0;
- const field=document.getElementById("field"),wildEl=document.getElementById("wild"),
- safeEl=document.getElementById("safe"),bankEl=document.getElementById("bank"),
- totalEl=document.getElementById("total"),bar=document.getElementById("bar"),
- eventBox=document.getElementById("eventBox");
- const plantBtn=document.getElementById("plantBtn"),waterBtn=document.getElementById("waterBtn");
+ let seeds=[],safeCarrot=0,bankStored=0,plantLimit=20,waterLimit=1,xmasTest=false,dailyEvents=0;
+ const field=document.getElementById("field"),eventBox=document.getElementById("eventBox");
+ const wildEl=document.getElementById("wild"),safeEl=document.getElementById("safe"),
+ bankEl=document.getElementById("bank"),totalEl=document.getElementById("total"),bar=document.getElementById("bar");
 
  document.getElementById("toggle-rule").onclick=()=>{
   const box=document.getElementById("rule-box");
   box.style.display=(box.style.display==="none"||!box.style.display)?"block":"none";
  };
+
+ function random(min,max){return Math.random()*(max-min)+min;}
 
  function updateFieldStyle(){
    const now=new Date();const hour=now.getHours();
@@ -190,47 +175,6 @@ document.addEventListener("DOMContentLoaded",()=>{
    }
  }
 
- function random(min,max){return Math.random()*(max-min)+min;}
-
- plantBtn.onclick=()=>{if(plantLimit<=0)return;
-  plantLimit--;const el=document.createElement("div");el.className="plant show";el.textContent="🌰";
-  el.style.left=random(5,85)+"%";el.style.bottom=random(25,40)+"%";field.appendChild(el);
-  seeds.push({stage:"seed",wateredSeed:false,wateredSprout:false,start:Date.now(),el});
-  eventBox.textContent="🌱 新蘿蔔種下～";updateUI();
- };
-
- waterBtn.onclick=()=>{if(waterLimit<=0)return;
-  waterLimit--;seeds.forEach(p=>{if(p.stage==="seed")p.wateredSeed=true;else if(p.stage==="sprout")p.wateredSprout=true;});
-  eventBox.textContent="💧 淋水完成！";updateUI();
- };
-
- document.getElementById("bankBtn").onclick=()=>{
-  const today=new Date();const isXmas=(today.getMonth()==11&&today.getDate()==24)||xmasTest;
-  if(isXmas){eventBox.innerHTML="<span class='bible-text'>🎁 聖誕快樂！去銀行看禮物～</span>";return;}
-  let harvested=0;
-  seeds=seeds.filter(p=>{if(p.stage==="grown"){let add=1;
-   if(p.wateredSeed&&p.wateredSprout)add=5;else if(p.wateredSeed||p.wateredSprout)add=3;
-   harvested+=add;setTimeout(()=>p.el.remove(),500);return false;}return true;});
-  if(harvested>0){safeCarrot+=harvested;bankStored+=harvested;
-    eventBox.textContent=`💳 收成 ${harvested} 根，存入銀行！`;}
-  else eventBox.textContent="冇成熟蘿蔔～";
-  updateUI();
- };
-
- document.getElementById("resetBtn").onclick=()=>{
-  if(confirm("確定要重設？"))location.reload();
- };
- document.getElementById("testBtn").onclick=()=>{xmasTest=!xmasTest;updateFieldStyle();};
-
- setInterval(()=>{
-  const now=Date.now();const today=new Date();const isXmas=(today.getMonth()==11&&today.getDate()==24)||xmasTest;
-  if(isXmas){seeds.forEach(p=>p.el.textContent="🎄");updateFieldStyle();return;}
-  seeds.forEach(p=>{const e=(now-p.start)/1000;
-   if(p.stage==="seed"&&e>=5400){p.stage="sprout";p.el.textContent="🌿";}
-   else if(p.stage==="sprout"&&e>=10800){p.stage="grown";p.el.textContent="🥕";}});
-  updateUI();updateFieldStyle();
- },60000);
-
  function updateUI(){
   const growing=seeds.filter(p=>p.stage!=="grown").length;
   const total=growing+safeCarrot;
@@ -240,14 +184,92 @@ document.addEventListener("DOMContentLoaded",()=>{
   bankEl.textContent="FARMLAND BANK 蘿蔔總數🏦："+bankStored;
   totalEl.textContent="總收成："+total+"根";
   bar.style.width=rate+"%";
-  plantBtn.textContent=`種蘿蔔 🌰 (${plantLimit}/20)`;waterBtn.textContent=`淋水 💧 (${waterLimit}/1)`;
-  plantBtn.disabled=plantLimit<=0;waterBtn.disabled=waterLimit<=0;
+  document.getElementById("plantBtn").textContent=`種蘿蔔 🌰 (${plantLimit}/20)`;
+  document.getElementById("waterBtn").textContent=`淋水 💧 (${waterLimit}/1)`;
  }
 
- // === 每日隨機事件 ===
+ // --- 新：聖誕轉換檢查 ---
+ function checkXmasAuto(){
+   const date=new Date();
+   if(date.getMonth()==11&&date.getDate()==24&&!xmasTest){
+     seeds.forEach(p=>p.el.textContent="🎄");
+     eventBox.textContent="🎄 聖誕節到！所有蘿蔔變成聖誕樹！";
+     updateFieldStyle();
+   }
+ }
+
+ // 種植
+ document.getElementById("plantBtn").onclick=()=>{
+  if(plantLimit<=0)return;
+  plantLimit--;
+  const el=document.createElement("div");el.className="plant show";el.textContent="🌰";
+  el.style.left=random(5,85)+"%";el.style.bottom=random(25,40)+"%";
+  field.appendChild(el);
+  seeds.push({stage:"seed",wateredSeed:false,wateredSprout:false,start:Date.now(),el});
+  eventBox.textContent="🌱 新蘿蔔種下～";
+  updateUI();
+ };
+
+ // 淋水
+ document.getElementById("waterBtn").onclick=()=>{
+  if(waterLimit<=0)return;
+  waterLimit--;
+  seeds.forEach(p=>{if(p.stage==="seed")p.wateredSeed=true;else if(p.stage==="sprout")p.wateredSprout=true;});
+  eventBox.textContent="💧 淋水完成！";
+  updateUI();
+ };
+
+ // 儲存入銀行
+ document.getElementById("bankBtn").onclick=()=>{
+  const today=new Date();const isXmas=(today.getMonth()==11&&today.getDate()==24)||xmasTest;
+  if(isXmas){eventBox.innerHTML="<span class='bible-text'>🎁 聖誕快樂！去銀行看禮物～</span>";return;}
+  let harvested=0;
+  seeds=seeds.filter(p=>{
+   if(p.stage==="grown"){let add=1;
+    if(p.wateredSeed&&p.wateredSprout)add=5;
+    else if(p.wateredSeed||p.wateredSprout)add=3;
+    harvested+=add;setTimeout(()=>p.el.remove(),500);return false;}
+   return true;});
+  if(harvested>0){safeCarrot+=harvested;bankStored+=harvested;
+   eventBox.textContent=`💳 收成 ${harvested} 根，存入銀行！`; }
+  else eventBox.textContent="冇成熟蘿蔔～";
+  updateUI();
+ };
+
+ // 重新開始
+ document.getElementById("resetBtn").onclick=()=>{if(confirm("確定要重設？"))location.reload();};
+
+ // 測試切換聖誕場景
+ document.getElementById("testBtn").onclick=()=>{xmasTest=!xmasTest;updateFieldStyle();};
+
+ // 🧪 新增下一階段測試
+ document.getElementById("growTestBtn").onclick=()=>{
+  seeds.forEach(p=>{
+   if(p.stage==="seed"){p.stage="sprout";p.el.textContent="🌿";}
+   else if(p.stage==="sprout"){p.stage="grown";p.el.textContent="🥕";}
+  });
+  eventBox.textContent="🧪 所有植物前進一個階段";
+ };
+
+ // 每分鐘檢查生長
+ setInterval(()=>{
+  checkXmasAuto();
+  const now=Date.now();
+  const date=new Date();
+  const isXmas=(date.getMonth()==11&&date.getDate()==24)||xmasTest;
+  if(isXmas){seeds.forEach(p=>p.el.textContent="🎄");updateFieldStyle();return;}
+  seeds.forEach(p=>{
+   const e=(now-p.start)/1000;
+   if(p.stage==="seed"&&e>=5400){p.stage="sprout";p.el.textContent="🌿";}
+   else if(p.stage==="sprout"&&e>=10800){p.stage="grown";p.el.textContent="🥕";}
+  });
+  updateUI();
+  updateFieldStyle();
+ },60000);
+
+ // 每隔 45 秒隨機事件（2 次限制）
  setInterval(()=>{if(dailyEvents>=2)return;
-  const chance=Math.random();if(chance<0.3){dailyEvents++;
-   triggerEvent();}},45000);
+  if(Math.random()<0.3){dailyEvents++;triggerEvent();}},45000);
 
  function triggerEvent(){
   const r=Math.random();
@@ -262,51 +284,34 @@ document.addEventListener("DOMContentLoaded",()=>{
   else rabbitEat();
  }
 
- function birdEvent(){
-  if(seeds.length>0)seeds.pop();
+ // ---- 事件群 ----
+ function birdEvent(){if(seeds.length>0)seeds.pop();
   const b=document.createElement("div");b.className="bird";b.textContent="🐦";field.appendChild(b);
-  eventBox.textContent="🐦 小鳥吃掉蘿蔔 -1";setTimeout(()=>b.remove(),4000);
- }
- function sunEvent(){
-  const s=document.createElement("div");s.className="sun";s.textContent="☀️";field.appendChild(s);
-  safeCarrot+=2;eventBox.textContent="☀️ 陽光普照 +2 蘿蔔";setTimeout(()=>s.remove(),4000);
- }
- function lavaEvent(){
-  eventBox.textContent="🌋 熔岩燒了蘿蔔！";seeds=seeds.slice(0,1);
-  document.body.classList.add("flash");setTimeout(()=>document.body.classList.remove("flash"),10000);
- }
- function snowEvent(){
-  if(seeds.length>0)seeds.pop();
+  eventBox.textContent="🐦 小鳥吃掉蘿蔔 -1";setTimeout(()=>b.remove(),4000);}
+ function sunEvent(){const s=document.createElement("div");s.className="sun";s.textContent="☀️";field.appendChild(s);
+  safeCarrot+=2;eventBox.textContent="☀️ 陽光普照 +2 蘿蔔";setTimeout(()=>s.remove(),4000);}
+ function lavaEvent(){eventBox.textContent="🌋 熔岩燒了蘿蔔！";seeds=seeds.slice(0,1);
+  document.body.classList.add("flash");setTimeout(()=>document.body.classList.remove("flash"),10000);}
+ function snowEvent(){if(seeds.length>0)seeds.pop();
   for(let i=0;i<15;i++){const s=document.createElement("div");s.className="snowflake";s.textContent="❄️";
-    s.style.left=Math.random()*100+"%";field.appendChild(s);setTimeout(()=>s.remove(),4000);}
-  eventBox.textContent="❄️ 下雪 蘿蔔 -1";
- }
- function rainEvent(){
-  safeCarrot+=2;
+  s.style.left=Math.random()*100+"%";field.appendChild(s);setTimeout(()=>s.remove(),4000);}
+  eventBox.textContent="❄️ 下雪 蘿蔔 -1";}
+ function rainEvent(){safeCarrot+=2;
   for(let i=0;i<20;i++){const r=document.createElement("div");r.className="rain";r.textContent="💧";
-    r.style.left=Math.random()*100+"%";field.appendChild(r);setTimeout(()=>r.remove(),2000);}
-  eventBox.textContent="💧 落雨 蘿蔔 +2";
- }
- function catSteal(){
-  if(seeds.length>0)seeds.pop();
+  r.style.left=Math.random()*100+"%";field.appendChild(r);setTimeout(()=>r.remove(),2000);}
+  eventBox.textContent="💧 落雨 蘿蔔 +2";}
+ function catSteal(){if(seeds.length>0)seeds.pop();
   const c=document.getElementById("cat");c.classList.add("run");
-  eventBox.textContent="🐈 小貓偷走蘿蔔 喵～";setTimeout(()=>c.classList.remove("run"),4000);
- }
- function catWater(){
-  safeCarrot+=1;eventBox.textContent="🐾 小貓幫忙淋水 +1";
+  eventBox.textContent="🐈 小貓偷走蘿蔔 喵～";setTimeout(()=>c.classList.remove("run"),4000);}
+ function catWater(){safeCarrot+=1;eventBox.textContent="🐾 小貓幫忙淋水 +1";
   const drop=document.createElement("div");drop.className="rain";drop.textContent="💧";
-  drop.style.left="50%";drop.style.animationDuration="1s";field.appendChild(drop);setTimeout(()=>drop.remove(),1000);
- }
- function rabbitHelp(){
-  safeCarrot+=1;const r=document.getElementById("rabbit");r.classList.add("run");
-  eventBox.textContent="🐇 小兔幫翻地 +1";setTimeout(()=>r.classList.remove("run"),4000);
- }
- function rabbitEat(){
-  if(seeds.length>0)seeds.pop();
+  drop.style.left="50%";drop.style.animationDuration="1s";field.appendChild(drop);
+  setTimeout(()=>drop.remove(),1000);}
+ function rabbitHelp(){safeCarrot+=1;const r=document.getElementById("rabbit");r.classList.add("run");
+  eventBox.textContent="🐇 小兔幫翻地 +1";setTimeout(()=>r.classList.remove("run"),4000);}
+ function rabbitEat(){if(seeds.length>0)seeds.pop();
   const r=document.getElementById("rabbit");r.classList.add("run");
-  eventBox.textContent="🐇 小兔貪食 咬蘿蔔 🤣";setTimeout(()=>r.classList.remove("run"),4000);
- }
- updateUI();updateFieldStyle();
+  eventBox.textContent="🐇 小兔貪食 咬蘿蔔 🤣";setTimeout(()=>r.classList.remove("run"),4000);}
  }
 });
 </script>
