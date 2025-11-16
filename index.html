@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>🎄 聖誕種蘿蔔 2025 🥕</title>
 <style>
-body{margin:0;font-family:"Nunito",sans-serif;background:linear-gradient(#b3e5ff,#fff);text-align:center;overflow-x:hidden;}
+body{margin:0;font-family:"Nunito",sans-serif;text-align:center;overflow-x:hidden;background:linear-gradient(#b3e5ff,#fff);}
 .snow{position:fixed;top:-10px;color:white;animation:fall linear infinite;z-index:0;}
 @keyframes fall{to{transform:translateY(110vh);}}
-#music-control{position:fixed;top:10px;right:10px;width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,0.85);display:flex;justify-content:center;align-items:center;font-size:24px;cursor:pointer;box-shadow:0 0 8px rgba(0,0,0,0.3);z-index:100;}
+#music-control{position:fixed;top:10px;right:10px;width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,0.85);display:flex;justify-content:center;align-items:center;font-size:22px;cursor:pointer;box-shadow:0 0 8px rgba(0,0,0,0.3);z-index:100;}
+
 #lockscreen{margin:60px auto;width:90%;max-width:420px;padding:25px;background:rgba(255,255,255,0.9);border-radius:15px;box-shadow:0 0 10px rgba(0,0,0,0.1);}
-#lockscreen h2{margin-bottom:8px;}
 #countdown{font-size:18px;color:#055;margin-bottom:10px;font-weight:bold;}
 .calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:10px;}
 .day{background:#fff;border-radius:6px;padding:6px;font-size:14px;box-shadow:0 0 3px rgba(0,0,0,0.2);}
@@ -20,15 +20,17 @@ body{margin:0;font-family:"Nunito",sans-serif;background:linear-gradient(#b3e5ff
 input[type=password]{padding:10px;width:80%;border-radius:8px;border:1.8px solid #88c;}
 button{padding:10px 14px;margin:6px 5px;border:none;border-radius:8px;background:#ff9999;color:white;font-size:16px;cursor:pointer;}
 button:hover{filter:brightness(1.08);}button:disabled{opacity:0.5;cursor:not-allowed;}
+
 #game{display:none;position:relative;}
-.merry{display:none;position:absolute;top:0;width:100%;font-size:2em;color:red;font-weight:bold;animation:glow 1.5s ease-in-out infinite alternate;text-shadow:2px 2px 8px #fff;}
-@keyframes glow{ from{color:#ff8080;text-shadow:0 0 5px #fff;} to{color:#fff;text-shadow:0 0 15px #ff5555;} }
-.container{max-width:520px;margin:10px auto;background:rgba(255,255,255,0.9);border-radius:15px;box-shadow:0 0 10px rgba(0,0,0,0.1);padding:15px;}
+.merry{display:none;position:absolute;top:-40px;width:100%;font-size:2em;color:red;font-weight:bold;animation:glow 1.5s ease-in-out infinite alternate;text-shadow:2px 2px 8px #fff;}
+@keyframes glow{from{color:#ff8080;text-shadow:0 0 5px #fff;}to{color:#fff;text-shadow:0 0 15px #ff5555;}}
+
+.container{max-width:520px;margin:10px auto;background:rgba(255,255,255,0.95);border-radius:15px;box-shadow:0 0 10px rgba(0,0,0,0.1);padding:15px;}
 .value{font-size:18px;margin:4px 0;}
-.progress-container{background:#eee;border-radius:10px;margin:8px auto;width:90%;height:16px;}
-.progress-bar{background:linear-gradient(45deg,#ffcc00,#ffaa00);height:100%;width:0%;transition:width 0.4s ease;}
-#field{position:relative;width:100%;height:200px;background:linear-gradient(#4ae,#3b9);border-radius:10px;overflow:hidden;margin-top:10px;}
-@media(max-width:480px){#field{height:160px;}}
+.progress-container{background:#ccc;border-radius:10px;margin:8px auto;width:90%;height:16px;overflow:hidden;}
+.progress-bar{background:linear-gradient(90deg,#ffca28,#ff9100);height:100%;width:0%;transition:width 0.4s ease;}
+
+#field{position:relative;width:100%;height:200px;border-radius:10px;overflow:hidden;margin-top:10px;transition:background 1s;}
 .ground{position:absolute;bottom:0;width:100%;height:60%;background:repeating-linear-gradient(45deg,#784,#693 12px);}
 .plant{position:absolute;transition:all .5s ease;font-size:2em;opacity:0;}
 .plant.show{opacity:1;}
@@ -38,78 +40,86 @@ button:hover{filter:brightness(1.08);}button:disabled{opacity:0.5;cursor:not-all
 #cat.run{animation:cat 4s linear;}
 @keyframes rabbit{0%{left:-50px;opacity:1;}100%{left:110%;opacity:0;}}
 @keyframes cat{0%{left:110%;opacity:1;}100%{left:-50px;opacity:0;}}
+
 .controls{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:10px;}
 .controls button{flex:1 1 45%;min-width:120px;}
 @media(max-width:420px){.controls button{flex:1 1 100%;width:90%;}}
-#rule-box{background:#eef;padding:8px;border-radius:8px;margin-top:6px;font-size:15px;line-height:1.4;}
+
+#rule-box{background:#eef;padding:8px;border-radius:8px;margin-top:6px;font-size:15px;line-height:1.4;display:none;text-align:left;}
+#toggle-rule{background:#88aaff;border:none;border-radius:8px;padding:6px 12px;color:#fff;font-weight:bold;cursor:pointer;margin-top:6px;}
+
 #eventBox{margin-top:8px;min-height:24px;font-weight:bold;color:#333;}
 .bible-text{color:#c33;font-weight:bold;animation:shine 1s ease-in-out infinite alternate;}
 @keyframes shine{0%{color:#c33;}100%{color:#f66;}}
+
+/* 星星閃爍 + 流星 */
+.star{position:absolute;width:2px;height:2px;background:white;border-radius:50%;animation:twinkle 2s infinite ease-in-out;}
+@keyframes twinkle{0%,100%{opacity:0.5;}50%{opacity:1;}}
+.meteor{position:absolute;width:100px;height:2px;background:linear-gradient(90deg,white,rgba(255,255,255,0));transform:rotate(-45deg);animation:shoot 3s linear;}
+@keyframes shoot{0%{left:-100px;top:-20px;opacity:0;}10%{opacity:1;}100%{left:100%;top:100%;opacity:0;}}
 </style>
 </head>
 <body>
 
-<script>for(let i=0;i<35;i++){let s=document.createElement('div');s.className='snow';s.textContent='❄️';s.style.left=Math.random()*100+'%';s.style.fontSize=(10+Math.random()*10)+'px';s.style.animationDuration=(5+Math.random()*5)+'s';document.body.appendChild(s);}</script>
+<script>for(let i=0;i<25;i++){let s=document.createElement('div');s.className='snow';s.textContent='❄️';s.style.left=Math.random()*100+'%';s.style.fontSize=(10+Math.random()*10)+'px';s.style.animationDuration=(5+Math.random()*5)+'s';document.body.appendChild(s);}</script>
 
 <div id="music-control">🔊</div>
 <audio id="bgm" loop preload="auto"><source src="bgm.mp3" type="audio/mpeg"></audio>
 
-<!-- ===== 登入畫面 + 倒數 + 打卡日曆 ===== -->
+<!-- 登入畫面 -->
 <div id="lockscreen">
  <h2>🎄 聖誕種蘿蔔 🥕</h2>
  <div id="countdown">載入中...</div>
-
- <div class="daylabel">🎅 聖誕打卡日曆（12月1日–24日 🎁）</div>
+ <div class="daylabel">🎅 聖誕打卡日曆（12月1–24）</div>
  <div id="calendar" class="calendar"></div>
-
  <p>請輸入活動密碼：</p>
  <input type="password" id="pwd" placeholder="輸入密碼"><br>
  <button id="loginBtn">登入</button>
  <p id="msg" style="color:red;"></p>
 </div>
 
-<!-- ===== 遊戲畫面 ===== -->
+<!-- 遊戲畫面 -->
 <div id="game">
  <div class="merry" id="merryText">🎅 MERRY CHRISTMAS 🎁</div>
  <div class="container">
   <h3>👩‍🌾 聖誕種蘿蔔 活動版</h3>
-  <div class="value" id="wild">野生蘿蔔🥕：0</div>
-  <div class="value" id="safe">安全蘿蔔🌟：0</div>
-  <div class="value" id="bank">FARMLAND BANK 存入蘿蔔🏦：0</div>
-  <div class="value" id="total">總收成：0 根</div>
-  <div class="value" id="rate">達標蘿蔔儲存率：0%</div>
-  <div class="value" id="goal"></div>
+
+  <div class="value" id="wild">種植中🥕：0</div>
+  <div class="value" id="safe">銀行儲值💳：0</div>
+  <div class="value" id="bank">FARMLAND BANK 蘿蔔總數🏦：0</div>
+  <div class="value" id="total">總收成：0根</div>
+
   <div class="progress-container"><div class="progress-bar" id="bar"></div></div>
 
   <div id="field"><div class="ground"></div><div class="icon" id="rabbit">🐇</div><div class="icon" id="cat">🐱</div></div>
 
   <div class="controls">
-   <button id="plantBtn">種蘿蔔 🌰 (20/20)</button>
-   <button id="waterBtn">淋水 💧 (1/1)</button>
+   <button id="plantBtn">種蘿蔔 🌰 (20/20)</button>
+   <button id="waterBtn">淋水 💧 (1/1)</button>
    <button id="bankBtn">存入銀行 💳</button>
    <button id="resetBtn" style="background:#77bb77;">🔄 重新開始</button>
    <button id="testBtn" style="background:#59c;">🎄 聖誕測試</button>
   </div>
 
+  <button id="toggle-rule">🌱 顯示／收起 種植規則</button>
   <div id="rule-box">
    🌱 <b>種植規則：</b><br>
    每棵蘿蔔限種一次、每日限淋一次水。<br>
-   淋過一次水的收成 +3；兩階段都淋水 +5；未淋水 +1。<br>
-   成熟蘿蔔存入 FARMLAND BANK 後會變成安全蘿蔔🌟。<br>
-   12 月 24 日為聖誕節，所有蘿蔔會變成聖誕樹／禮物，只供觀賞。🎄
+   淋一次水的收成 +3；兩階段都淋水 +5；未淋水 +1。<br>
+   成熟蘿蔔存入 FARMLAND BANK 後變成銀行儲值💳。<br>
+   12月24日為聖誕節，所有蘿蔔會變成聖誕樹／禮物，只供觀賞🎄。
   </div>
 
-  <div id="eventBox">🌤 歡迎回來，小農夫～</div>
+  <div id="eventBox">🌤 歡迎回來，小兔子～</div>
  </div>
 </div>
 
 <script>
 document.addEventListener("DOMContentLoaded",()=>{
- // 背景音樂控制
- const bgm=document.getElementById("bgm");let playing=false;
+ const bgm=document.getElementById("bgm");
+ let playing=false;
  document.getElementById("music-control").onclick=()=>{
-  playing=!playing;
-  playing?(bgm.play(),musicControl.textContent="🔈"):(bgm.pause(),musicControl.textContent="🔇");
+  playing=!playing;playing?(bgm.play(),musicControl.textContent="🔈"):(bgm.pause(),musicControl.textContent="🔇");
  };
 
  const PASSWORD="carrot2025";
@@ -118,176 +128,188 @@ document.addEventListener("DOMContentLoaded",()=>{
  const saveKey="checkin2025";
  let data=JSON.parse(localStorage.getItem(saveKey)||"[]");
 
- // ==== 倒數只顯示天數 ====
  function updateCountdown(){
    const now=new Date();
-   const year=now.getFullYear();
-   const christmas=new Date(year,11,24);
-   let diff=christmas-now;
+   const xmas=new Date(now.getFullYear(),11,24);
+   const diff=xmas-now;
    if(diff<=0){countdownEl.textContent="🎅 聖誕節到了！";return;}
    const days=Math.ceil(diff/(1000*60*60*24));
    countdownEl.textContent=`距離聖誕節還有 ${days} 天 🎁`;
  }
- setInterval(updateCountdown,3600000);
- updateCountdown();
+ setInterval(updateCountdown,3600000); updateCountdown();
 
- // ==== 打卡日曆生成 ====
  for(let i=1;i<=24;i++){
-   const d=document.createElement("div");
-   d.className="day";
-   d.textContent=i;
-   if(data.includes(i)) d.classList.add("checked");
-   const today=new Date();
-   if(today.getMonth()===11 && today.getDate()===i) d.classList.add("today");
+   const d=document.createElement("div");d.className="day";d.textContent=i;
+   if(data.includes(i))d.classList.add("checked");
+   const now=new Date();if(now.getMonth()==11&&now.getDate()==i)d.classList.add("today");
    cal.appendChild(d);
  }
 
- // ==== 登入同時打卡 ====
  document.getElementById("loginBtn").onclick=()=>{
    const pwd=document.getElementById("pwd").value.trim();
    if(pwd!==PASSWORD){document.getElementById("msg").textContent="❌ 密碼錯誤";return;}
-   const now=new Date();
-   if(now.getMonth()===11 && now.getDate()<=24){
-     const day=now.getDate();
-     if(!data.includes(day)){
-       data.push(day);
-       localStorage.setItem(saveKey,JSON.stringify(data));
-       alert(`✅ 打卡完成！今天是 12 月 ${day} 日`);
-     }
-     document.querySelectorAll(".day").forEach(e=>{
-        if(parseInt(e.textContent)==day) e.classList.add("checked");
-     });
+   const now=new Date();if(now.getMonth()==11&&now.getDate()<=24){
+    const day=now.getDate();
+    if(!data.includes(day)){data.push(day);localStorage.setItem(saveKey,JSON.stringify(data));alert(`✅ 打卡完成！12月${day}日 💮`);}
    }
    document.getElementById("lockscreen").style.display="none";
    document.getElementById("game").style.display="block";
-   loadData();
+   initGame();
  };
 
- // ===== 以下為遊戲邏輯 =====
+ function random(min,max){return Math.random()*(max-min)+min;}
+
+ // ====== GAME ======
+ function initGame(){
  let seeds=[],safeCarrot=0,bankStored=0,plantLimit=20,waterLimit=1,xmasTest=false;
  const field=document.getElementById("field"),wildEl=document.getElementById("wild"),
  safeEl=document.getElementById("safe"),bankEl=document.getElementById("bank"),
- totalEl=document.getElementById("total"),rateEl=document.getElementById("rate"),
- goalEl=document.getElementById("goal"),bar=document.getElementById("bar"),
+ totalEl=document.getElementById("total"),bar=document.getElementById("bar"),
  eventBox=document.getElementById("eventBox"),merry=document.getElementById("merryText");
 
- const GOAL_CARROTS=400,GOAL_DAYS=8,perDay=Math.ceil(GOAL_CARROTS/GOAL_DAYS);
- goalEl.textContent=`🎯 中上級目標：${GOAL_CARROTS} 根（約 ${perDay} 根／天）`;
+ const plantBtn=document.getElementById("plantBtn"),waterBtn=document.getElementById("waterBtn");
 
+ document.getElementById("toggle-rule").onclick=()=>{
+  const box=document.getElementById("rule-box");
+  box.style.display=(box.style.display==="none"||!box.style.display)?"block":"none";
+ };
+
+ // 早晚雪地變化
+ function updateFieldStyle(){
+   const now=new Date();
+   const hour=now.getHours();
+   const isXmas=(now.getMonth()==11&&now.getDate()==24)||xmasTest;
+   if(isXmas){
+     field.style.background="linear-gradient(#002244,#445)";
+     field.querySelector(".ground").style.background="repeating-linear-gradient(45deg,#ccd,#eef 12px)";
+     // 星星 & 流星
+     field.querySelectorAll('.star,.meteor').forEach(e=>e.remove());
+     for(let i=0;i<40;i++){
+        let st=document.createElement("div");
+        st.className="star";
+        st.style.left=Math.random()*100+"%";
+        st.style.top=Math.random()*40+"%";
+        st.style.animationDelay=(Math.random()*2)+"s";
+        field.appendChild(st);
+     }
+     if(Math.random()<0.3){
+       let m=document.createElement("div");m.className="meteor";field.appendChild(m);
+       setTimeout(()=>m.remove(),3000);
+     }
+   }else if(hour>=6&&hour<18){
+     field.style.background="linear-gradient(#aee7ff,#8be25d)";
+     field.querySelector(".ground").style.background="repeating-linear-gradient(45deg,#784,#693 12px)";
+     field.querySelectorAll('.star,.meteor').forEach(e=>e.remove());
+   }else{
+     field.style.background="linear-gradient(#003,#336)";
+     field.querySelector(".ground").style.background="repeating-linear-gradient(45deg,#384,#274 12px)";
+     field.querySelectorAll('.star,.meteor').forEach(e=>e.remove());
+     for(let i=0;i<20;i++){
+        const st=document.createElement("div");
+        st.className="star";st.style.left=Math.random()*100+"%";st.style.top=Math.random()*30+"%";
+        field.appendChild(st);
+     }
+   }
+ }
+
+ const iconForStage=s=>s==="seed"?"🌰":s==="sprout"?"🌿":s==="grown"?"🥕":"🎄";
+ function simplifySeeds(){return seeds.map(p=>({stage:p.stage,wateredSeed:p.wateredSeed,wateredSprout:p.wateredSprout,start:p.start,left:p.el.style.left,bottom:p.el.style.bottom}));}
  function saveData(){const d={seeds:simplifySeeds(),safeCarrot,bankStored,plantLimit,waterLimit};localStorage.setItem("carrot2025Data",JSON.stringify(d));}
  function loadData(){
-  const raw=localStorage.getItem("carrot2025Data");
-  if(raw){
-   const d=JSON.parse(raw);
-   safeCarrot=d.safeCarrot||0;bankStored=d.bankStored||0;plantLimit=d.plantLimit??20;waterLimit=d.waterLimit??1;
-   d.seeds?.forEach(p=>{
-    const el=document.createElement("div");
-    el.className="plant show";el.textContent=iconForStage(p.stage);
-    el.style.left=p.left;el.style.bottom=p.bottom;
-    field.appendChild(el);
-    seeds.push({...p,el});
-   });
+  const raw=localStorage.getItem("carrot2025Data");if(raw){
+    const d=JSON.parse(raw);
+    safeCarrot=d.safeCarrot||0;bankStored=d.bankStored||0;plantLimit=d.plantLimit??20;waterLimit=d.waterLimit??1;
+    d.seeds?.forEach(p=>{
+      const el=document.createElement("div");
+      el.className="plant show";el.textContent=iconForStage(p.stage);
+      el.style.left=p.left;el.style.bottom=p.bottom;field.appendChild(el);
+      seeds.push({...p,el});
+    });
   }
   updateUI();
  }
- function simplifySeeds(){return seeds.map(p=>({stage:p.stage,wateredSeed:p.wateredSeed,wateredSprout:p.wateredSprout,start:p.start,left:p.el.style.left,bottom:p.el.style.bottom}));}
- const iconForStage=st=>st==="seed"?"🌰":st==="sprout"?"🌿":st==="grown"?"🥕":"🎄";
+ loadData();
 
- const plantBtn=document.getElementById("plantBtn"),waterBtn=document.getElementById("waterBtn");
  plantBtn.onclick=()=>{
-  if(plantLimit<=0){eventBox.textContent="🚫 今日種夠啦～";return;}
+  if(plantLimit<=0){eventBox.textContent="🚫 種完啦";return;}
   plantLimit--;
   const el=document.createElement("div");el.className="plant show";el.textContent="🌰";
-  el.style.left=Math.random()*80+5+"%";el.style.bottom=Math.random()*10+25+"%";
-  field.appendChild(el);
+  el.style.left=random(5,85)+"%";el.style.bottom=random(25,40)+"%";field.appendChild(el);
   seeds.push({stage:"seed",wateredSeed:false,wateredSprout:false,start:Date.now(),el});
-  eventBox.textContent="🌱 種下新蘿蔔！";
-  updateUI();saveData();
+  eventBox.textContent="🌱 新蘿蔔種下～";updateUI();saveData();
  };
  waterBtn.onclick=()=>{
-  if(waterLimit<=0){eventBox.textContent="💧 今日已經淋過喇！";return;}
-  waterLimit--;seeds.forEach(p=>{
-   if(p.stage==="seed"&&!p.wateredSeed)p.wateredSeed=true;
-   if(p.stage==="sprout"&&!p.wateredSprout)p.wateredSprout=true;
-  });
-  eventBox.textContent="💧 淋水成功！";
-  updateUI();saveData();
+  if(waterLimit<=0){eventBox.textContent="💧 今日已淋過～";return;}
+  waterLimit--;seeds.forEach(p=>{if(p.stage==="seed")p.wateredSeed=true;else if(p.stage==="sprout")p.wateredSprout=true;});
+  eventBox.textContent="💧 淋水完成！";updateUI();saveData();
  };
 
  document.getElementById("bankBtn").onclick=()=>{
   const today=new Date();
-  const isXmas=(today.getMonth()===11&&today.getDate()===24)||xmasTest;
-  if(isXmas){eventBox.innerHTML="<span class='bible-text'>🎉 聖誕到了！！！<br>請到 FARMLAND BANK 找花貓小姐換拎你的聖誕禮物！！！</span>";return;}
+  const isXmas=(today.getMonth()==11&&today.getDate()==24)||xmasTest;
+  if(isXmas){eventBox.innerHTML="<span class='bible-text'>🎁 聖誕節快樂！去 FARMLAND BANK 拿禮物！</span>";return;}
   let harvested=0;
   seeds=seeds.filter(p=>{
    if(p.stage==="grown"){
     let add=1;if(p.wateredSeed&&p.wateredSprout)add=5;else if(p.wateredSeed||p.wateredSprout)add=3;
-    harvested+=add;setTimeout(()=>p.el.remove(),1000);return false;
+    harvested+=add;setTimeout(()=>p.el.remove(),500);return false;
    }return true;
   });
-  if(harvested>0){safeCarrot+=harvested;bankStored+=harvested;eventBox.textContent=`💳 收成 ${harvested} 根安全蘿蔔，已存入 FARMLAND BANK！`;}
-  else eventBox.textContent="冇成熟蘿蔔可以收成～";
+  if(harvested>0){safeCarrot+=harvested;bankStored+=harvested;eventBox.textContent=`💳 收成 ${harvested} 根，存入銀行！`;}
+  else eventBox.textContent="冇成熟蘿蔔～";
   updateUI();saveData();
  };
 
  document.getElementById("resetBtn").onclick=()=>{
-  if(confirm("確定要重新開始？")){
-   localStorage.removeItem("carrot2025Data");
-   seeds=[];safeCarrot=bankStored=0;plantLimit=20;waterLimit=1;
-   field.querySelectorAll(".plant").forEach(p=>p.remove());
-   xmasTest=false;merry.style.display="none";
-   eventBox.textContent="🔄 已重設進度。";
-   updateUI();
+  if(confirm("確定要重設？")){
+    localStorage.removeItem("carrot2025Data");
+    seeds=[];safeCarrot=bankStored=0;plantLimit=20;waterLimit=1;field.querySelectorAll(".plant").forEach(e=>e.remove());
+    xmasTest=false;merry.style.display="none";eventBox.textContent="🔄 已重設進度";updateUI();
   }
  };
-
  document.getElementById("testBtn").onclick=()=>{
   xmasTest=!xmasTest;
-  if(xmasTest){
-    merry.style.display="block";
-    eventBox.innerHTML="<span class='bible-text'>🎉 聖誕到了！！！<br>請到 FARMLAND BANK 找花貓小姐換拎你的聖誕禮物！！！</span>";
-    seeds.forEach(p=>{
-      if(p.stage==="grown"){const icons=["🎁","🎄","🎅","⭐","🕯️"];p.el.textContent=icons[Math.floor(Math.random()*icons.length)];}
-    });
-  }else{merry.style.display="none";eventBox.textContent="❄️ 聖誕測試模式關閉";}
+  if(xmasTest){merry.style.display="block";eventBox.innerHTML="<span class='bible-text'>🎄 聖誕到！全部變聖誕樹～</span>";}
+  else{merry.style.display="none";eventBox.textContent="❄️ 聖誕測試關閉";}
+  updateFieldStyle();
  };
 
- // 成長循環 + 聖誕自動切換
  setInterval(()=>{
-   const now=Date.now();const today=new Date();
-   const isXmas=(today.getMonth()===11&&today.getDate()===24)||xmasTest;
-   if(isXmas){seeds.forEach(p=>{const icons=["🎁","🎄","🎅","⭐"];p.el.textContent=icons[Math.floor(Math.random()*icons.length)];});merry.style.display="block";return;}
-   else merry.style.display="none";
-   for(const p of seeds){
-     const elapsed=(now-p.start)/1000;
-     if(p.stage==="seed"&&elapsed>=5400){p.stage="sprout";p.el.textContent="🌿";}
-     else if(p.stage==="sprout"&&elapsed>=10800){p.stage="grown";p.el.textContent="🥕";}
-   }
-   updateUI();saveData();
+  const now=Date.now();const today=new Date();
+  const isXmas=(today.getMonth()==11&&today.getDate()==24)||xmasTest;
+  if(isXmas){
+    seeds.forEach(p=>{const icons=["🎄","🎁","⭐"];p.el.textContent=icons[Math.floor(Math.random()*icons.length)];});
+    merry.style.display="block";updateFieldStyle();return;}
+  else merry.style.display="none";
+  for(const p of seeds){
+    const elap=(now-p.start)/1000;
+    if(p.stage==="seed"&&elap>=5400){p.stage="sprout";p.el.textContent="🌿";}
+    else if(p.stage==="sprout"&&elap>=10800){p.stage="grown";p.el.textContent="🥕";}
+  }
+  updateUI();saveData();updateFieldStyle();
  },60000);
 
- // 隨機事件
  setInterval(()=>{
-   const r=Math.random(),tod=new Date();
-   const isXmas=(tod.getMonth()===11&&tod.getDate()===24)||xmasTest;
-   if(isXmas){eventBox.innerHTML="<span class='bible-text'>🎉 聖誕到了！！！<br>請到 FARMLAND BANK 找花貓小姐換拎你的聖誕禮物！！！</span>";return;}
+   const r=Math.random();
    const rabbit=document.getElementById("rabbit"),cat=document.getElementById("cat");
-   if(r<0.1){rabbit.classList.add("run");eventBox.textContent="🐇 野兔跑過田邊～";setTimeout(()=>rabbit.classList.remove("run"),4000);}
-   else if(r<0.2){cat.classList.add("run");eventBox.textContent="🐱 小貓巡田～";setTimeout(()=>cat.classList.remove("run"),4000);}
+   if(r<0.1){rabbit.classList.add("run");eventBox.textContent="🐇 野兔經過";setTimeout(()=>rabbit.classList.remove("run"),4000);}
+   else if(r<0.2){cat.classList.add("run");eventBox.textContent="🐱 小貓巡田";setTimeout(()=>cat.classList.remove("run"),4000);}
  },45000);
 
  function updateUI(){
-   const wild=seeds.filter(p=>p.stage!=="grown").length;
-   const total=wild+safeCarrot;
-   const rate=total?Math.round((safeCarrot/400)*100):0;
-   wildEl.textContent="野生蘿蔔🥕："+wild;
-   safeEl.textContent="安全蘿蔔🌟："+safeCarrot;
-   bankEl.textContent="FARMLAND BANK 存入蘿蔔🏦："+bankStored;
-   totalEl.textContent="總收成："+total+" 根";
-   rateEl.textContent="達標蘿蔔儲存率："+rate+"%";
-   bar.style.width=Math.min(rate,100)+"%";
-   plantBtn.textContent=`種蘿蔔 🌰 (${plantLimit}/20)`;waterBtn.textContent=`淋水 💧 (${waterLimit}/1)`;
+   const growing=seeds.filter(p=>p.stage!=="grown").length;
+   const total=growing+safeCarrot;
+   const rate=Math.min(Math.round((safeCarrot/400)*100),100);
+   wildEl.textContent="種植中🥕："+growing;
+   safeEl.textContent="銀行儲值💳："+safeCarrot;
+   bankEl.textContent="FARMLAND BANK 蘿蔔總數🏦："+bankStored;
+   totalEl.textContent="總收成："+total+"根";
+   bar.style.width=rate+"%";
+   plantBtn.textContent=`種蘿蔔 🌰 (${plantLimit}/20)`;waterBtn.textContent=`淋水 💧 (${waterLimit}/1)`;
    plantBtn.disabled=plantLimit<=0;waterBtn.disabled=waterLimit<=0;
+   updateFieldStyle();
+ }
+ updateFieldStyle();
  }
 });
 </script>
