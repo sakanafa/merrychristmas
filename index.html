@@ -29,11 +29,17 @@ button:hover{filter:brightness(1.08);}button:disabled{opacity:0.5;cursor:not-all
 
 /* 遊戲 */
 #game{display:none;position:relative;}
-.merry{position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;
+.merry{display:none;position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;
  font-size:2em;font-weight:bold;color:#ff4d4d;z-index:100;
- animation:merryGlow 2s ease-in-out infinite alternate, merryJump 1.5s ease-in-out infinite;}
-@keyframes merryGlow{0%{text-shadow:0 0 10px #fff,0 0 20px #ff4d4d;}100%{text-shadow:0 0 15px #ffe,0 0 25px #f33;}}
-@keyframes merryJump{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(-10px) scale(1.1);}}
+ animation:merryGlow 2s ease-in-out infinite alternate, merryJump 2s ease-in-out infinite;}
+@keyframes merryGlow{
+  0%{text-shadow:0 0 5px #fff,0 0 10px #ff4d4d;}
+  100%{text-shadow:0 0 10px #ffe,0 0 15px #f33;}
+}
+@keyframes merryJump{
+  0%,100%{transform:translateX(-50%) translateY(0);}
+  50%{transform:translateX(-50%) translateY(-5px) scale(1.05);}
+}
 
 .container{max-width:520px;margin:10px auto;background:rgba(255,255,255,0.95);
  border-radius:15px;box-shadow:0 0 10px rgba(0,0,0,0.1);padding:15px;}
@@ -65,17 +71,19 @@ button:hover{filter:brightness(1.08);}button:disabled{opacity:0.5;cursor:not-all
 .meteor{position:absolute;width:100px;height:2px;background:linear-gradient(90deg,white,rgba(255,255,255,0));
  transform:rotate(45deg);animation:shootLeft 3s linear;}
 @keyframes shootLeft{0%{right:-100px;top:-20px;opacity:0;}10%{opacity:1;}100%{right:110%;top:100%;opacity:0;}}
+
 /* 聖誕提示彈窗 */
 #xmasPopup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
 background:rgba(255,255,255,0.95);padding:30px 40px;border-radius:15px;
 box-shadow:0 0 20px rgba(255,0,0,0.4);font-size:24px;color:#e00;z-index:1000;
 animation:popfade 3s ease-in-out;cursor:pointer;}
-@keyframes popfade{0%{opacity:0;transform:translate(-50%,-50%) scale(0.8);}10%{opacity:1;transform:translate(-50%,-50%) scale(1.1);}
+@keyframes popfade{0%{opacity:0;transform:translate(-50%,-50%) scale(0.8);}10%{opacity:1;transform:translate(-50%,-50%) scale(1.05);}
 90%{opacity:1;}100%{opacity:0;transform:translate(-50%,-50%) scale(0.9);}}
 </style>
 </head>
 <body>
 
+<!-- 雪花背景 -->
 <script>for(let i=0;i<25;i++){let s=document.createElement('div');s.className='snow';s.textContent='❄️';
 s.style.left=Math.random()*100+'%';s.style.fontSize=(10+Math.random()*10)+'px';
 s.style.animationDuration=(5+Math.random()*5)+'s';document.body.appendChild(s);}</script>
@@ -95,7 +103,7 @@ s.style.animationDuration=(5+Math.random()*5)+'s';document.body.appendChild(s);}
 </div>
 
 <div id="game">
- <div class="merry">🎅 MERRY CHRISTMAS 🎁</div>
+ <div class="merry" id="merryText">🎅 MERRY CHRISTMAS 🎁</div>
  <div class="container">
   <h3>👩‍🌾 聖誕種蘿蔔 活動版</h3>
 
@@ -106,7 +114,7 @@ s.style.animationDuration=(5+Math.random()*5)+'s';document.body.appendChild(s);}
 
   <div class="progress-container"><div class="progress-bar" id="bar"></div></div>
 
-  <div id="field"><div class="ground"></div><div class="icon" id="rabbit">🐇</div><div class="icon" id="cat">🐈</div></div>
+  <div id="field"><div class="ground"></div></div>
 
   <div class="controls">
    <button id="plantBtn">種蘿蔔 🌰 (20/20)</button>
@@ -149,124 +157,44 @@ document.addEventListener("DOMContentLoaded",()=>{
  };
 
  function initGame(){
- let seeds=[],safeCarrot=0,bankStored=0,plantLimit=20,waterLimit=1,xmasTest=false;
- const field=document.getElementById("field"),eventBox=document.getElementById("eventBox");
- const wildEl=document.getElementById("wild"),safeEl=document.getElementById("safe"),
- bankEl=document.getElementById("bank"),totalEl=document.getElementById("total"),bar=document.getElementById("bar");
+ const field=document.getElementById("field");
+ const merry=document.getElementById("merryText");
+ const today=new Date();
 
- document.getElementById("toggle-rule").onclick=()=>{
-  const box=document.getElementById("rule-box");
-  box.style.display=(box.style.display==="none"||!box.style.display)?"block":"none";
- };
+ /** 只在 12 月 24 日 顯示 MERRY CHRSITMAS **/
+ if(today.getMonth()==11 && today.getDate()==24){
+   merry.style.display="block";
+ } else {
+   merry.style.display="none";
+ }
 
- /** 初始畫面修正 **/
+ // 初始化背景和介面
  updateFieldStyle();
 
- function random(min,max){return Math.random()*(max-min)+min;}
- function showPopup(msg){
-   const p=document.createElement("div");
-   p.id="xmasPopup";p.innerHTML=msg;document.body.appendChild(p);
-   setTimeout(()=>p.remove(),3000);p.onclick=()=>p.remove();
- }
-
  function updateFieldStyle(){
-   const now=new Date();const hour=now.getHours();
-   const isXmas=(now.getMonth()==11&&now.getDate()==24)||xmasTest;
+   const hour=(new Date()).getHours();
+   const isXmas=(today.getMonth()==11 && today.getDate()==24);
    if(isXmas){
-     field.style.background="linear-gradient(#002244,#445)";
-     field.querySelector(".ground").style.background="repeating-linear-gradient(45deg,#ccd,#eef 12px)";
-     field.querySelectorAll('.star,.meteor').forEach(e=>e.remove());
-     for(let i=0;i<40;i++){let st=document.createElement("div");st.className="star";
-       st.style.right=Math.random()*100+"%";st.style.top=Math.random()*40+"%";
-       st.style.animationDelay=(Math.random()*2)+"s";field.appendChild(st);}
-   }else if(hour>=6&&hour<18){
+     field.style.background="linear-gradient(#001133,#335)";
+     field.querySelector(".ground").style.background="repeating-linear-gradient(45deg,#ccc,#eef 12px)";
+     // 星空
+     for(let i=0;i<30;i++){
+       const st=document.createElement("div");
+       st.className="star";
+       st.style.top=Math.random()*40+"%";
+       st.style.left=Math.random()*100+"%";
+       st.style.animationDelay=Math.random()*2+"s";
+       field.appendChild(st);
+     }
+   } else if(hour>=6&&hour<18){
      field.style.background="linear-gradient(#aee7ff,#8be25d)";
      field.querySelector(".ground").style.background="repeating-linear-gradient(45deg,#784,#693 12px)";
-     field.querySelectorAll('.star,.meteor').forEach(e=>e.remove());
-   }else{
+   } else {
      field.style.background="linear-gradient(#003,#336)";
      field.querySelector(".ground").style.background="repeating-linear-gradient(45deg,#384,#274 12px)";
-     field.querySelectorAll('.star,.meteor').forEach(e=>e.remove());
-     for(let i=0;i<15;i++){const st=document.createElement("div");
-       st.className="star";st.style.left=Math.random()*100+"%";st.style.top=Math.random()*30+"%";field.appendChild(st);}
    }
  }
-
- function updateUI(){
-  const growing=seeds.filter(p=>p.stage!=="grown").length;
-  const total=growing+safeCarrot;
-  const rate=Math.min(Math.round((safeCarrot/400)*100),100);
-  wildEl.textContent="種植中🥕："+growing;
-  safeEl.textContent="銀行儲值💳："+safeCarrot;
-  bankEl.textContent="FARMLAND BANK 蘿蔔總數🏦："+bankStored;
-  totalEl.textContent="總收成："+total+"根";
-  bar.style.width=rate+"%";
-  document.getElementById("plantBtn").textContent=`種蘿蔔 🌰 (${plantLimit}/20)`;
-  document.getElementById("waterBtn").textContent=`淋水 💧 (${waterLimit}/1)`;
  }
-
- function changeAllToTrees(){ seeds.forEach(p=>p.el.textContent="🎄"); updateFieldStyle(); }
-
- // 🔄 按聖誕測試即時切換
- document.getElementById("testBtn").onclick=()=>{
-   xmasTest=!xmasTest;
-   if(xmasTest){
-     changeAllToTrees();
-     showPopup("🎄 聖誕模式開啟 &nbsp;Merry Christmas!");
-     eventBox.textContent="🎄 所有蘿蔔變成聖誕樹！";
-   }else{
-     seeds.forEach(p=>{
-       if(p.stage==="seed")p.el.textContent="🌰";
-       else if(p.stage==="sprout")p.el.textContent="🌿";
-       else if(p.stage==="grown")p.el.textContent="🥕";
-     });
-     eventBox.textContent="🌞 返回農田模式";
-   }
-   updateFieldStyle();
- };
-
- // 其他按鈕──略同，上述內容不變……
- document.getElementById("plantBtn").onclick=()=>{
-  if(plantLimit<=0)return;
-  plantLimit--;
-  const el=document.createElement("div");el.className="plant show";el.textContent="🌰";
-  el.style.left=random(5,85)+"%";el.style.bottom=random(25,40)+"%";
-  field.appendChild(el);
-  seeds.push({stage:"seed",wateredSeed:false,wateredSprout:false,start:Date.now(),el});
-  eventBox.textContent="🌱 新蘿蔔種下～";
-  updateUI();
- };
- document.getElementById("waterBtn").onclick=()=>{
-  if(waterLimit<=0)return;
-  waterLimit--;
-  seeds.forEach(p=>{if(p.stage==="seed")p.wateredSeed=true;else if(p.stage==="sprout")p.wateredSprout=true;});
-  eventBox.textContent="💧 淋水完成！";
-  updateUI();
- };
- document.getElementById("bankBtn").onclick=()=>{
-  const today=new Date();const isXmas=(today.getMonth()==11&&today.getDate()==24)||xmasTest;
-  if(isXmas){eventBox.innerHTML="<span class='bible-text'>🎁 聖誕快樂！去銀行看禮物～</span>";return;}
-  let harvested=0;
-  seeds=seeds.filter(p=>{
-   if(p.stage==="grown"){let add=1;
-    if(p.wateredSeed&&p.wateredSprout)add=5;
-    else if(p.wateredSeed||p.wateredSprout)add=3;
-    harvested+=add;setTimeout(()=>p.el.remove(),500);return false;}
-   return true;});
-  if(harvested>0){safeCarrot+=harvested;bankStored+=harvested;
-   eventBox.textContent=`💳 收成 ${harvested} 根，存入銀行！`; }
-  else eventBox.textContent="冇成熟蘿蔔～";
-  updateUI();
- };
- document.getElementById("resetBtn").onclick=()=>{if(confirm("確定要重設？"))location.reload();};
- document.getElementById("growTestBtn").onclick=()=>{
-  seeds.forEach(p=>{
-   if(p.stage==="seed"){p.stage="sprout";p.el.textContent="🌿";}
-   else if(p.stage==="sprout"){p.stage="grown";p.el.textContent="🥕";}
-  });
-  eventBox.textContent="🧪 所有植物前進一個階段";
- };
-}
 });
 </script>
 </body>
