@@ -64,6 +64,12 @@ button:hover{filter:brightness(1.08);}button:disabled{opacity:0.5;cursor:not-all
 @keyframes dropRain{0%{top:-10px;opacity:1;}100%{top:100%;opacity:0;}}
 .flash{animation:flashRed 0.2s alternate 10;}
 @keyframes flashRed{from{filter:brightness(1);}to{filter:brightness(1.5) sepia(1) hue-rotate(-20deg);}}
+/* 🎄 聖誕提示彈窗 */
+#xmasPopup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,0.95);
+ padding:30px 40px;border-radius:15px;box-shadow:0 0 20px rgba(255,0,0,0.4);font-size:24px;color:#e00;z-index:1000;
+ animation:popfade 3s ease-in-out;cursor:pointer;}
+@keyframes popfade{0%{opacity:0;transform:translate(-50%,-50%) scale(0.8);}10%{opacity:1;transform:translate(-50%,-50%) scale(1.1);}
+90%{opacity:1;}100%{opacity:0;transform:translate(-50%,-50%) scale(0.9);}}
 </style>
 </head>
 <body>
@@ -151,6 +157,14 @@ document.addEventListener("DOMContentLoaded",()=>{
 
  function random(min,max){return Math.random()*(max-min)+min;}
 
+ function showPopup(msg){
+   const p=document.createElement("div");
+   p.id="xmasPopup";p.innerHTML=msg;
+   document.body.appendChild(p);
+   setTimeout(()=>{p.remove();},3000);
+   p.onclick=()=>p.remove();
+ }
+
  function updateFieldStyle(){
    const now=new Date();const hour=now.getHours();
    const isXmas=(now.getMonth()==11&&now.getDate()==24)||xmasTest;
@@ -188,12 +202,13 @@ document.addEventListener("DOMContentLoaded",()=>{
   document.getElementById("waterBtn").textContent=`淋水 💧 (${waterLimit}/1)`;
  }
 
- // --- 新：聖誕轉換檢查 ---
+ // 🎄 自動進入聖誕模式 + 彈窗
  function checkXmasAuto(){
    const date=new Date();
    if(date.getMonth()==11&&date.getDate()==24&&!xmasTest){
      seeds.forEach(p=>p.el.textContent="🎄");
      eventBox.textContent="🎄 聖誕節到！所有蘿蔔變成聖誕樹！";
+     showPopup("🎄 聖誕快樂！");
      updateFieldStyle();
    }
  }
@@ -238,11 +253,7 @@ document.addEventListener("DOMContentLoaded",()=>{
 
  // 重新開始
  document.getElementById("resetBtn").onclick=()=>{if(confirm("確定要重設？"))location.reload();};
-
- // 測試切換聖誕場景
  document.getElementById("testBtn").onclick=()=>{xmasTest=!xmasTest;updateFieldStyle();};
-
- // 🧪 新增下一階段測試
  document.getElementById("growTestBtn").onclick=()=>{
   seeds.forEach(p=>{
    if(p.stage==="seed"){p.stage="sprout";p.el.textContent="🌿";}
@@ -251,7 +262,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   eventBox.textContent="🧪 所有植物前進一個階段";
  };
 
- // 每分鐘檢查生長
+ // 每分鐘檢查生長及聖誕
  setInterval(()=>{
   checkXmasAuto();
   const now=Date.now();
@@ -263,11 +274,10 @@ document.addEventListener("DOMContentLoaded",()=>{
    if(p.stage==="seed"&&e>=5400){p.stage="sprout";p.el.textContent="🌿";}
    else if(p.stage==="sprout"&&e>=10800){p.stage="grown";p.el.textContent="🥕";}
   });
-  updateUI();
-  updateFieldStyle();
+  updateUI();updateFieldStyle();
  },60000);
 
- // 每隔 45 秒隨機事件（2 次限制）
+ // 每 45 秒隨機事件（每日 2 次限制）
  setInterval(()=>{if(dailyEvents>=2)return;
   if(Math.random()<0.3){dailyEvents++;triggerEvent();}},45000);
 
@@ -284,7 +294,6 @@ document.addEventListener("DOMContentLoaded",()=>{
   else rabbitEat();
  }
 
- // ---- 事件群 ----
  function birdEvent(){if(seeds.length>0)seeds.pop();
   const b=document.createElement("div");b.className="bird";b.textContent="🐦";field.appendChild(b);
   eventBox.textContent="🐦 小鳥吃掉蘿蔔 -1";setTimeout(()=>b.remove(),4000);}
