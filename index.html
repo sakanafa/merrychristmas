@@ -64,12 +64,24 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 .progress-bar{background:linear-gradient(90deg,#ffca28,#ff9100);height:100%;width:0%;transition:width 0.4s ease;}
 
 #field{
-  position:relative;width:100%;height:200px;border-radius:10px;overflow:hidden;margin-top:10px;
-  transition:background 1s;z-index:1;
+  position:relative;
+  width:100%;
+  height:200px;
+  border-radius:10px;
+  overflow:hidden;
+  margin-top:10px;
+  /* 預設日間藍天＋綠地（登入即見） */
+  background:linear-gradient(#aee7ff 0%, #aee7ff 40%, #8be25d 40%, #8be25d 100%);
+  transition:background 1s;
+  z-index:1;
 }
+/* ground 改做透明，唔再畫草色，由 #field 負責 */
 .ground{
-  position:absolute;bottom:0;width:100%;height:60%;
-  background:repeating-linear-gradient(45deg,#784,#693 12px);
+  position:absolute;
+  bottom:0;
+  width:100%;
+  height:60%;
+  background:transparent;
 }
 .plant{position:absolute;transition:all .5s ease;font-size:2em;opacity:0;}
 .plant.show{opacity:1;}
