@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
 <title>🎄 聖誕種蘿蔔 2025 🥕</title>
 <style>
+/* ---------- 基本樣式 ---------- */
 body{
   margin:0;
   font-family:"Nunito",sans-serif;
@@ -27,6 +28,7 @@ body{
   background:rgba(255,255,255,0.85);display:flex;justify-content:center;align-items:center;
   font-size:22px;cursor:pointer;box-shadow:0 0 8px rgba(0,0,0,0.3);z-index:2100;
 }
+/* ---------- 鎖屏 ---------- */
 #lockscreen{
   margin:60px auto;width:90%;max-width:420px;padding:25px;background:rgba(255,255,255,0.9);
   border-radius:15px;box-shadow:0 0 10px rgba(0,0,0,0.1);position:relative;z-index:1000;
@@ -40,6 +42,7 @@ input[type=password]{padding:10px;width:80%;border-radius:8px;border:1.8px solid
 button{padding:10px 14px;margin:6px 5px;border:none;border-radius:8px;background:#ff9999;color:white;font-size:16px;cursor:pointer;}
 button:hover{filter:brightness(1.08);}
 button:disabled{opacity:0.5;cursor:not-allowed;}
+/* ---------- 遊戲主畫面 ---------- */
 #game{display:none;position:relative;z-index:1000;}
 #merryTitle{
   display:none;
@@ -101,6 +104,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 #eventBox{margin-top:8px;min-height:24px;font-weight:bold;color:#333;}
 .bible-text{color:#c33;font-weight:bold;animation:shine 1s ease-in-out infinite alternate;}
 @keyframes shine{0%{color:#c33;}100%{color:#f66;}}
+/* ---------- 天氣 & 特效 ---------- */
 .star{position:absolute;width:2px;height:2px;background:white;border-radius:50%;animation:twinkle 2s infinite ease-in-out;}
 @keyframes twinkle{0%,100%{opacity:0.5;}50%{opacity:1;}}
 .meteor{
@@ -123,6 +127,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 @keyframes dropRain{0%{top:-10px;opacity:1;}100%{top:100%;opacity:0;}}
 .flash{animation:flashRed 0.2s alternate 10;}
 @keyframes flashRed{from{filter:brightness(1);}to{filter:brightness(1.5) sepia(1) hue-rotate(-20deg);}}
+/* ---------- 聖誕 Popup ---------- */
 #xmasPopupOverlay{
   position:fixed;
   inset:0;
@@ -229,6 +234,8 @@ for(let i=0;i<25;i++){
 <audio id="bgm" loop preload="auto">
   <source src="bgm.mp3" type="audio/mpeg">
 </audio>
+
+<!-- 聖誕 Popup -->
 <div id="xmasPopupOverlay">
   <div id="xmasPopup">
     <button id="xmasPopupClose">✕</button>
@@ -264,6 +271,8 @@ for(let i=0;i<25;i++){
     </div>
   </div>
 </div>
+
+<!-- 鎖屏 -->
 <div id="lockscreen">
  <h2>🎄 聖誕種蘿蔔 🥕</h2>
  <div id="countdown">載入中...</div>
@@ -274,6 +283,8 @@ for(let i=0;i<25;i++){
  <button id="loginBtn">登入</button>
  <p id="msg" style="color:red;"></p>
 </div>
+
+<!-- 遊戲 -->
 <div id="game">
  <div id="merryTitle">🎅 MERRY CHRISTMAS 🎁</div>
  <div class="container">
@@ -309,12 +320,15 @@ for(let i=0;i<25;i++){
   <div id="eventBox">🌤 歡迎回來，小農夫～</div>
  </div>
 </div>
+
 <script>
 document.addEventListener("DOMContentLoaded",()=>{
   const PASSWORD="carrot2025";
   const saveKey="checkin2025";
-  const GAME_SAVE_KEY="carrotGame2025_v2"; // 新 key，避免舊 bug 資料干擾
+  const OLD_GAME_KEY="carrotGame2025";      // 你之前用嗰個 key
+  const GAME_SAVE_KEY="carrotGame2025_v2";  // 新 key
   const LAST_LOGIN_KEY="carrotLastLogin";
+
   const cal=document.getElementById("calendar");
   let data=JSON.parse(localStorage.getItem(saveKey)||"[]");
 
@@ -527,7 +541,7 @@ document.addEventListener("DOMContentLoaded",()=>{
         stage:p.stage,
         wateredSeed:p.wateredSeed,
         wateredSprout:p.wateredSprout,
-        plantedAt:p.plantedAt, // 真正種落去嘅時間
+        plantedAt:p.plantedAt,
         left:p.el.style.left,
         bottom:p.el.style.bottom
       }));
@@ -543,8 +557,14 @@ document.addEventListener("DOMContentLoaded",()=>{
       localStorage.setItem(GAME_SAVE_KEY,JSON.stringify(data));
     }
 
+    // 讀取遊戲：優先新 key，如果冇，再試舊 key
     function loadGame(){
-      const raw=localStorage.getItem(GAME_SAVE_KEY);
+      let raw=localStorage.getItem(GAME_SAVE_KEY);
+      let fromOld=false;
+      if(!raw){
+        raw=localStorage.getItem(OLD_GAME_KEY);
+        if(raw) fromOld=true;
+      }
       if(!raw) return;
       try{
         const data=JSON.parse(raw);
@@ -558,23 +578,27 @@ document.addEventListener("DOMContentLoaded",()=>{
         seeds=(data.seeds||[]).map(p=>{
           const el=document.createElement("div");
           el.className="plant show";
-          el.style.left=p.left;
-          el.style.bottom=p.bottom;
-          el.textContent="🌰"; // 先種子，等下面計 stage 再改 icon
+          el.style.left=p.left || (Math.random()*80+10)+"%";
+          el.style.bottom=p.bottom || (Math.random()*15+25)+"%";
+          el.textContent="🌰";
           field.appendChild(el);
           return{
-            stage:"seed",
+            stage:p.stage || "seed",
             wateredSeed:!!p.wateredSeed,
             wateredSprout:!!p.wateredSprout,
-            plantedAt:p.plantedAt ?? Date.now(), // 兼容舊數據
+            plantedAt:p.plantedAt || Date.now(),
             el
           };
         });
 
-        recomputeGrowth(true); // 一開就計一次 offline 生長
+        recomputeGrowth(true);
         if(xmasTest){
           seeds.forEach(p=>p.el.textContent="🎄");
           setXmasUI(true);
+        }
+        // 如果係喺舊 key 度搵返，立即寫一次去新 key，之後就統一用新 key
+        if(fromOld){
+          saveGame();
         }
       }catch(e){
         console.error("Load game failed:",e);
@@ -607,7 +631,8 @@ document.addEventListener("DOMContentLoaded",()=>{
     function checkXmasAuto(){
       const date=new Date();
       if(date.getMonth()==11 && date.getDate()==24 && !xmasTest){
-        seeds.forEach(p=>p.el.textContent="🎄");
+        seeds.forEach(p=>p.el.textContent="🎄";
+        );
         eventBox.textContent="🎄 聖誕節到！所有蘿蔔變成聖誕樹！";
         updateFieldStyle();
         setXmasUI(true);
@@ -691,6 +716,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     document.getElementById("resetBtn").onclick=()=>{
       if(confirm("確定要重設？（包括清除本機紀錄）")){
         localStorage.removeItem(GAME_SAVE_KEY);
+        localStorage.removeItem(OLD_GAME_KEY);
         localStorage.removeItem(LAST_LOGIN_KEY);
         location.reload();
       }
