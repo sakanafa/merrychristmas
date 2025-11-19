@@ -417,7 +417,19 @@ document.addEventListener("DOMContentLoaded",()=>{
   };
 
   function initGame(){
-    let seeds=[],safeCarrot=0,bankStored=0,plantLimit=20,waterLimit=1,xmasTest=false,dailyEvents=0;
+    // === 種子相關常數 ===
+    const PLANT_MAX = 20;                   // 上限 20 粒
+    const PLANT_REGEN_INTERVAL = 5 * 60 * 1000; // 每 5 分鐘 +1
+
+    let seeds=[],
+        safeCarrot=0,
+        bankStored=0,
+        plantLimit=PLANT_MAX,
+        waterLimit=1,
+        plantRegenStart=null,   // ⭐ 用完 20 粒後開始計時的時間戳
+        xmasTest=false,
+        dailyEvents=0;
+
     const field=document.getElementById("field");
     const eventBox=document.getElementById("eventBox");
     const wildEl=document.getElementById("wild");
@@ -507,9 +519,37 @@ document.addEventListener("DOMContentLoaded",()=>{
       safeEl.textContent="銀行儲值💳："+safeCarrot;
       bankEl.textContent="FARMLAND BANK 蘿蔔總數🏦："+bankStored;
       totalEl.textContent="總收成："+total+"根";
-      document.getElementById("plantBtn").textContent=`種蘿蔔 🌰 (${plantLimit}/20)`;
+      document.getElementById("plantBtn").textContent=`種蘿蔔 🌰 (${plantLimit}/${PLANT_MAX})`;
       document.getElementById("waterBtn").textContent=`淋水 💧 (${waterLimit}/1)`;
       bar.style.width=rate+"%";
+    }
+
+    // ⭐ 種子恢復邏輯（用完 20 粒後每 5 分鐘 +1 粒，上限 20）
+    function updatePlantRegen(){
+      if(plantRegenStart==null) return;
+      if(plantLimit>=PLANT_MAX){
+        plantRegenStart = null;
+        return;
+      }
+      const now = Date.now();
+      const elapsed = now - plantRegenStart;
+      if(elapsed < PLANT_REGEN_INTERVAL) return;
+
+      const canRegen = Math.floor(elapsed / PLANT_REGEN_INTERVAL);
+      if(canRegen <= 0) return;
+
+      const old = plantLimit;
+      const next = Math.min(plantLimit + canRegen, PLANT_MAX);
+      plantLimit = next;
+
+      if(plantLimit >= PLANT_MAX){
+        plantRegenStart = null;
+      }else{
+        const used = next - old;
+        plantRegenStart += used * PLANT_REGEN_INTERVAL;
+      }
+      updateUI();
+      saveGame();
     }
 
     // 儲存 / 載入遊戲狀態
@@ -528,6 +568,7 @@ document.addEventListener("DOMContentLoaded",()=>{
         bankStored,
         plantLimit,
         waterLimit,
+        plantRegenStart,   // ⭐ 新增：保存恢復開始時間
         xmasTest
       };
       localStorage.setItem(GAME_SAVE_KEY, JSON.stringify(data));
@@ -540,8 +581,9 @@ document.addEventListener("DOMContentLoaded",()=>{
         const data = JSON.parse(raw);
         safeCarrot = data.safeCarrot ?? 0;
         bankStored = data.bankStored ?? 0;
-        plantLimit = data.plantLimit ?? 20;
+        plantLimit = data.plantLimit ?? PLANT_MAX;
         waterLimit = data.waterLimit ?? 1;
+        plantRegenStart = data.plantRegenStart ?? null;
         xmasTest   = data.xmasTest ?? false;
 
         seeds = (data.seeds || []).map(p=>{
@@ -564,7 +606,6 @@ document.addEventListener("DOMContentLoaded",()=>{
           };
         });
 
-        // 如果已經係聖誕模式，要更新 UI
         if(xmasTest){
           seeds.forEach(p=>p.el.textContent="🎄");
           setXmasUI(true);
@@ -587,12 +628,22 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     loadGame();
     updateFieldStyle(true);
+    updatePlantRegen(); // ⭐ 進入遊戲時先補一次種子
     updateUI();
 
     // 種蘿蔔
     document.getElementById("plantBtn").onclick=()=>{
-      if(plantLimit<=0)return;
+      if(plantLimit<=0){
+        eventBox.textContent="🌰 種子用完了，等一等會自動回復～";
+        return;
+      }
       plantLimit--;
+
+      // 如果剛好用到 0 粒，開始記錄恢復時間
+      if(plantLimit === 0 && plantRegenStart==null){
+        plantRegenStart = Date.now();
+      }
+
       const el=document.createElement("div");
       el.className="plant show";el.textContent="🌰";
       el.style.left=random(5,85)+"%";
@@ -693,6 +744,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       saveGame();
     };
 
+    // 植物生長 & 場景
     setInterval(()=>{
       checkXmasAuto();
       const now=Date.now();
@@ -718,6 +770,12 @@ document.addEventListener("DOMContentLoaded",()=>{
       updateFieldStyle();
     },60000);
 
+    // ⭐ 每 10 秒檢查一次種子恢復
+    setInterval(()=>{
+      updatePlantRegen();
+    },10000);
+
+    // 每 45 秒觸發隨機事件（每日最多 2 次）
     setInterval(()=>{
       if(dailyEvents>=2) return;
       if(Math.random()<0.3){
