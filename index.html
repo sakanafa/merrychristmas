@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
 <title>🎄 聖誕種蘿蔔 2025 🥕</title>
 <style>
 body{
@@ -13,26 +13,20 @@ body{
   background:linear-gradient(#b3e5ff,#fff);
   position:relative;
 }
-
-/* ❄️ 飄雪：改到喺所有內容上面 */
 .snow{
   position:fixed;
   top:-10px;
   color:white;
   animation:fall linear infinite;
-  z-index:2000; /* ⭐ 提升層級，蓋住登入 / 遊戲卡片 */
+  z-index:2000;
   pointer-events:none;
 }
 @keyframes fall{to{transform:translateY(110vh);}}
-
-/* 🔊 音樂按鈕 */
 #music-control{
   position:fixed;top:10px;right:10px;width:46px;height:46px;border-radius:50%;
   background:rgba(255,255,255,0.85);display:flex;justify-content:center;align-items:center;
   font-size:22px;cursor:pointer;box-shadow:0 0 8px rgba(0,0,0,0.3);z-index:2100;
 }
-
-/* 🔐 鎖屏 */
 #lockscreen{
   margin:60px auto;width:90%;max-width:420px;padding:25px;background:rgba(255,255,255,0.9);
   border-radius:15px;box-shadow:0 0 10px rgba(0,0,0,0.1);position:relative;z-index:1000;
@@ -46,11 +40,7 @@ input[type=password]{padding:10px;width:80%;border-radius:8px;border:1.8px solid
 button{padding:10px 14px;margin:6px 5px;border:none;border-radius:8px;background:#ff9999;color:white;font-size:16px;cursor:pointer;}
 button:hover{filter:brightness(1.08);}
 button:disabled{opacity:0.5;cursor:not-allowed;}
-
-/* 🎮 遊戲區 */
 #game{display:none;position:relative;z-index:1000;}
-
-/* 🎄 MERRY CHRISTMAS 只在 12/24 顯示的新動畫標題 */
 #merryTitle{
   display:none;
   position:absolute;
@@ -74,7 +64,6 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   from{ text-shadow:0 0 8px rgba(255,120,120,0.4); }
   to  { text-shadow:0 0 18px rgba(255,40,40,0.85); }
 }
-
 .container{
   max-width:520px;margin:10px auto;background:rgba(255,255,255,0.95);border-radius:15px;
   box-shadow:0 0 10px rgba(0,0,0,0.1);padding:15px;position:relative;
@@ -82,8 +71,6 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 .value{font-size:18px;margin:4px 0;}
 .progress-container{background:#ccc;border-radius:10px;margin:8px auto;width:90%;height:16px;overflow:hidden;}
 .progress-bar{background:linear-gradient(90deg,#ffca28,#ff9100);height:100%;width:0%;transition:width 0.4s ease;}
-
-/* 田地：天空 + 草地 */
 #field{
   position:relative;width:100%;height:200px;border-radius:10px;overflow:hidden;margin-top:10px;
   transition:background 1s;z-index:1;
@@ -100,11 +87,9 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 #cat.run{animation:cat 4s linear;}
 @keyframes rabbit{0%{right:-50px;opacity:1;}100%{right:110%;opacity:0;}}
 @keyframes cat{0%{left:110%;opacity:1;}100%{left:-50px;opacity:0;}}
-
 .controls{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:10px;}
 .controls button{flex:1 1 45%;min-width:110px;}
 @media(max-width:420px){.controls button{flex:1 1 100%;width:90%;}}
-
 #rule-box{
   background:#eef;padding:8px;border-radius:8px;margin-top:6px;font-size:15px;
   line-height:1.4;display:none;text-align:left;
@@ -114,11 +99,8 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   cursor:pointer;margin-top:6px;
 }
 #eventBox{margin-top:8px;min-height:24px;font-weight:bold;color:#333;}
-
 .bible-text{color:#c33;font-weight:bold;animation:shine 1s ease-in-out infinite alternate;}
 @keyframes shine{0%{color:#c33;}100%{color:#f66;}}
-
-/* 夜空元素 */
 .star{position:absolute;width:2px;height:2px;background:white;border-radius:50%;animation:twinkle 2s infinite ease-in-out;}
 @keyframes twinkle{0%,100%{opacity:0.5;}50%{opacity:1;}}
 .meteor{
@@ -141,8 +123,6 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 @keyframes dropRain{0%{top:-10px;opacity:1;}100%{top:100%;opacity:0;}}
 .flash{animation:flashRed 0.2s alternate 10;}
 @keyframes flashRed{from{filter:brightness(1);}to{filter:brightness(1.5) sepia(1) hue-rotate(-20deg);}}
-
-/* 🎄 右上角可關閉的聖誕 Popup Overlay */
 #xmasPopupOverlay{
   position:fixed;
   inset:0;
@@ -152,8 +132,6 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   justify-content:center;
   z-index:2500;
 }
-
-/* Popup 內容 */
 #xmasPopup{
   position:relative;
   width:min(420px,90vw);
@@ -164,8 +142,6 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   animation:xmasPopupIn .45s ease-out;
   overflow:hidden;
 }
-
-/* 右上角交叉 */
 #xmasPopupClose{
   position:absolute;
   top:10px;
@@ -180,8 +156,6 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   line-height:1;
   box-shadow:0 0 6px rgba(0,0,0,0.15);
 }
-
-/* Popup Header */
 .xmas-popup-header{
   display:flex;
   align-items:center;
@@ -196,8 +170,6 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   text-shadow:0 0 10px rgba(255,150,150,0.6);
 }
 .xmas-emoji{font-size:24px;}
-
-/* Popup Body */
 .xmas-popup-body{
   text-align:center;
   color:#333;
@@ -211,8 +183,6 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   font-weight:700;
   color:#e53935;
 }
-
-/* Emoji 圖卡 */
 .xmas-pics{
   display:flex;
   justify-content:center;
@@ -238,7 +208,6 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   font-size:18px;
   opacity:0.8;
 }
-
 @keyframes xmasPopupIn{
   from{opacity:0;transform:translateY(20px) scale(0.96);}
   to  {opacity:1;transform:translateY(0) scale(1);}
@@ -246,9 +215,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 </style>
 </head>
 <body>
-
 <script>
-// ❄️ 飄雪：z-index 已改高，會蓋住卡片
 for(let i=0;i<25;i++){
   let s=document.createElement('div');
   s.className='snow';s.textContent='❄️';
@@ -258,23 +225,18 @@ for(let i=0;i<25;i++){
   document.body.appendChild(s);
 }
 </script>
-
 <div id="music-control">🔊</div>
 <audio id="bgm" loop preload="auto">
   <source src="bgm.mp3" type="audio/mpeg">
 </audio>
-
-<!-- 🎄 聖誕 Popup -->
 <div id="xmasPopupOverlay">
   <div id="xmasPopup">
     <button id="xmasPopupClose">✕</button>
-
     <div class="xmas-popup-header">
       <span class="xmas-emoji">🎅</span>
       <span class="xmas-title">MERRY CHRISTMAS</span>
       <span class="xmas-emoji">🎁</span>
     </div>
-
     <div class="xmas-popup-body">
       <p class="xmas-main-text">
         聖誕快樂!! 🎄<br>
@@ -282,7 +244,6 @@ for(let i=0;i<25;i++){
         希望你 enjoy 我為你準備嘅
         <span class="xmas-money">💵 100 蚊聖誕禮物</span> !!!
       </p>
-
       <div class="xmas-pics">
         <div class="xmas-pic-card">
           <div class="xmas-pic-icon">🐰</div>
@@ -297,14 +258,12 @@ for(let i=0;i<25;i++){
           <div class="xmas-pic-label">禮物盒</div>
         </div>
       </div>
-
       <div class="xmas-snow-row">
         <span>❄️</span><span>❄️</span><span>❄️</span>
       </div>
     </div>
   </div>
 </div>
-
 <div id="lockscreen">
  <h2>🎄 聖誕種蘿蔔 🥕</h2>
  <div id="countdown">載入中...</div>
@@ -315,31 +274,22 @@ for(let i=0;i<25;i++){
  <button id="loginBtn">登入</button>
  <p id="msg" style="color:red;"></p>
 </div>
-
 <div id="game">
  <div id="merryTitle">🎅 MERRY CHRISTMAS 🎁</div>
-
  <div class="container">
   <h3>👩‍🌾 聖誕種蘿蔔 活動版</h3>
-
-  <!-- ⭐ 新增：上一次登入時間 -->
   <div class="value" id="lastLoginText">上一次登入：--</div>
-
   <div class="value" id="wild">種植中🥕：0</div>
   <div class="value" id="safe">銀行儲值💳：0</div>
-  <!-- ⭐ 已移除 FARMLAND BANK 總數 -->
   <div class="value" id="total">總收成：0根</div>
-
   <div class="progress-container">
     <div class="progress-bar" id="bar"></div>
   </div>
-
   <div id="field">
     <div class="ground"></div>
     <div class="icon" id="rabbit">🐇</div>
     <div class="icon" id="cat">🐈</div>
   </div>
-
   <div class="controls">
    <button id="plantBtn">種蘿蔔 🌰 (20/20)</button>
    <button id="waterBtn">淋水 💧 (1/1)</button>
@@ -348,7 +298,6 @@ for(let i=0;i<25;i++){
    <button id="testBtn" style="background:#59c;">🎄 聖誕測試</button>
    <button id="growTestBtn" style="background:#ffaa00;">🧪 下一階段測試</button>
   </div>
-
   <button id="toggle-rule">🌱 種植規則</button>
   <div id="rule-box">
    🌱 <b>種植規則：</b><br>
@@ -357,21 +306,18 @@ for(let i=0;i<25;i++){
    成熟蘿蔔存入銀行後變成銀行儲值💳。<br>
    12月24日為聖誕節，所有蘿蔔變成聖誕樹／禮物🎄。
   </div>
-
   <div id="eventBox">🌤 歡迎回來，小農夫～</div>
  </div>
 </div>
-
 <script>
 document.addEventListener("DOMContentLoaded",()=>{
   const PASSWORD="carrot2025";
   const saveKey="checkin2025";
-  const GAME_SAVE_KEY="carrotGame2025";
-  const LAST_LOGIN_KEY="carrotLastLogin"; // ⭐ 新增：記錄上次登入時間
+  const GAME_SAVE_KEY="carrotGame2025_v2"; // 新 key，避免舊 bug 資料干擾
+  const LAST_LOGIN_KEY="carrotLastLogin";
   const cal=document.getElementById("calendar");
   let data=JSON.parse(localStorage.getItem(saveKey)||"[]");
 
-  // 倒數
   const countdownEl=document.getElementById("countdown");
   function updateCountdown(){
     const now=new Date();
@@ -388,7 +334,6 @@ document.addEventListener("DOMContentLoaded",()=>{
   updateCountdown();
   setInterval(updateCountdown,60000);
 
-  // BGM 控制
   const bgm=document.getElementById("bgm");
   const musicBtn=document.getElementById("music-control");
   let musicOn=false;
@@ -403,7 +348,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     }
   });
 
-  // 建立打卡日曆
   for(let i=1;i<=24;i++){
     const d=document.createElement("div");
     d.className="day";d.textContent=i;
@@ -411,7 +355,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     cal.appendChild(d);
   }
 
-  // 日期格式化
   function formatDateStr(date){
     const y=date.getFullYear();
     const m=String(date.getMonth()+1).padStart(2,"0");
@@ -421,7 +364,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     return `${y}-${m}-${d} ${hh}:${mm}`;
   }
 
-  // 登入
   document.getElementById("loginBtn").onclick=()=>{
     const pwd=document.getElementById("pwd").value.trim();
     if(pwd!==PASSWORD){
@@ -437,25 +379,19 @@ document.addEventListener("DOMContentLoaded",()=>{
       }
     }
 
-    // ⭐ 更新上一次登入時間（先讀舊，再寫新）
-    const prevLogin = localStorage.getItem(LAST_LOGIN_KEY);
+    const prevLogin=localStorage.getItem(LAST_LOGIN_KEY);
     if(prevLogin){
-      // 遊戲畫面出現後先填字
       setTimeout(()=>{
-        const lastLoginText = document.getElementById("lastLoginText");
-        if(lastLoginText){
-          lastLoginText.textContent = "上一次登入：" + prevLogin;
-        }
+        const t=document.getElementById("lastLoginText");
+        if(t) t.textContent="上一次登入："+prevLogin;
       },0);
     }else{
       setTimeout(()=>{
-        const lastLoginText = document.getElementById("lastLoginText");
-        if(lastLoginText){
-          lastLoginText.textContent = "上一次登入：第一次登入 🎉";
-        }
+        const t=document.getElementById("lastLoginText");
+        if(t) t.textContent="上一次登入：第一次登入 🎉";
       },0);
     }
-    localStorage.setItem(LAST_LOGIN_KEY, formatDateStr(now));
+    localStorage.setItem(LAST_LOGIN_KEY,formatDateStr(now));
 
     document.getElementById("lockscreen").style.display="none";
     document.getElementById("game").style.display="block";
@@ -463,48 +399,41 @@ document.addEventListener("DOMContentLoaded",()=>{
   };
 
   function initGame(){
-    // === 種子相關常數 ===
-    const PLANT_MAX = 20;                       // 上限 20 粒
-    const PLANT_REGEN_INTERVAL = 5 * 60 * 1000; // 每 5 分鐘 +1
+    const PLANT_MAX=20;
+    const PLANT_REGEN_INTERVAL=5*60*1000;
 
-    let seeds=[],
-        safeCarrot=0,
-        bankStored=0, // 變數仍保留，用嚟計 total
-        plantLimit=PLANT_MAX,
-        waterLimit=1,
-        plantRegenStart=null,
-        xmasTest=false,
-        dailyEvents=0;
+    let seeds=[];
+    let safeCarrot=0;
+    let bankStored=0;
+    let plantLimit=PLANT_MAX;
+    let waterLimit=1;
+    let plantRegenStart=null;
+    let xmasTest=false;
+    let dailyEvents=0;
 
     const field=document.getElementById("field");
     const eventBox=document.getElementById("eventBox");
     const wildEl=document.getElementById("wild");
     const safeEl=document.getElementById("safe");
-    // const bankEl=document.getElementById("bank"); // ⭐ 不再使用／不存在
     const totalEl=document.getElementById("total");
     const bar=document.getElementById("bar");
-
-    const merryTitle        = document.getElementById("merryTitle");
-    const xmasPopupOverlay  = document.getElementById("xmasPopupOverlay");
-    const xmasPopupClose    = document.getElementById("xmasPopupClose");
+    const merryTitle=document.getElementById("merryTitle");
+    const xmasPopupOverlay=document.getElementById("xmasPopupOverlay");
+    const xmasPopupClose=document.getElementById("xmasPopupClose");
 
     function setXmasUI(show){
       if(show){
-        merryTitle.style.display = "block";
-        xmasPopupOverlay.style.display = "flex";
+        merryTitle.style.display="block";
+        xmasPopupOverlay.style.display="flex";
       }else{
-        merryTitle.style.display = "none";
-        xmasPopupOverlay.style.display = "none";
+        merryTitle.style.display="none";
+        xmasPopupOverlay.style.display="none";
       }
     }
-
-    const today = new Date();
-    const isRealXmasEve = (today.getMonth()===11 && today.getDate()===24);
+    const today=new Date();
+    const isRealXmasEve=(today.getMonth()===11 && today.getDate()===24);
     if(isRealXmasEve) setXmasUI(true); else setXmasUI(false);
-
-    xmasPopupClose.addEventListener("click",()=>{
-      xmasPopupOverlay.style.display="none";
-    });
+    xmasPopupClose.addEventListener("click",()=>{xmasPopupOverlay.style.display="none";});
 
     document.getElementById("toggle-rule").onclick=()=>{
       const box=document.getElementById("rule-box");
@@ -517,7 +446,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       const now=new Date();
       const hour=now.getHours();
       const isRealXmas=(now.getMonth()==11 && now.getDate()==24);
-      const isXmas = (!forceNormal) && (isRealXmas || xmasTest);
+      const isXmas=(!forceNormal)&&(isRealXmas||xmasTest);
 
       field.querySelectorAll('.star,.meteor').forEach(e=>e.remove());
 
@@ -563,52 +492,46 @@ document.addEventListener("DOMContentLoaded",()=>{
       const rate=Math.min(Math.round((safeCarrot/400)*100),100);
       wildEl.textContent="種植中🥕："+growing;
       safeEl.textContent="銀行儲值💳："+safeCarrot;
-      // bankEl 已刪除，不再更新
       totalEl.textContent="總收成："+total+"根";
       document.getElementById("plantBtn").textContent=`種蘿蔔 🌰 (${plantLimit}/${PLANT_MAX})`;
       document.getElementById("waterBtn").textContent=`淋水 💧 (${waterLimit}/1)`;
       bar.style.width=rate+"%";
     }
 
-    // ⭐ 種子恢復邏輯
     function updatePlantRegen(){
       if(plantRegenStart==null) return;
       if(plantLimit>=PLANT_MAX){
-        plantRegenStart = null;
+        plantRegenStart=null;
         return;
       }
-      const now = Date.now();
-      const elapsed = now - plantRegenStart;
-      if(elapsed < PLANT_REGEN_INTERVAL) return;
-
-      const canRegen = Math.floor(elapsed / PLANT_REGEN_INTERVAL);
-      if(canRegen <= 0) return;
-
-      const old = plantLimit;
-      const next = Math.min(plantLimit + canRegen, PLANT_MAX);
-      plantLimit = next;
-
-      if(plantLimit >= PLANT_MAX){
-        plantRegenStart = null;
+      const now=Date.now();
+      const elapsed=now-plantRegenStart;
+      if(elapsed<PLANT_REGEN_INTERVAL) return;
+      const canRegen=Math.floor(elapsed/PLANT_REGEN_INTERVAL);
+      if(canRegen<=0) return;
+      const old=plantLimit;
+      const next=Math.min(plantLimit+canRegen,PLANT_MAX);
+      plantLimit=next;
+      if(plantLimit>=PLANT_MAX){
+        plantRegenStart=null;
       }else{
-        const used = next - old;
-        plantRegenStart += used * PLANT_REGEN_INTERVAL;
+        const used=next-old;
+        plantRegenStart+=used*PLANT_REGEN_INTERVAL;
       }
       updateUI();
       saveGame();
     }
 
-    // 儲存 / 載入遊戲狀態
     function saveGame(){
-      const simpleSeeds = seeds.map(p=>({
+      const simpleSeeds=seeds.map(p=>({
         stage:p.stage,
         wateredSeed:p.wateredSeed,
         wateredSprout:p.wateredSprout,
-        start:p.start,
+        plantedAt:p.plantedAt, // 真正種落去嘅時間
         left:p.el.style.left,
         bottom:p.el.style.bottom
       }));
-      const data = {
+      const data={
         seeds:simpleSeeds,
         safeCarrot,
         bankStored,
@@ -617,41 +540,38 @@ document.addEventListener("DOMContentLoaded",()=>{
         plantRegenStart,
         xmasTest
       };
-      localStorage.setItem(GAME_SAVE_KEY, JSON.stringify(data));
+      localStorage.setItem(GAME_SAVE_KEY,JSON.stringify(data));
     }
 
     function loadGame(){
-      const raw = localStorage.getItem(GAME_SAVE_KEY);
+      const raw=localStorage.getItem(GAME_SAVE_KEY);
       if(!raw) return;
       try{
-        const data = JSON.parse(raw);
-        safeCarrot = data.safeCarrot ?? 0;
-        bankStored = data.bankStored ?? 0;
-        plantLimit = data.plantLimit ?? PLANT_MAX;
-        waterLimit = data.waterLimit ?? 1;
-        plantRegenStart = data.plantRegenStart ?? null;
-        xmasTest   = data.xmasTest ?? false;
+        const data=JSON.parse(raw);
+        safeCarrot=data.safeCarrot??0;
+        bankStored=data.bankStored??0;
+        plantLimit=data.plantLimit??PLANT_MAX;
+        waterLimit=data.waterLimit??1;
+        plantRegenStart=data.plantRegenStart??null;
+        xmasTest=data.xmasTest??false;
 
-        seeds = (data.seeds || []).map(p=>{
+        seeds=(data.seeds||[]).map(p=>{
           const el=document.createElement("div");
           el.className="plant show";
           el.style.left=p.left;
           el.style.bottom=p.bottom;
-
-          if(p.stage==="seed")       el.textContent="🌰";
-          else if(p.stage==="sprout") el.textContent="🌿";
-          else if(p.stage==="grown")  el.textContent="🥕";
-
+          el.textContent="🌰"; // 先種子，等下面計 stage 再改 icon
           field.appendChild(el);
-          return {
-            stage:p.stage,
+          return{
+            stage:"seed",
             wateredSeed:!!p.wateredSeed,
             wateredSprout:!!p.wateredSprout,
-            start:p.start,
+            plantedAt:p.plantedAt ?? Date.now(), // 兼容舊數據
             el
           };
         });
 
+        recomputeGrowth(true); // 一開就計一次 offline 生長
         if(xmasTest){
           seeds.forEach(p=>p.el.textContent="🎄");
           setXmasUI(true);
@@ -659,6 +579,29 @@ document.addEventListener("DOMContentLoaded",()=>{
       }catch(e){
         console.error("Load game failed:",e);
       }
+    }
+
+    function recomputeGrowth(init=false){
+      const now=Date.now();
+      const THREE_HOURS=3*60*60;
+      const SIX_HOURS=6*60*60;
+      let changed=false;
+      seeds.forEach(p=>{
+        const elapsedSec=(now-p.plantedAt)/1000;
+        let newStage="seed";
+        if(elapsedSec>=SIX_HOURS) newStage="grown";
+        else if(elapsedSec>=THREE_HOURS) newStage="sprout";
+
+        if(newStage!==p.stage || init){
+          p.stage=newStage;
+          if(newStage==="seed") p.el.textContent="🌰";
+          else if(newStage==="sprout") p.el.textContent="🌿";
+          else if(newStage==="grown") p.el.textContent="🥕";
+          changed=true;
+        }
+      });
+      if(changed && !init) saveGame();
+      updateUI();
     }
 
     function checkXmasAuto(){
@@ -674,21 +617,18 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     loadGame();
     updateFieldStyle(true);
-    updatePlantRegen(); // 進入遊戲先補一次種子
+    updatePlantRegen();
     updateUI();
 
-    // 種蘿蔔
     document.getElementById("plantBtn").onclick=()=>{
       if(plantLimit<=0){
         eventBox.textContent="🌰 種子用完了，等一等會自動回復～";
         return;
       }
       plantLimit--;
-
-      if(plantLimit === 0 && plantRegenStart==null){
-        plantRegenStart = Date.now();
+      if(plantLimit===0 && plantRegenStart==null){
+        plantRegenStart=Date.now();
       }
-
       const el=document.createElement("div");
       el.className="plant show";el.textContent="🌰";
       el.style.left=random(5,85)+"%";
@@ -698,7 +638,7 @@ document.addEventListener("DOMContentLoaded",()=>{
         stage:"seed",
         wateredSeed:false,
         wateredSprout:false,
-        start:Date.now(),
+        plantedAt:Date.now(),
         el
       });
       eventBox.textContent="🌱 新蘿蔔種下～";
@@ -706,7 +646,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       saveGame();
     };
 
-    // 淋水
     document.getElementById("waterBtn").onclick=()=>{
       if(waterLimit<=0)return;
       waterLimit--;
@@ -719,7 +658,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       saveGame();
     };
 
-    // 存入銀行
     document.getElementById("bankBtn").onclick=()=>{
       const today=new Date();
       const isXmas=(today.getMonth()==11 && today.getDate()==24)||xmasTest;
@@ -762,18 +700,13 @@ document.addEventListener("DOMContentLoaded",()=>{
       xmasTest=!xmasTest;
       const now=new Date();
       const isRealXmas=(now.getMonth()==11 && now.getDate()==24);
-      const isXmasMode=isRealXmas || xmasTest;
-
+      const isXmasMode=isRealXmas||xmasTest;
       if(isXmasMode){
         seeds.forEach(p=>p.el.textContent="🎄");
         eventBox.textContent="🧪 已開啟聖誕測試模式，蘿蔔變成聖誕樹～";
         setXmasUI(true);
       }else{
-        seeds.forEach(p=>{
-          if(p.stage==="seed")      p.el.textContent="🌰";
-          else if(p.stage==="sprout") p.el.textContent="🌿";
-          else if(p.stage==="grown")  p.el.textContent="🥕";
-        });
+        recomputeGrowth(true);
         eventBox.textContent="🧪 已關閉聖誕測試模式～";
         if(!isRealXmas) setXmasUI(false);
       }
@@ -788,12 +721,11 @@ document.addEventListener("DOMContentLoaded",()=>{
       });
       eventBox.textContent="🧪 所有植物前進一個階段";
       saveGame();
+      updateUI();
     };
 
-    // 植物生長 & 場景
     setInterval(()=>{
       checkXmasAuto();
-      const now=Date.now();
       const date=new Date();
       const isXmas=(date.getMonth()==11 && date.getDate()==24)||xmasTest;
       if(isXmas){
@@ -801,27 +733,12 @@ document.addEventListener("DOMContentLoaded",()=>{
         updateFieldStyle();
         return;
       }
-      let changed=false;
-      seeds.forEach(p=>{
-        const e=(now-p.start)/1000;
-        if(p.stage==="seed" && e>=5400){p.stage="sprout";p.el.textContent="🌿";changed=true;}
-        else if(p.stage==="sprout" && e>=10800){p.stage="grown";p.el.textContent="🥕";changed=true;}
-      });
-      if(changed){
-        updateUI();
-        saveGame();
-      }else{
-        updateUI();
-      }
+      recomputeGrowth(false);
       updateFieldStyle();
     },60000);
 
-    // 種子恢復
-    setInterval(()=>{
-      updatePlantRegen();
-    },10000);
+    setInterval(()=>{updatePlantRegen();},10000);
 
-    // 每 45 秒隨機事件（每日最多 2 次）
     setInterval(()=>{
       if(dailyEvents>=2) return;
       if(Math.random()<0.3){
@@ -842,7 +759,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       else if(r<0.9)  rabbitHelp();
       else            rabbitEat();
     }
-
     function birdEvent(){
       if(seeds.length>0) seeds.pop();
       const b=document.createElement("div");
@@ -926,8 +842,8 @@ document.addEventListener("DOMContentLoaded",()=>{
       setTimeout(()=>r.classList.remove("run"),4000);
       updateUI();saveGame();
     }
-  } // end initGame
-}); // end DOMContentLoaded
+  }
+});
 </script>
 </body>
 </html>
