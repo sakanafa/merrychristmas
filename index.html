@@ -324,13 +324,38 @@ for(let i=0;i<25;i++){
 <script>
 document.addEventListener("DOMContentLoaded",()=>{
   const PASSWORD="carrot2025";
-  const saveKey="checkin2025";
-  const OLD_GAME_KEY="carrotGame2025";      // 你之前用嗰個 key
-  const GAME_SAVE_KEY="carrotGame2025_v2";  // 新 key
+
+  // ✅ 新舊打卡 key：新 checkin2025，舊 adventCheckin2025
+  const CHECKIN_KEY_NEW="checkin2025";
+  const CHECKIN_KEY_OLD="adventCheckin2025";
+
+  // ✅ 遊戲 save key：新 v2，舊 carrotGame2025
+  const OLD_GAME_KEY="carrotGame2025";
+  const GAME_SAVE_KEY="carrotGame2025_v2";
   const LAST_LOGIN_KEY="carrotLastLogin";
 
   const cal=document.getElementById("calendar");
-  let data=JSON.parse(localStorage.getItem(saveKey)||"[]");
+
+  // 讀取打卡：先新，再舊，然後寫回新 key
+  function loadCheckin(){
+    let raw=localStorage.getItem(CHECKIN_KEY_NEW);
+    let fromOld=false;
+    if(!raw){
+      raw=localStorage.getItem(CHECKIN_KEY_OLD);
+      if(raw) fromOld=true;
+    }
+    let days=[];
+    try{
+      days=raw?JSON.parse(raw):[];
+      if(!Array.isArray(days)) days=[];
+    }catch(e){days=[];}
+    if(fromOld){
+      localStorage.setItem(CHECKIN_KEY_NEW,JSON.stringify(days));
+    }
+    return days;
+  }
+
+  let data=loadCheckin();
 
   const countdownEl=document.getElementById("countdown");
   function updateCountdown(){
@@ -362,6 +387,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     }
   });
 
+  // 畫出 1–24 號格仔，已打卡的加 checked
   for(let i=1;i<=24;i++){
     const d=document.createElement("div");
     d.className="day";d.textContent=i;
@@ -389,7 +415,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       const day=now.getDate();
       if(!data.includes(day)){
         data.push(day);
-        localStorage.setItem(saveKey,JSON.stringify(data));
+        localStorage.setItem(CHECKIN_KEY_NEW,JSON.stringify(data));
       }
     }
 
@@ -557,7 +583,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       localStorage.setItem(GAME_SAVE_KEY,JSON.stringify(data));
     }
 
-    // 讀取遊戲：優先新 key，如果冇，再試舊 key
+    // 讀取遊戲：先新 key，再舊 key，再存回新 key
     function loadGame(){
       let raw=localStorage.getItem(GAME_SAVE_KEY);
       let fromOld=false;
@@ -596,9 +622,8 @@ document.addEventListener("DOMContentLoaded",()=>{
           seeds.forEach(p=>p.el.textContent="🎄");
           setXmasUI(true);
         }
-        // 如果係喺舊 key 度搵返，立即寫一次去新 key，之後就統一用新 key
         if(fromOld){
-          saveGame();
+          saveGame();   // 立即寫一次去新 key
         }
       }catch(e){
         console.error("Load game failed:",e);
@@ -631,8 +656,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     function checkXmasAuto(){
       const date=new Date();
       if(date.getMonth()==11 && date.getDate()==24 && !xmasTest){
-        seeds.forEach(p=>p.el.textContent="🎄";
-        );
+        seeds.forEach(p=>p.el.textContent="🎄");
         eventBox.textContent="🎄 聖誕節到！所有蘿蔔變成聖誕樹！";
         updateFieldStyle();
         setXmasUI(true);
@@ -717,6 +741,8 @@ document.addEventListener("DOMContentLoaded",()=>{
       if(confirm("確定要重設？（包括清除本機紀錄）")){
         localStorage.removeItem(GAME_SAVE_KEY);
         localStorage.removeItem(OLD_GAME_KEY);
+        localStorage.removeItem(CHECKIN_KEY_NEW);
+        localStorage.removeItem(CHECKIN_KEY_OLD);
         localStorage.removeItem(LAST_LOGIN_KEY);
         location.reload();
       }
