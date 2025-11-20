@@ -217,6 +217,44 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   from{opacity:0;transform:translateY(20px) scale(0.96);}
   to  {opacity:1;transform:translateY(0) scale(1);}
 }
+
+/* ---------- 隨機事件 Popup ---------- */
+#eventPopupOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.4);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:2600;
+}
+#eventPopup{
+  width:min(400px,90vw);
+  background:#ffffff;
+  border-radius:14px;
+  padding:16px 18px 14px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.25);
+  text-align:center;
+}
+#eventPopupEmoji{
+  font-size:30px;
+  margin-bottom:6px;
+}
+#eventPopupTitle{
+  font-size:18px;
+  font-weight:bold;
+  margin-bottom:6px;
+}
+#eventPopupText{
+  font-size:14px;
+  line-height:1.5;
+  color:#333;
+}
+#eventPopupHint{
+  font-size:12px;
+  color:#777;
+  margin-top:8px;
+}
 </style>
 </head>
 <body>
@@ -230,9 +268,15 @@ for(let i=0;i<25;i++){
   document.body.appendChild(s);
 }
 </script>
+
 <div id="music-control">🔊</div>
-<audio id="bgm" loop preload="auto">
+
+<!-- 兩首歌：平日 bells.mp3，12/24 用 1224.mp3 -->
+<audio id="bgm-normal" loop preload="auto">
   <source src="bells.mp3" type="audio/mpeg">
+</audio>
+<audio id="bgm-xmas" loop preload="auto">
+  <source src="1224.mp3" type="audio/mpeg">
 </audio>
 
 <!-- 聖誕 Popup -->
@@ -269,6 +313,16 @@ for(let i=0;i<25;i++){
         <span>❄️</span><span>❄️</span><span>❄️</span>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- 隨機事件 Popup -->
+<div id="eventPopupOverlay">
+  <div id="eventPopup">
+    <div id="eventPopupEmoji">✨</div>
+    <div id="eventPopupTitle">事件發生了！</div>
+    <div id="eventPopupText">……</div>
+    <div id="eventPopupHint">（點擊畫面任何地方關閉）</div>
   </div>
 </div>
 
@@ -311,11 +365,26 @@ for(let i=0;i<25;i++){
   </div>
   <button id="toggle-rule">🌱 種植規則</button>
   <div id="rule-box">
-   🌱 <b>種植規則：</b><br>
-   每棵蘿蔔限種一次、每日限淋一次水。<br>
-   淋一次水的收成 +3；兩階段都淋水 +5；未淋水 +1。<br>
-   成熟蘿蔔存入銀行後變成銀行儲值💳。<br>
-   12月24日為聖誕節，所有蘿蔔變成聖誕樹／禮物🎄。
+    🌱 <b>種植規則：</b><br>
+    1️⃣ 每次按「種蘿蔔」會種出一棵新蘿蔔。<br>
+    2️⃣ 上面顯示 <b>(目前數量 / 最大 20)</b>，用完 20 粒之後，要等時間自動回復。<br>
+    3️⃣ 種子會經過三個階段：<br>
+    &nbsp;&nbsp;&nbsp;• 🌰 種子（剛種落去）<br>
+    &nbsp;&nbsp;&nbsp;• 🌿 幼苗（大約 3 小時後）<br>
+    &nbsp;&nbsp;&nbsp;• 🥕 成熟蘿蔔（大約 6 小時後）<br>
+    4️⃣ 「淋水 💧」每日限按一次，會一次過淋晒所有當時存在的蘿蔔：<br>
+    &nbsp;&nbsp;&nbsp;• 喺 🌰 階段被淋過水：水記錄喺「種子」<br>
+    &nbsp;&nbsp;&nbsp;• 喺 🌿 階段被淋過水：水記錄喺「幼苗」<br>
+    5️⃣ 收成請用「存入銀行 💳」，只會收成已經係 🥕 的蘿蔔，數量計法：<br>
+    &nbsp;&nbsp;&nbsp;• 未淋過水：+1 根<br>
+    &nbsp;&nbsp;&nbsp;• 只喺一個階段淋過水（種子 或 幼苗）：+3 根<br>
+    &nbsp;&nbsp;&nbsp;• 種子同幼苗兩個階段都淋過水：+5 根<br>
+    6️⃣ 收成後嘅蘿蔔會加到「銀行儲值 💳」，同時計入「總收成」。<br>
+    7️⃣ 特別事件（小鳥、太陽、落雪、小貓、小兔）會不定時出現，<br>
+    &nbsp;&nbsp;&nbsp;有啲會加蘿蔔，有啲會偷走／減少蘿蔔，請小心守護你嘅田！<br>
+    8️⃣ 12 月 24 日（或開啟聖誕測試模式）時：<br>
+    &nbsp;&nbsp;&nbsp;• 田裡所有蘿蔔會變成 🎄 聖誕樹 / 🎁 禮物，<br>
+    &nbsp;&nbsp;&nbsp;• 會彈出聖誕祝福視窗，記得去銀行睇你嘅禮物～<br>
   </div>
   <div id="eventBox">🌤 歡迎回來，小農夫～</div>
  </div>
@@ -373,16 +442,50 @@ document.addEventListener("DOMContentLoaded",()=>{
   updateCountdown();
   setInterval(updateCountdown,60000);
 
-  const bgm=document.getElementById("bgm");
+  // ===== 音樂邏輯：平日 bells.mp3，12/24 用 1224.mp3 =====
+  const bgmNormal=document.getElementById("bgm-normal");
+  const bgmXmas=document.getElementById("bgm-xmas");
   const musicBtn=document.getElementById("music-control");
+  let currentBgm=bgmNormal;
   let musicOn=false;
+
+  function isXmasDay(){
+    const now=new Date();
+    return now.getMonth()===11 && now.getDate()===24;
+  }
+
+  function chooseBgmByDate(){
+    currentBgm.pause();
+    currentBgm.currentTime=0;
+    currentBgm = isXmasDay() ? bgmXmas : bgmNormal;
+  }
+
+  function tryPlayBgm(auto=false){
+    currentBgm.volume=0.8;
+    currentBgm.play()
+      .then(()=>{
+        musicOn=true;
+        musicBtn.textContent="🔈";
+      })
+      .catch(()=>{
+        if(!auto){
+          musicOn=false;
+          musicBtn.textContent="🔊";
+        }
+      });
+  }
+
+  // 一入頁面先根據日期揀歌，再嘗試自動播放
+  chooseBgmByDate();
+  tryPlayBgm(true);
+
   musicBtn.addEventListener("click",()=>{
     musicOn=!musicOn;
     if(musicOn){
-      bgm.play().catch(()=>{});
-      musicBtn.textContent="🔈";
+      chooseBgmByDate();
+      tryPlayBgm(false);
     }else{
-      bgm.pause();
+      currentBgm.pause();
       musicBtn.textContent="🔊";
     }
   });
@@ -435,6 +538,11 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     document.getElementById("lockscreen").style.display="none";
     document.getElementById("game").style.display="block";
+
+    // 登入成功再按日期揀歌並播放
+    chooseBgmByDate();
+    tryPlayBgm(false);
+
     initGame();
   };
 
@@ -460,6 +568,47 @@ document.addEventListener("DOMContentLoaded",()=>{
     const merryTitle=document.getElementById("merryTitle");
     const xmasPopupOverlay=document.getElementById("xmasPopupOverlay");
     const xmasPopupClose=document.getElementById("xmasPopupClose");
+
+    const eventPopupOverlay=document.getElementById("eventPopupOverlay");
+    const eventPopupEmoji=document.getElementById("eventPopupEmoji");
+    const eventPopupTitle=document.getElementById("eventPopupTitle");
+    const eventPopupText=document.getElementById("eventPopupText");
+
+    // === 隨機事件 Popup helper ===
+    let eventQueue=[];
+    let showingEventPopup=false;
+
+    function showEventPopup(emoji,title,text,finalText){
+      eventQueue.push({emoji,title,text,finalText});
+      if(!showingEventPopup){
+        displayNextEventPopup();
+      }
+    }
+
+    function displayNextEventPopup(){
+      const ev=eventQueue.shift();
+      if(!ev){
+        showingEventPopup=false;
+        return;
+      }
+      showingEventPopup=true;
+      eventPopupEmoji.textContent=ev.emoji;
+      eventPopupTitle.textContent=ev.title;
+      eventPopupText.textContent=ev.text;
+      eventPopupOverlay.style.display="flex";
+
+      // 關閉邏輯：點任何位置
+      const closeHandler=()=>{
+        eventPopupOverlay.style.display="none";
+        eventPopupOverlay.removeEventListener("click",closeHandler);
+        // 關閉後，先更新底下 eventBox 文字
+        eventBox.textContent=ev.finalText;
+        showingEventPopup=false;
+        // 如果仲有排隊事件，再顯示下一個
+        displayNextEventPopup();
+      };
+      eventPopupOverlay.addEventListener("click",closeHandler);
+    }
 
     function setXmasUI(show){
       if(show){
@@ -811,31 +960,57 @@ document.addEventListener("DOMContentLoaded",()=>{
       else if(r<0.9)  rabbitHelp();
       else            rabbitEat();
     }
+
+    // ===== 以下事件全部改用 Popup，再更新 eventBox =====
     function birdEvent(){
       if(seeds.length>0) seeds.pop();
       const b=document.createElement("div");
       b.className="bird";b.textContent="🐦";
       field.appendChild(b);
-      eventBox.textContent="🐦 小鳥吃掉蘿蔔 -1";
       setTimeout(()=>b.remove(),4000);
+
       updateUI();saveGame();
+
+      showEventPopup(
+        "🐦",
+        "小鳥嚟咗！",
+        "一隻小鳥飛過嚟，偷咗你一棵蘿蔔。",
+        "🐦 小鳥吃掉蘿蔔 -1"
+      );
     }
+
     function sunEvent(){
       const s=document.createElement("div");
       s.className="sun";s.textContent="☀️";
       field.appendChild(s);
       safeCarrot+=2;
-      eventBox.textContent="☀️ 陽光普照 +2 蘿蔔";
       setTimeout(()=>s.remove(),4000);
+
       updateUI();saveGame();
+
+      showEventPopup(
+        "☀️",
+        "陽光普照！",
+        "今日陽光好靚，蘿蔔長得特別好，多咗兩根！",
+        "☀️ 陽光普照 +2 蘿蔔"
+      );
     }
+
     function lavaEvent(){
-      eventBox.textContent="🌋 熔岩燒了蘿蔔！";
       seeds=seeds.slice(0,1);
       document.body.classList.add("flash");
       setTimeout(()=>document.body.classList.remove("flash"),10000);
+
       updateUI();saveGame();
+
+      showEventPopup(
+        "🌋",
+        "熔岩警報！",
+        "熔岩經過，把大部分蘿蔔都燒走，只剩返少少…",
+        "🌋 熔岩燒了蘿蔔！"
+      );
     }
+
     function snowEvent(){
       if(seeds.length>0) seeds.pop();
       for(let i=0;i<15;i++){
@@ -845,9 +1020,17 @@ document.addEventListener("DOMContentLoaded",()=>{
         field.appendChild(s);
         setTimeout(()=>s.remove(),4000);
       }
-      eventBox.textContent="❄️ 下雪 蘿蔔 -1";
+
       updateUI();saveGame();
+
+      showEventPopup(
+        "❄️",
+        "下雪了！",
+        "天氣突然變冷，下起雪嚟，有一棵蘿蔔被雪埋咗。",
+        "❄️ 下雪 蘿蔔 -1"
+      );
     }
+
     function rainEvent(){
       safeCarrot+=2;
       for(let i=0;i<20;i++){
@@ -857,42 +1040,81 @@ document.addEventListener("DOMContentLoaded",()=>{
         field.appendChild(r);
         setTimeout(()=>r.remove(),2000);
       }
-      eventBox.textContent="💧 落雨 蘿蔔 +2";
+
       updateUI();saveGame();
+
+      showEventPopup(
+        "💧",
+        "落雨好消息！",
+        "一場溫柔嘅雨滋潤咗田裡所有蘿蔔，多咗兩根！",
+        "💧 落雨 蘿蔔 +2"
+      );
     }
+
     function catSteal(){
       if(seeds.length>0) seeds.pop();
       const c=document.getElementById("cat");
       c.classList.add("run");
-      eventBox.textContent="🐈 小貓偷走蘿蔔 喵～";
       setTimeout(()=>c.classList.remove("run"),4000);
+
       updateUI();saveGame();
+
+      showEventPopup(
+        "🐈",
+        "小貓偷食！",
+        "小貓偷偷走入田裡，叼走咗一棵蘿蔔，喵～",
+        "🐈 小貓偷走蘿蔔 喵～"
+      );
     }
+
     function catWater(){
       safeCarrot+=1;
-      eventBox.textContent="🐾 小貓幫忙淋水 +1";
       const drop=document.createElement("div");
       drop.className="rain";drop.textContent="💧";
       drop.style.left="50%";drop.style.animationDuration="1s";
       field.appendChild(drop);
       setTimeout(()=>drop.remove(),1000);
+
       updateUI();saveGame();
+
+      showEventPopup(
+        "🐾",
+        "小貓幫忙！",
+        "小貓好有愛心，幫你喺田中央淋咗一啲水，多咗一根蘿蔔。",
+        "🐾 小貓幫忙淋水 +1"
+      );
     }
+
     function rabbitHelp(){
       safeCarrot+=1;
       const r=document.getElementById("rabbit");
       r.classList.add("run");
-      eventBox.textContent="🐇 小兔幫翻地 +1";
       setTimeout(()=>r.classList.remove("run"),4000);
+
       updateUI();saveGame();
+
+      showEventPopup(
+        "🐇",
+        "小兔幫手！",
+        "小兔乖乖幫你鬆土，令土壤更肥沃，多咗一根蘿蔔。",
+        "🐇 小兔幫翻地 +1"
+      );
     }
+
     function rabbitEat(){
       if(seeds.length>0) seeds.pop();
       const r=document.getElementById("rabbit");
       r.classList.add("run");
-      eventBox.textContent="🐇 小兔子貪食 咬蘿蔔🥕 ";
       setTimeout(()=>r.classList.remove("run"),4000);
+
       updateUI();saveGame();
+
+      showEventPopup(
+        "🐇",
+        "小兔貪食！",
+        "小兔太肚餓，忍唔住咬咗你一棵蘿蔔。",
+        "🐇 小兔子貪食 咬蘿蔔🥕 "
+      );
     }
   }
 });
