@@ -271,7 +271,7 @@ for(let i=0;i<25;i++){
 
 <div id="music-control">🔊</div>
 
-<!-- 兩首歌：平日 bells.mp3，12/24 用 1224.mp3 -->
+<!-- 兩首歌：平日 bells.mp3，12/24 & 聖誕測試用 1224.mp3 -->
 <audio id="bgm-normal" loop preload="auto">
   <source src="bells.mp3" type="audio/mpeg">
 </audio>
@@ -394,18 +394,15 @@ for(let i=0;i<25;i++){
 document.addEventListener("DOMContentLoaded",()=>{
   const PASSWORD="600lovefafa";
 
-  // ✅ 新舊打卡 key：新 checkin2025，舊 adventCheckin2025
   const CHECKIN_KEY_NEW="checkin2025";
   const CHECKIN_KEY_OLD="adventCheckin2025";
 
-  // ✅ 遊戲 save key：新 v2，舊 carrotGame2025
   const OLD_GAME_KEY="carrotGame2025";
   const GAME_SAVE_KEY="carrotGame2025_v2";
   const LAST_LOGIN_KEY="carrotLastLogin";
 
   const cal=document.getElementById("calendar");
 
-  // 讀取打卡：先新，再舊，然後寫回新 key
   function loadCheckin(){
     let raw=localStorage.getItem(CHECKIN_KEY_NEW);
     let fromOld=false;
@@ -442,22 +439,30 @@ document.addEventListener("DOMContentLoaded",()=>{
   updateCountdown();
   setInterval(updateCountdown,60000);
 
-  // ===== 音樂邏輯：平日 bells.mp3，12/24 用 1224.mp3 =====
+  // ===== 音樂邏輯：平日 bells.mp3，12/24 + 聖誕測試 用 1224.mp3 =====
   const bgmNormal=document.getElementById("bgm-normal");
   const bgmXmas=document.getElementById("bgm-xmas");
   const musicBtn=document.getElementById("music-control");
   let currentBgm=bgmNormal;
   let musicOn=false;
 
+  // 由遊戲內更新聖誕測試狀態
+  let globalXmasTest=false;
+  function setGlobalXmasTest(v){ globalXmasTest=v; }
+
   function isXmasDay(){
     const now=new Date();
     return now.getMonth()===11 && now.getDate()===24;
   }
+  function shouldUseXmasMusic(){
+    // ✅ 真 12/24 或者 開啟聖誕測試 時，一律用 1224.mp3
+    return isXmasDay() || globalXmasTest;
+  }
 
-  function chooseBgmByDate(){
+  function chooseBgm(){
     currentBgm.pause();
     currentBgm.currentTime=0;
-    currentBgm = isXmasDay() ? bgmXmas : bgmNormal;
+    currentBgm = shouldUseXmasMusic() ? bgmXmas : bgmNormal;
   }
 
   function tryPlayBgm(auto=false){
@@ -475,14 +480,13 @@ document.addEventListener("DOMContentLoaded",()=>{
       });
   }
 
-  // 一入頁面先根據日期揀歌，再嘗試自動播放
-  chooseBgmByDate();
+  chooseBgm();
   tryPlayBgm(true);
 
   musicBtn.addEventListener("click",()=>{
     musicOn=!musicOn;
     if(musicOn){
-      chooseBgmByDate();
+      chooseBgm();
       tryPlayBgm(false);
     }else{
       currentBgm.pause();
@@ -490,7 +494,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     }
   });
 
-  // 畫出 1–24 號格仔，已打卡的加 checked
   for(let i=1;i<=24;i++){
     const d=document.createElement("div");
     d.className="day";d.textContent=i;
@@ -539,8 +542,8 @@ document.addEventListener("DOMContentLoaded",()=>{
     document.getElementById("lockscreen").style.display="none";
     document.getElementById("game").style.display="block";
 
-    // 登入成功再按日期揀歌並播放
-    chooseBgmByDate();
+    // 重新根據聖誕狀態選歌
+    chooseBgm();
     tryPlayBgm(false);
 
     initGame();
@@ -558,6 +561,8 @@ document.addEventListener("DOMContentLoaded",()=>{
     let plantRegenStart=null;
     let xmasTest=false;
     let dailyEvents=0;
+
+    let loginEventTimer=null;   // ✅ 登入後 2 分鐘事件計時器
 
     const field=document.getElementById("field");
     const eventBox=document.getElementById("eventBox");
@@ -597,14 +602,11 @@ document.addEventListener("DOMContentLoaded",()=>{
       eventPopupText.textContent=ev.text;
       eventPopupOverlay.style.display="flex";
 
-      // 關閉邏輯：點任何位置
       const closeHandler=()=>{
         eventPopupOverlay.style.display="none";
         eventPopupOverlay.removeEventListener("click",closeHandler);
-        // 關閉後，先更新底下 eventBox 文字
         eventBox.textContent=ev.finalText;
         showingEventPopup=false;
-        // 如果仲有排隊事件，再顯示下一個
         displayNextEventPopup();
       };
       eventPopupOverlay.addEventListener("click",closeHandler);
@@ -732,7 +734,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       localStorage.setItem(GAME_SAVE_KEY,JSON.stringify(data));
     }
 
-    // 讀取遊戲：先新 key，再舊 key，再存回新 key
     function loadGame(){
       let raw=localStorage.getItem(GAME_SAVE_KEY);
       let fromOld=false;
@@ -749,6 +750,7 @@ document.addEventListener("DOMContentLoaded",()=>{
         waterLimit=data.waterLimit??1;
         plantRegenStart=data.plantRegenStart??null;
         xmasTest=data.xmasTest??false;
+        setGlobalXmasTest(xmasTest); // ✅ 同步去音樂判斷
 
         seeds=(data.seeds||[]).map(p=>{
           const el=document.createElement("div");
@@ -772,7 +774,7 @@ document.addEventListener("DOMContentLoaded",()=>{
           setXmasUI(true);
         }
         if(fromOld){
-          saveGame();   // 立即寫一次去新 key
+          saveGame();
         }
       }catch(e){
         console.error("Load game failed:",e);
@@ -813,10 +815,39 @@ document.addEventListener("DOMContentLoaded",()=>{
       }
     }
 
+    function triggerEvent(){
+      const r=Math.random();
+      if(r<0.15)      birdEvent();
+      else if(r<0.3)  sunEvent();
+      else if(r<0.4)  lavaEvent();
+      else if(r<0.5)  snowEvent();
+      else if(r<0.6)  rainEvent();
+      else if(r<0.7)  catSteal();
+      else if(r<0.8)  catWater();
+      else if(r<0.9)  rabbitHelp();
+      else            rabbitEat();
+    }
+
+    // ======= 登入後 2 分鐘隨機事件（80% 機會） =======
+    function scheduleLoginEvent(){
+      if(loginEventTimer) clearTimeout(loginEventTimer);
+      // 只要田裡有東西先計時
+      if(seeds.length===0) return;
+      loginEventTimer = setTimeout(()=>{
+        if(seeds.length>0 && Math.random() < 0.8){
+          triggerEvent();
+        }
+        loginEventTimer=null;
+      }, 2*60*1000); // 2 分鐘
+    }
+
     loadGame();
     updateFieldStyle(true);
     updatePlantRegen();
     updateUI();
+
+    // 登入之後立刻安排一次 2 分鐘事件（如果田裡有東西）
+    scheduleLoginEvent();
 
     document.getElementById("plantBtn").onclick=()=>{
       if(plantLimit<=0){
@@ -842,6 +873,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       eventBox.textContent="🌱 新蘿蔔種下～";
       updateUI();
       saveGame();
+      scheduleLoginEvent();   // 如果之前冇安排，種咗之後都再安排
     };
 
     document.getElementById("waterBtn").onclick=()=>{
@@ -884,6 +916,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       }
       updateUI();
       saveGame();
+      scheduleLoginEvent(); // 收成之後如果仲有，確保計時存在
     };
 
     document.getElementById("resetBtn").onclick=()=>{
@@ -899,6 +932,7 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     document.getElementById("testBtn").onclick=()=>{
       xmasTest=!xmasTest;
+      setGlobalXmasTest(xmasTest); // ✅ 更新給音樂用
       const now=new Date();
       const isRealXmas=(now.getMonth()==11 && now.getDate()==24);
       const isXmasMode=isRealXmas||xmasTest;
@@ -913,6 +947,10 @@ document.addEventListener("DOMContentLoaded",()=>{
       }
       updateFieldStyle();
       saveGame();
+
+      // 聖誕測試開/關 時即時換歌
+      chooseBgm();
+      if(musicOn) tryPlayBgm(false);
     };
 
     document.getElementById("growTestBtn").onclick=()=>{
@@ -948,20 +986,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       }
     },45000);
 
-    function triggerEvent(){
-      const r=Math.random();
-      if(r<0.15)      birdEvent();
-      else if(r<0.3)  sunEvent();
-      else if(r<0.4)  lavaEvent();
-      else if(r<0.5)  snowEvent();
-      else if(r<0.6)  rainEvent();
-      else if(r<0.7)  catSteal();
-      else if(r<0.8)  catWater();
-      else if(r<0.9)  rabbitHelp();
-      else            rabbitEat();
-    }
-
-    // ===== 以下事件全部改用 Popup，再更新 eventBox =====
+    // ===== 事件實作（用 Popup） =====
     function birdEvent(){
       if(seeds.length>0) seeds.pop();
       const b=document.createElement("div");
