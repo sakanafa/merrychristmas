@@ -16,6 +16,10 @@
             --gold: #FFD700;
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
         body, html {
             margin: 0;
             padding: 0;
@@ -24,20 +28,22 @@
             background-image: linear-gradient(180deg, #1a472a 0%, #0d2b18 100%);
             color: #333;
             height: 100%;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
+            overflow-x: hidden; /* 防止左右滑動 */
         }
 
         /* 雪花特效 */
         .snowflake {
-            position: absolute;
+            position: fixed;
             top: -10px;
             color: white;
             font-size: 1em;
             opacity: 0.8;
             z-index: 1;
+            pointer-events: none;
             animation: fall linear forwards;
         }
 
@@ -46,14 +52,14 @@
         }
 
         .container {
-            width: 90%;
+            width: 94%;
             max-width: 420px;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
             box-shadow: 0 0 30px rgba(255, 0, 0, 0.2);
             overflow: hidden;
             position: relative;
-            min-height: 550px;
+            min-height: 540px;
             display: flex;
             flex-direction: column;
             z-index: 10;
@@ -64,7 +70,7 @@
         .christmas-header {
             background-color: var(--christmas-red);
             color: white;
-            padding: 15px;
+            padding: 15px 40px;
             text-align: center;
             position: relative;
             border-bottom: 3px dashed white;
@@ -73,14 +79,18 @@
         .christmas-header::before {
             content: '🎄';
             position: absolute;
-            left: 15px;
-            font-size: 1.5rem;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.4rem;
         }
         .christmas-header::after {
             content: '🎄';
             position: absolute;
-            right: 15px;
-            font-size: 1.5rem;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.4rem;
         }
 
         .bank-name {
@@ -90,7 +100,7 @@
         }
 
         .content {
-            padding: 20px;
+            padding: 18px 16px 20px;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
@@ -102,13 +112,14 @@
         /* --- 步驟 1: 開卡介面 --- */
         #step-activation h2 {
             color: var(--christmas-red);
-            margin-bottom: 15px;
+            margin-bottom: 12px;
+            font-size: 1.4rem;
         }
 
         .instruction {
             color: #555;
-            font-size: 1rem;
-            margin-bottom: 30px;
+            font-size: 0.95rem;
+            margin-bottom: 24px;
             line-height: 1.6;
         }
 
@@ -116,118 +127,128 @@
             background: var(--christmas-red);
             color: white;
             border: 2px solid white;
-            padding: 15px 40px;
-            font-size: 1.2rem;
+            padding: 14px 24px;
+            font-size: 1.05rem;
             border-radius: 50px;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(211, 47, 47, 0.5);
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
             width: 100%;
+            max-width: 280px;
             font-weight: bold;
             font-family: 'Varela Round', sans-serif;
         }
 
         .activate-btn:active {
-            transform: scale(0.95);
+            transform: scale(0.96);
+            box-shadow: 0 2px 8px rgba(211, 47, 47, 0.6);
         }
 
         /* --- 步驟 2: 載入動畫 (聖誕風) --- */
         #step-loading {
             display: none;
+            width: 100%;
         }
 
         .loading-icon {
-            font-size: 3rem;
+            font-size: 2.6rem;
             animation: bounce 1s infinite alternate;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         @keyframes bounce {
             from { transform: translateY(0); }
-            to { transform: translateY(-20px); }
+            to { transform: translateY(-14px); }
         }
 
         .loading-text {
             color: var(--christmas-green);
             font-weight: bold;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
         /* --- 步驟 3: 成功與卡片 --- */
         #step-success {
             display: none;
             width: 100%;
-            animation: fadeIn 1s ease;
+            animation: fadeIn 0.8s ease;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.9); }
+            from { opacity: 0; transform: scale(0.96); }
             to { opacity: 1; transform: scale(1); }
         }
 
-        /* --- 1:1 還原卡片樣式 --- */
+        /* --- 信用卡樣式（手機友善） --- */
         .credit-card {
             width: 100%;
-            aspect-ratio: 1.586; /* 標準信用卡比例 */
+            max-width: 360px;
+            margin: 0 auto 20px;
             background-color: var(--card-bg);
             border-radius: 15px;
-            padding: 20px;
+            padding: 16px 16px 18px;
             box-sizing: border-box;
             color: white;
             position: relative;
-            margin-bottom: 25px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.3);
             text-align: left;
             overflow: hidden;
+        }
+
+        /* 防止太矮 */
+        @media (min-width: 360px) {
+            .credit-card {
+                min-height: 200px;
+            }
         }
 
         /* 背景浮水印蘿蔔 (選用) */
         .credit-card::before {
             content: '🥕';
             position: absolute;
-            font-size: 15rem;
-            right: -50px;
-            bottom: -50px;
+            font-size: 12rem;
+            right: -40px;
+            bottom: -40px;
             opacity: 0.05;
             transform: rotate(-20deg);
         }
 
-        /* 左上角 Logo */
+        /* 左上 Logo */
         .card-top-left {
             display: flex;
             align-items: center;
         }
         .card-rabbit-icon {
-            font-size: 2rem;
-            margin-right: 5px;
+            font-size: 1.8rem;
+            margin-right: 4px;
         }
         .card-brand {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 900;
             letter-spacing: 1px;
             text-transform: uppercase;
         }
 
-        /* 右上角 Mamaercard Logo */
+        /* 右上 Mamaercard Logo */
         .card-top-right {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 14px;
+            right: 14px;
             text-align: center;
         }
         .mastercard-circles {
             display: flex;
             justify-content: center;
             position: relative;
-            width: 40px;
-            height: 24px;
+            width: 36px;
+            height: 22px;
             margin: 0 auto 2px auto;
         }
         .circle {
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
-            border: 1.5px solid white;
+            border: 1.2px solid white;
             background: transparent;
             position: absolute;
         }
@@ -235,36 +256,36 @@
         .c2 { right: 0; }
         
         .mamaercard-text {
-            font-size: 0.5rem;
+            font-size: 0.55rem;
             font-weight: bold;
         }
 
         /* 中間裝飾 */
         .card-middle {
-            margin-top: 25px;
+            margin-top: 22px;
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            padding-right: 10px;
+            padding-right: 4px;
         }
         .red-dots {
             display: flex;
-            gap: 5px;
-            margin-right: 10px;
+            gap: 4px;
+            margin-right: 8px;
         }
         .dot {
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
             background-color: #D32F2F; /* 暗紅色 */
             border-radius: 50%;
         }
         .merry-text {
-            font-size: 0.9rem;
+            font-size: 0.82rem;
             font-weight: bold;
-            margin-right: 10px;
+            margin-right: 6px;
         }
         .contactless {
-            font-size: 1.2rem;
+            font-size: 1.05rem;
             transform: rotate(90deg);
             display: inline-block;
         }
@@ -272,21 +293,26 @@
         /* 卡號 */
         .card-number {
             font-family: 'Courier New', monospace; /* 接近圖片字體 */
-            font-size: 1.1rem;
-            margin-top: 15px;
+            font-size: 0.9rem;
+            margin-top: 14px;
             font-weight: bold;
             letter-spacing: 1px;
             text-shadow: 0 1px 2px rgba(0,0,0,0.2);
             display: flex;
-            justify-content: space-between;
-            width: 95%;
+            flex-wrap: wrap;             /* 重要：手機可以自動換行 */
+            gap: 6px 10px;               /* 行間距、字距 */
+            max-width: 100%;
+        }
+
+        .card-number span {
+            flex: 0 0 auto;
         }
 
         /* 持卡人 */
         .card-holder {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: bold;
-            margin-top: 15px;
+            margin-top: 14px;
             letter-spacing: 1px;
         }
 
@@ -295,26 +321,52 @@
             background: #fffaf0;
             border: 1px solid #e0e0e0;
             border-top: 4px solid var(--christmas-red);
-            padding: 15px;
+            padding: 12px 12px 14px;
             text-align: left;
-            border-radius: 5px;
+            border-radius: 8px;
             position: relative;
+            max-width: 100%;
         }
 
         .letter-content {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             line-height: 1.6;
             color: #444;
             white-space: pre-line;
         }
 
         .signature {
-            margin-top: 15px;
+            margin-top: 12px;
             text-align: right;
             font-weight: bold;
             color: var(--christmas-green);
+            font-size: 0.9rem;
         }
 
+        /* 手機版細節調整 */
+        @media (max-width: 360px) {
+            .christmas-header {
+                padding: 12px 32px;
+            }
+            .bank-name {
+                font-size: 1.05rem;
+            }
+            #step-activation h2 {
+                font-size: 1.25rem;
+            }
+            .instruction {
+                font-size: 0.9rem;
+            }
+            .credit-card {
+                padding: 14px 12px 16px;
+            }
+            .card-rabbit-icon {
+                font-size: 1.6rem;
+            }
+            .card-brand {
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -419,17 +471,17 @@
             snowflake.classList.add('snowflake');
             snowflake.innerText = '❄';
             snowflake.style.left = Math.random() * 100 + 'vw';
-            snowflake.style.animationDuration = Math.random() * 3 + 2 + 's';
-            snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
+            snowflake.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            snowflake.style.fontSize = (Math.random() * 10 + 10) + 'px';
             
             document.body.appendChild(snowflake);
 
             setTimeout(() => {
                 snowflake.remove();
-            }, 5000);
+            }, 6000);
         }
 
-        setInterval(createSnow, 200);
+        setInterval(createSnow, 250);
 
         // 開卡流程
         function startActivation() {
@@ -442,6 +494,7 @@
             step2.style.display = 'flex';
             step2.style.flexDirection = 'column';
             step2.style.alignItems = 'center';
+            step2.style.justifyContent = 'center';
 
             setTimeout(() => {
                 loadingText.innerText = "正在包裝蘿蔔禮盒...";
