@@ -232,7 +232,7 @@ for(let i=0;i<25;i++){
 </script>
 <div id="music-control">🔊</div>
 <audio id="bgm" loop preload="auto">
-  <source src="bgm.mp3" type="audio/mpeg">
+  <source src="bells.mp3" type="audio/mpeg">
 </audio>
 
 <!-- 聖誕 Popup -->
@@ -274,11 +274,11 @@ for(let i=0;i<25;i++){
 
 <!-- 鎖屏 -->
 <div id="lockscreen">
- <h2>🎄 聖誕種蘿蔔 🥕</h2>
+ <h2>🎄 聖誕種蘿蔔特別活動 🥕</h2>
  <div id="countdown">載入中...</div>
- <div class="daylabel">🎅 聖誕打卡日曆（12月1–24）</div>
+ <div class="daylabel">🐰🎄 聖誕打卡日曆（12月1–24）</div>
  <div id="calendar" class="calendar"></div>
- <p>請輸入活動密碼：</p>
+ <p>請輸入銀行咭密碼：</p>
  <input type="password" id="pwd" placeholder="輸入密碼"><br>
  <button id="loginBtn">登入</button>
  <p id="msg" style="color:red;"></p>
@@ -288,11 +288,11 @@ for(let i=0;i<25;i++){
 <div id="game">
  <div id="merryTitle">🎅 MERRY CHRISTMAS 🎁</div>
  <div class="container">
-  <h3>👩‍🌾 聖誕種蘿蔔 活動版</h3>
+  <h3>🐰🎄🥕🥕 種蘿蔔 🎄</h3>
   <div class="value" id="lastLoginText">上一次登入：--</div>
   <div class="value" id="wild">種植中🥕：0</div>
   <div class="value" id="safe">銀行儲值💳：0</div>
-  <div class="value" id="total">總收成：0根</div>
+  <div class="value" id="total">🥕🥕總收成：0根</div>
   <div class="progress-container">
     <div class="progress-bar" id="bar"></div>
   </div>
@@ -323,7 +323,7 @@ for(let i=0;i<25;i++){
 
 <script>
 document.addEventListener("DOMContentLoaded",()=>{
-  const PASSWORD="carrot2025";
+  const PASSWORD="600lovefafa";
 
   // ✅ 新舊打卡 key：新 checkin2025，舊 adventCheckin2025
   const CHECKIN_KEY_NEW="checkin2025";
@@ -890,7 +890,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       if(seeds.length>0) seeds.pop();
       const r=document.getElementById("rabbit");
       r.classList.add("run");
-      eventBox.textContent="🐇 小兔貪食 咬蘿蔔 🤣";
+      eventBox.textContent="🐇 小兔子貪食 咬蘿蔔🥕 ";
       setTimeout(()=>r.classList.remove("run"),4000);
       updateUI();saveGame();
     }
