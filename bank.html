@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FRFARMLAND BANK - 聖誕開卡中心</title>
+    <!-- 引入圓潤字體以配合圖片風格 -->
+    <link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
+    <style>
+        /* --- 基礎設定 --- */
+        :root {
+            --christmas-red: #D32F2F;
+            --christmas-green: #2E7D32;
+            --card-bg: #008566; /* 圖片中的綠色 */
+            --snow-white: #fff;
+            --gold: #FFD700;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Varela Round', sans-serif; /* 圓潤字體 */
+            background-color: #1a472a; /* 深綠背景 */
+            background-image: linear-gradient(180deg, #1a472a 0%, #0d2b18 100%);
+            color: #333;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* 雪花特效 */
+        .snowflake {
+            position: absolute;
+            top: -10px;
+            color: white;
+            font-size: 1em;
+            opacity: 0.8;
+            z-index: 1;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(105vh); }
+        }
+
+        .container {
+            width: 90%;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.2);
+            overflow: hidden;
+            position: relative;
+            min-height: 550px;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            border: 4px solid var(--christmas-red);
+        }
+
+        /* 聖誕裝飾頂部 */
+        .christmas-header {
+            background-color: var(--christmas-red);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+            border-bottom: 3px dashed white;
+        }
+
+        .christmas-header::before {
+            content: '🎄';
+            position: absolute;
+            left: 15px;
+            font-size: 1.5rem;
+        }
+        .christmas-header::after {
+            content: '🎄';
+            position: absolute;
+            right: 15px;
+            font-size: 1.5rem;
+        }
+
+        .bank-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        /* --- 步驟 1: 開卡介面 --- */
+        #step-activation h2 {
+            color: var(--christmas-red);
+            margin-bottom: 15px;
+        }
+
+        .instruction {
+            color: #555;
+            font-size: 1rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .activate-btn {
+            background: var(--christmas-red);
+            color: white;
+            border: 2px solid white;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(211, 47, 47, 0.5);
+            transition: transform 0.2s;
+            width: 100%;
+            font-weight: bold;
+            font-family: 'Varela Round', sans-serif;
+        }
+
+        .activate-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* --- 步驟 2: 載入動畫 (聖誕風) --- */
+        #step-loading {
+            display: none;
+        }
+
+        .loading-icon {
+            font-size: 3rem;
+            animation: bounce 1s infinite alternate;
+            margin-bottom: 20px;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-20px); }
+        }
+
+        .loading-text {
+            color: var(--christmas-green);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* --- 步驟 3: 成功與卡片 --- */
+        #step-success {
+            display: none;
+            width: 100%;
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* --- 1:1 還原卡片樣式 --- */
+        .credit-card {
+            width: 100%;
+            aspect-ratio: 1.586; /* 標準信用卡比例 */
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            box-sizing: border-box;
+            color: white;
+            position: relative;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            text-align: left;
+            overflow: hidden;
+        }
+
+        /* 背景浮水印蘿蔔 (選用) */
+        .credit-card::before {
+            content: '🥕';
+            position: absolute;
+            font-size: 15rem;
+            right: -50px;
+            bottom: -50px;
+            opacity: 0.05;
+            transform: rotate(-20deg);
+        }
+
+        /* 左上角 Logo */
+        .card-top-left {
+            display: flex;
+            align-items: center;
+        }
+        .card-rabbit-icon {
+            font-size: 2rem;
+            margin-right: 5px;
+        }
+        .card-brand {
+            font-size: 1.2rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* 右上角 Mamaercard Logo */
+        .card-top-right {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            text-align: center;
+        }
+        .mastercard-circles {
+            display: flex;
+            justify-content: center;
+            position: relative;
+            width: 40px;
+            height: 24px;
+            margin: 0 auto 2px auto;
+        }
+        .circle {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 1.5px solid white;
+            background: transparent;
+            position: absolute;
+        }
+        .c1 { left: 0; }
+        .c2 { right: 0; }
+        
+        .mamaercard-text {
+            font-size: 0.5rem;
+            font-weight: bold;
+        }
+
+        /* 中間裝飾 */
+        .card-middle {
+            margin-top: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+        }
+        .red-dots {
+            display: flex;
+            gap: 5px;
+            margin-right: 10px;
+        }
+        .dot {
+            width: 8px;
+            height: 8px;
+            background-color: #D32F2F; /* 暗紅色 */
+            border-radius: 50%;
+        }
+        .merry-text {
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .contactless {
+            font-size: 1.2rem;
+            transform: rotate(90deg);
+            display: inline-block;
+        }
+
+        /* 卡號 */
+        .card-number {
+            font-family: 'Courier New', monospace; /* 接近圖片字體 */
+            font-size: 1.1rem;
+            margin-top: 15px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: space-between;
+            width: 95%;
+        }
+
+        /* 持卡人 */
+        .card-holder {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 15px;
+            letter-spacing: 1px;
+        }
+
+        /* 信件樣式 */
+        .letter-box {
+            background: #fffaf0;
+            border: 1px solid #e0e0e0;
+            border-top: 4px solid var(--christmas-red);
+            padding: 15px;
+            text-align: left;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .letter-content {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #444;
+            white-space: pre-line;
+        }
+
+        .signature {
+            margin-top: 15px;
+            text-align: right;
+            font-weight: bold;
+            color: var(--christmas-green);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- 銀行頂部 -->
+        <div class="christmas-header">
+            <div class="bank-name">FRFARMLAND BANK</div>
+            <div style="font-size: 0.8rem;">Christmas Special Edition</div>
+        </div>
+
+        <div class="content">
+            
+            <!-- 畫面 1: 開卡按鈕 -->
+            <div id="step-activation">
+                <h2>🎅 聖誕禮物開卡 🎅</h2>
+                <p class="instruction">
+                    叮叮噹！聖誕快樂！<br>
+                    這裡有一份來自 FRFARMLAND 的特別禮物。<br>
+                    請點擊下方按鈕，領取你的專屬卡片。
+                </p>
+                <button class="activate-btn" onclick="startActivation()">🎁 立即開卡</button>
+            </div>
+
+            <!-- 畫面 2: 處理中 -->
+            <div id="step-loading">
+                <div class="loading-icon">🐰🥕</div>
+                <div class="loading-text" id="loading-text">正在聯絡聖誕老公公...</div>
+            </div>
+
+            <!-- 畫面 3: 成功與信件 -->
+            <div id="step-success">
+                <!-- 虛擬信用卡 (依照圖片還原) -->
+                <div class="credit-card">
+                    <!-- 左上 -->
+                    <div class="card-top-left">
+                        <span class="card-rabbit-icon">🐰🥕</span>
+                        <span class="card-brand">FARMLAND</span>
+                    </div>
+
+                    <!-- 右上 -->
+                    <div class="card-top-right">
+                        <div class="mastercard-circles">
+                            <div class="circle c1"></div>
+                            <div class="circle c2"></div>
+                        </div>
+                        <div class="mamaercard-text">Mamaercard</div>
+                    </div>
+
+                    <!-- 中間裝飾 -->
+                    <div class="card-middle">
+                        <div class="red-dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                        <span class="merry-text">Merry Christmas</span>
+                        <span class="contactless">)))</span>
+                    </div>
+
+                    <!-- 卡號 -->
+                    <div class="card-number">
+                        <span>600</span>
+                        <span>88</span>
+                        <span>🥕🥕🥕</span>
+                        <span>🥕🥕🥕</span>
+                        <span>5201314</span>
+                    </div>
+
+                    <!-- 名字 -->
+                    <div class="card-holder">SixWhite</div>
+                </div>
+
+                <!-- 信件內容 -->
+                <div class="letter-box">
+                    <div class="letter-content">
+親愛的小兔子：
+
+聖誕快樂！🎄
+
+恭喜你成功開通了這張獨一無二的 **Mamaercard**！
+這張卡片的尾號是 5201314，代表著我對你滿滿的心意。
+
+拿著這張卡，你可以無限次進入我們的快樂農場，所有的蘿蔔和驚喜都屬於你。
+
+記得掃描卡片背面的 QR Code (遊戲那個) 去儲分換禮物喔！
+                    </div>
+                    <div class="signature">
+                        FRFARMLAND 行長<br>
+                        (聖誕特別版) 敬上
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // 產生雪花
+        function createSnow() {
+            const snowflake = document.createElement('div');
+            snowflake.classList.add('snowflake');
+            snowflake.innerText = '❄';
+            snowflake.style.left = Math.random() * 100 + 'vw';
+            snowflake.style.animationDuration = Math.random() * 3 + 2 + 's';
+            snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
+            
+            document.body.appendChild(snowflake);
+
+            setTimeout(() => {
+                snowflake.remove();
+            }, 5000);
+        }
+
+        setInterval(createSnow, 200);
+
+        // 開卡流程
+        function startActivation() {
+            const step1 = document.getElementById('step-activation');
+            const step2 = document.getElementById('step-loading');
+            const step3 = document.getElementById('step-success');
+            const loadingText = document.getElementById('loading-text');
+
+            step1.style.display = 'none';
+            step2.style.display = 'flex';
+            step2.style.flexDirection = 'column';
+            step2.style.alignItems = 'center';
+
+            setTimeout(() => {
+                loadingText.innerText = "正在包裝蘿蔔禮盒...";
+            }, 1500);
+
+            setTimeout(() => {
+                loadingText.innerText = "正在刻上 SixWhite 的名字...";
+            }, 3000);
+
+            setTimeout(() => {
+                step2.style.display = 'none';
+                step3.style.display = 'block';
+            }, 4500);
+        }
+    </script>
+</body>
+</html>
