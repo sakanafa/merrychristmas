@@ -584,26 +584,53 @@ for(let i=0;i<25;i++){
   </div>
   <button id="toggle-rule">🌱 種植規則</button>
   <div id="rule-box">
-    🌱 <b>種植規則：</b><br>
-    1️⃣ 每次按「種蘿蔔」會種出一棵新蘿蔔。<br>
-    2️⃣ 上面顯示 <b>(目前數量 / 最大 20)</b>，用完 20 粒之後，要等時間自動回復。<br>
-    3️⃣ 種子會經過三個階段：<br>
-    &nbsp;&nbsp;&nbsp;• 🌰 種子（剛種落去）<br>
-    &nbsp;&nbsp;&nbsp;• 🌿 幼苗（大約 1.5 小時後）<br>
-    &nbsp;&nbsp;&nbsp;• 🥕 成熟蘿蔔（大約 3 小時後，總共）<br>
-    4️⃣ 「淋水 💧」每日限按一次，會一次過淋晒所有當時存在的蘿蔔：<br>
-    &nbsp;&nbsp;&nbsp;• 喺 🌰 階段被淋過水：水記錄喺「種子」<br>
-    &nbsp;&nbsp;&nbsp;• 喺 🌿 階段被淋過水：水記錄喺「幼苗」<br>
-    5️⃣ 收成請用「存入銀行 💳」，只會收成已經係 🥕 的蘿蔔，數量計法：<br>
-    &nbsp;&nbsp;&nbsp;• 未淋過水：+1 根<br>
-    &nbsp;&nbsp;&nbsp;• 只喺一個階段淋過水（種子 或 幼苗）：+3 根<br>
-    &nbsp;&nbsp;&nbsp;• 種子同幼苗兩個階段都淋過水：+5 根<br>
-    6️⃣ 收成後嘅蘿蔔會加到「銀行儲值 💳」，同時計入「總收成」。<br>
-    7️⃣ 特別事件（小鳥、太陽、落雪、小貓、小兔）會不定時出現，<br>
-    &nbsp;&nbsp;&nbsp;有啲會加蘿蔔，有啲會偷走／減少蘿蔔，請小心守護你嘅田！<br>
-    8️⃣ 12 月 24 日（或開啟聖誕測試模式）時：<br>
-    &nbsp;&nbsp;&nbsp;• 田裡所有蘿蔔會變成 🎄 聖誕樹 / 🎁 禮物，<br>
-    &nbsp;&nbsp;&nbsp;• 會彈出聖誕祝福視窗，記得去銀行睇你嘅禮物～<br>
+    🌱 <b>遊戲規則（2025 版）：</b><br>
+    <br>
+    【基本種植】<br>
+    1️⃣ 按「種蘿蔔 🌰」會種出一棵新蘿蔔。每次消耗 1 粒種子。<br>
+    2️⃣ 種子上限為 <b>20 粒</b>，用完之後會隨時間自動回復（數分鐘補 1 粒）。<br>
+    3️⃣ 每一棵蘿蔔會經過 3 個階段：<br>
+    &nbsp;&nbsp;&nbsp;• 🌰 種子：剛種落泥；<br>
+    &nbsp;&nbsp;&nbsp;• 🌿 幼苗：約 1.5 小時後；<br>
+    &nbsp;&nbsp;&nbsp;• 🥕 成熟蘿蔔：約 3 小時後。<br>
+    &nbsp;&nbsp;&nbsp;（如果擁有「🎄 貓貓聖誕樹」，成長時間會 <b>縮短約 50%</b>）<br>
+    <br>
+    【淋水系統】<br>
+    4️⃣ 「淋水 💧」每日限用一次，會對田裡當時所有蘿蔔生效：<br>
+    &nbsp;&nbsp;&nbsp;• 當佢仍然係 🌰 時，被記錄為「種子期淋水」；<br>
+    &nbsp;&nbsp;&nbsp;• 當佢已經係 🌿 時，被記錄為「幼苗期淋水」。<br>
+    5️⃣ 淋水次數會影響每棵成熟蘿蔔嘅收成量：<br>
+    &nbsp;&nbsp;&nbsp;• 無淋水：每棵收成 <b>1 根</b>；<br>
+    &nbsp;&nbsp;&nbsp;• 只喺其中一個階段淋水：每棵收成 <b>3 根</b>；<br>
+    &nbsp;&nbsp;&nbsp;• 種子期 + 幼苗期都淋過水：每棵收成 <b>5 根</b>。<br>
+    <br>
+    【收成與資源】<br>
+    6️⃣ 「存入銀行 💳」：收成所有已成熟嘅 🥕，按上面規則加到銀行儲值。<br>
+    &nbsp;&nbsp;&nbsp;• 這些蘿蔔記為「銀行蘿蔔」，用嚟計聖誕達標率。<br>
+    7️⃣ 「🥕 放入背包」：一樣只收成熟嘅 🥕，不過會直接加到 <b>背包</b>。<br>
+    &nbsp;&nbsp;&nbsp;• 背包蘿蔔可以用嚟換購聖誕禮物。<br>
+    8️⃣ 「總收成」會統計你歷來賺到嘅蘿蔔總數，用嚟顯示聖誕達標進度。<br>
+    <br>
+    【聖誕禮物與加成】<br>
+    9️⃣ 「🎁 聖誕禮品換購」可以用背包蘿蔔換不同禮物，加成效果包括：<br>
+    &nbsp;&nbsp;&nbsp;• 🎁 兔兔驚喜禮盒：每次「收成 / 放入背包」，有 20% 機會額外 +20 根入背包。<br>
+    &nbsp;&nbsp;&nbsp;• 🎄 貓貓聖誕樹：所有蘿蔔成長時間縮短約 50%。<br>
+    &nbsp;&nbsp;&nbsp;• 🕯️ 貓貓暖爐：落雪時有 50% 機會完全免疫損失。<br>
+    &nbsp;&nbsp;&nbsp;• 🍪 聖誕貓薄餅：本來會偷蘿蔔嘅小貓，有 50% 機會變成幫你淋水。<br>
+    &nbsp;&nbsp;&nbsp;• ⭐ 兔貓流星燈：每次種蘿蔔，有 5% 機會觸發額外好事事件。<br>
+    <br>
+    【隨機事件】<br>
+    🔟 遊戲途中會不定時出現事件（小鳥、太陽、落雪、小貓、小兔等）：<br>
+    &nbsp;&nbsp;&nbsp;• 有啲會增加銀行蘿蔔；<br>
+    &nbsp;&nbsp;&nbsp;• 有啲會偷走田裡嘅蘿蔔；<br>
+    &nbsp;&nbsp;&nbsp;• 有啲會幫你淋水或加速成長。<br>
+    &nbsp;&nbsp;&nbsp;詳細效果會彈出提示視窗話你知～<br>
+    <br>
+    【聖誕特別】<br>
+    1️⃣1️⃣ 12 月 24 日（或開啟聖誕測試模式）時：<br>
+    &nbsp;&nbsp;&nbsp;• 田裡所有蘿蔔會變成 🎄 聖誕樹；<br>
+    &nbsp;&nbsp;&nbsp;• 會彈出聖誕祝福視窗；<br>
+    &nbsp;&nbsp;&nbsp;• 可以檢查「聖誕達標率」以及「已換到的聖誕禮物」。<br>
   </div>
   <div id="eventBox">🌤 歡迎回來，小農夫～</div>
  </div>
@@ -623,17 +650,17 @@ document.addEventListener("DOMContentLoaded",()=>{
   const XMAS_TARGET_CARROTS = 1888;
 
   const XMAS_GIFTS = [
-    { id:"hat_rabbit",  name:"🎅 兔兔聖誕帽",   icon:"🎅", cost:200, type:"decor",
+    { id:"hat_rabbit",  name:"🎅 兔兔聖誕帽",   icon:"🎅", cost:100, type:"decor",
       effect:"純裝飾限定小物，代表你已正式成為今年嘅聖誕小農夫～" },
-    { id:"rabbit_box",  name:"🎁 兔兔驚喜禮盒", icon:"🎁", cost:400, type:"buff",
-      effect:"每次收成或放入背包時，有 20% 機會額外 +1 根蘿蔔放入背包。" },
-    { id:"tree_cat",    name:"🎄 貓貓聖誕樹",   icon:"🎄", cost:600, type:"buff",
-      effect:"令所有蘿蔔成長時間縮短約 10%，更快由種子變成成熟蘿蔔。" },
-    { id:"cat_heater",  name:"🕯️ 貓貓暖爐",   icon:"🕯️", cost:500, type:"buff",
+    { id:"rabbit_box",  name:"🎁 兔兔驚喜禮盒", icon:"🎁", cost:200, type:"buff",
+      effect:"每次收成或放入背包時，有 20% 機會額外 +20 根蘿蔔放入背包。" },
+    { id:"tree_cat",    name:"🎄 貓貓聖誕樹",   icon:"🎄", cost:300, type:"buff",
+      effect:"令所有蘿蔔成長時間縮短約 50%，更快由種子變成成熟蘿蔔。" },
+    { id:"cat_heater",  name:"🕯️ 貓貓暖爐",   icon:"🕯️", cost:250, type:"buff",
       effect:"遇到落雪事件時有 50% 機會完全免疫損失，保護你嘅蘿蔔不被雪埋。" },
-    { id:"cat_cookie",  name:"🍪 聖誕貓薄餅", icon:"🍪", cost:700, type:"buff",
+    { id:"cat_cookie",  name:"🍪 聖誕貓薄餅", icon:"🍪", cost:350, type:"buff",
       effect:"小貓原本會偷食蘿蔔時，有 50% 機會變成幫你淋水嘅好貓貓。" },
-    { id:"star_lights", name:"⭐ 兔貓流星燈", icon:"⭐", cost:900, type:"buff_decor",
+    { id:"star_lights", name:"⭐ 兔貓流星燈", icon:"⭐", cost:450, type:"buff_decor",
       effect:"之後每次種蘿蔔，有 5% 機會額外觸發一個隨機好事事件（加蘿蔔/幫忙）。" }
   ];
 
@@ -1086,8 +1113,8 @@ document.addEventListener("DOMContentLoaded",()=>{
       let baseSeedToGrown  = ONE_AND_HALF_HOUR * 2;
 
       if (hasItem("tree_cat")) {
-        baseSeedToSprout *= 0.9;
-        baseSeedToGrown  *= 0.9;
+        baseSeedToSprout *= 0.5;  // 成長時間減半
+        baseSeedToGrown  *= 0.5;
       }
 
       let changed=false;
@@ -1296,11 +1323,11 @@ document.addEventListener("DOMContentLoaded",()=>{
         totalCarrotCollected += harvested;
 
         if(hasItem("rabbit_box") && Math.random()<0.2){
-          backpackCarrot += 1;
-          totalCarrotCollected += 1;
-          eventBox.textContent=`💳 收成 ${harvested} 根，存入銀行！禮盒加送 1 根入背包～`;
+          backpackCarrot += 20;
+          totalCarrotCollected += 20;
+          eventBox.textContent=`💳 收成 ${harvested} 根，存入銀行！禮盒加送 20 根入背包～`;
         }else{
-          eventBox.textContent=`💳 收成 ${harvested} 根，存入銀行！`;
+          eventBox.textContent=`💳 收成 ${harvested} 根，存入銀行！`;
         }
       }else{
         eventBox.textContent="冇成熟蘿蔔～";
@@ -1333,9 +1360,9 @@ document.addEventListener("DOMContentLoaded",()=>{
       totalCarrotCollected += harvested;
 
       if(hasItem("rabbit_box") && Math.random()<0.2){
-        backpackCarrot += 1;
-        totalCarrotCollected += 1;
-        eventBox.textContent=`🥕 已將 ${harvested} 根蘿蔔放入背包！禮盒額外送 1 根～`;
+        backpackCarrot += 20;
+        totalCarrotCollected += 20;
+        eventBox.textContent=`🥕 已將 ${harvested} 根蘿蔔放入背包！禮盒額外送 20 根～`;
       }else{
         eventBox.textContent=`🥕 已將 ${harvested} 根蘿蔔放入背包！`;
       }
