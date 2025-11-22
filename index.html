@@ -72,8 +72,6 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   box-shadow:0 0 10px rgba(0,0,0,0.1);padding:15px;position:relative;
 }
 .value{font-size:18px;margin:4px 0;}
-.progress-container{background:#ccc;border-radius:10px;margin:8px auto;width:90%;height:16px;overflow:hidden;}
-.progress-bar{background:linear-gradient(90deg,#ffca28,#ff9100);height:100%;width:0%;transition:width 0.4s ease;}
 #field{
   position:relative;width:100%;height:200px;border-radius:10px;overflow:hidden;margin-top:10px;
   transition:background 1s;z-index:1;
@@ -350,19 +348,19 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   border-radius:999px;
 }
 
-/* ---------- 🎁 聖誕禮物展示 Frame（設計 B：粉底實線框） ---------- */
+/* ---------- 🎁 聖誕禮物展示 Frame ---------- */
 #xmasOwnedFrame{
   margin-top:8px;
   padding:10px 10px 12px;
   border-radius:16px;
   background:#ffeef1;
-  border:1px solid #b9404a;           /* 實線框，用 b9404a */
+  border:1px solid #b9404a;
   box-shadow:0 2px 6px rgba(185,64,74,0.22);
   text-align:center;
 }
 .xmasOwnedTitle{
   font-weight:bold;
-  color:#b9404a;                       /* 標題字色 b9404a */
+  color:#b9404a;
   margin-bottom:2px;
 }
 #xmasOwnedList{
@@ -393,7 +391,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   box-shadow:0 3px 7px rgba(0,0,0,0.22);
 }
 
-/* 🎁 Gift Tooltip / 彈窗 */
+/* 🎁 Gift Tooltip */
 #xmasGiftTooltip{
   position:fixed;
   left:0;
@@ -519,7 +517,7 @@ for(let i=0;i<25;i++){
   </div>
 </div>
 
-<!-- 點擊禮物 icon 功用 Tooltip -->
+<!-- 點擊禮物 icon Tooltip -->
 <div id="xmasGiftTooltip">
   <div class="tooltipInner">
     <div class="tooltipIcon" id="tooltipIcon"></div>
@@ -552,7 +550,7 @@ for(let i=0;i<25;i++){
   <div class="value" id="backpack">🥕 背包：0</div>
   <div class="value" id="total">🥕🥕總收成：0根</div>
 
-  <!-- 聖誕達標率 -->
+  <!-- 1️⃣ 聖誕達標率 BAR -->
   <div id="xmasProgress">
     <div id="xmasProgressLabel">
       💳 換聖誕禮達標率：<span id="xmasProgressText">0/1888</span>
@@ -562,15 +560,12 @@ for(let i=0;i<25;i++){
     </div>
   </div>
 
-  <!-- 🎁 已換到的聖誕禮物展示區（無提示行） -->
+  <!-- 2️⃣ 已換到的聖誕禮物 Frame -->
   <div id="xmasOwnedFrame">
     <div class="xmasOwnedTitle">🎄 換到的聖誕禮物 🎁</div>
     <div id="xmasOwnedList"></div>
   </div>
 
-  <div class="progress-container">
-    <div class="progress-bar" id="bar"></div>
-  </div>
   <div id="field">
     <div class="ground"></div>
     <div class="icon" id="rabbit">🐇</div>
@@ -594,8 +589,8 @@ for(let i=0;i<25;i++){
     2️⃣ 上面顯示 <b>(目前數量 / 最大 20)</b>，用完 20 粒之後，要等時間自動回復。<br>
     3️⃣ 種子會經過三個階段：<br>
     &nbsp;&nbsp;&nbsp;• 🌰 種子（剛種落去）<br>
-    &nbsp;&nbsp;&nbsp;• 🌿 幼苗（大約 3 小時後）<br>
-    &nbsp;&nbsp;&nbsp;• 🥕 成熟蘿蔔（大約 6 小時後）<br>
+    &nbsp;&nbsp;&nbsp;• 🌿 幼苗（大約 1.5 小時後）<br>
+    &nbsp;&nbsp;&nbsp;• 🥕 成熟蘿蔔（大約 3 小時後，總共）<br>
     4️⃣ 「淋水 💧」每日限按一次，會一次過淋晒所有當時存在的蘿蔔：<br>
     &nbsp;&nbsp;&nbsp;• 喺 🌰 階段被淋過水：水記錄喺「種子」<br>
     &nbsp;&nbsp;&nbsp;• 喺 🌿 階段被淋過水：水記錄喺「幼苗」<br>
@@ -796,7 +791,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     const safeEl=document.getElementById("safe");
     const backpackEl=document.getElementById("backpack");
     const totalEl=document.getElementById("total");
-    const bar=document.getElementById("bar");
     const merryTitle=document.getElementById("merryTitle");
     const xmasPopupOverlay=document.getElementById("xmasPopupOverlay");
     const xmasPopupClose=document.getElementById("xmasPopupClose");
@@ -975,14 +969,12 @@ document.addEventListener("DOMContentLoaded",()=>{
     function updateUI(){
       const growing=seeds.filter(p=>p.stage!=="grown").length;
       const total=growing+safeCarrot;
-      const rate=Math.min(Math.round((safeCarrot/400)*100),100);
       wildEl.textContent="種植中🥕："+growing;
       safeEl.textContent="銀行儲值💳："+safeCarrot;
       backpackEl.textContent="🥕 背包："+backpackCarrot;
       totalEl.textContent="總收成："+total+"根";
       document.getElementById("plantBtn").textContent=`種蘿蔔 🌰 (${plantLimit}/${PLANT_MAX})`;
       document.getElementById("waterBtn").textContent=`淋水 💧 (${waterLimit}/1)`;
-      bar.style.width=rate+"%";
       updateXmasProgressUI();
       renderOwnedGifts();
     }
@@ -1085,29 +1077,31 @@ document.addEventListener("DOMContentLoaded",()=>{
       }
     }
 
+    // 1.5 小時 + 1.5 小時 成長
     function recomputeGrowth(init=false){
-      const now=Date.now();
-      const THREE_HOURS=3*60*60;
-      const SIX_HOURS=6*60*60;
+      const now = Date.now();
+      const ONE_AND_HALF_HOUR = 1.5 * 60 * 60;
+
+      let baseSeedToSprout = ONE_AND_HALF_HOUR;
+      let baseSeedToGrown  = ONE_AND_HALF_HOUR * 2;
+
+      if (hasItem("tree_cat")) {
+        baseSeedToSprout *= 0.9;
+        baseSeedToGrown  *= 0.9;
+      }
+
       let changed=false;
       seeds.forEach(p=>{
         const elapsedSec=(now-p.plantedAt)/1000;
 
-        let three = THREE_HOURS;
-        let six = SIX_HOURS;
-        if(hasItem("tree_cat")){
-          three = THREE_HOURS * 0.9;
-          six   = SIX_HOURS * 0.9;
-        }
-
         let newStage="seed";
-        if(elapsedSec>=six) newStage="grown";
-        else if(elapsedSec>=three) newStage="sprout";
+        if (elapsedSec >= baseSeedToGrown)        newStage="grown";
+        else if (elapsedSec >= baseSeedToSprout)  newStage="sprout";
 
         if(newStage!==p.stage || init){
           p.stage=newStage;
-          if(newStage==="seed") p.el.textContent="🌰";
-          else if(newStage==="sprout") p.el.textContent="🌿";
+          if(newStage==="seed")       p.el.textContent="🌰";
+          else if(newStage==="sprout")p.el.textContent="🌿";
           else if(newStage==="grown") p.el.textContent="🥕";
           changed=true;
         }
