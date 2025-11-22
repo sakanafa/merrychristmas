@@ -349,6 +349,110 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   transition:width 0.4s ease;
   border-radius:999px;
 }
+
+/* ---------- 🎁 聖誕禮物展示 Frame ---------- */
+#xmasOwnedFrame{
+  margin-top:8px;
+  padding:10px;
+  border-radius:14px;
+  background:rgba(255,255,255,0.8);
+  border:2px dashed #c2185b;
+  box-shadow:0 0 8px rgba(194,24,91,0.18);
+  text-align:center;
+}
+.xmasOwnedTitle{
+  font-weight:bold;
+  color:#c2185b;
+  margin-bottom:2px;
+}
+.xmasOwnedHint{
+  font-size:12px;
+  color:#777;
+  margin-bottom:6px;
+}
+#xmasOwnedList{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:6px;
+  min-height:26px;
+}
+.xmasGiftIcon{
+  width:32px;
+  height:32px;
+  border-radius:8px;
+  background:#fff5f8;
+  border:1px solid #f48fb1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+  cursor:pointer;
+  position:relative;
+  box-shadow:0 1px 3px rgba(0,0,0,0.12);
+  transition:transform 0.1s ease, box-shadow 0.1s ease;
+}
+.xmasGiftIcon:hover{
+  transform:translateY(-1px);
+  box-shadow:0 2px 5px rgba(0,0,0,0.16);
+}
+.xmasGiftIcon span.qty{
+  position:absolute;
+  right:-4px;
+  bottom:-4px;
+  background:#c2185b;
+  color:#fff;
+  font-size:10px;
+  padding:1px 3px;
+  border-radius:999px;
+}
+
+/* 🎁 Gift Tooltip / 彈窗 */
+#xmasGiftTooltip{
+  position:fixed;
+  left:0;
+  top:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.35);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+#xmasGiftTooltip .tooltipInner{
+  max-width:280px;
+  width:80%;
+  background:#fff;
+  border-radius:16px;
+  padding:14px 16px 12px;
+  box-shadow:0 4px 14px rgba(0,0,0,0.25);
+  text-align:center;
+}
+#xmasGiftTooltip .tooltipIcon{
+  font-size:32px;
+  margin-bottom:6px;
+}
+#xmasGiftTooltip .tooltipName{
+  font-weight:bold;
+  margin-bottom:4px;
+  color:#c2185b;
+}
+#xmasGiftTooltip .tooltipEffect{
+  font-size:13px;
+  color:#555;
+  margin-bottom:10px;
+  line-height:1.5;
+}
+#xmasGiftTooltip button{
+  padding:6px 14px;
+  border:none;
+  border-radius:999px;
+  background:#c2185b;
+  color:#fff;
+  font-size:13px;
+  cursor:pointer;
+}
 </style>
 </head>
 <body>
@@ -430,6 +534,16 @@ for(let i=0;i<25;i++){
   </div>
 </div>
 
+<!-- 🎁 點擊禮物 icon 功用 Tooltip -->
+<div id="xmasGiftTooltip">
+  <div class="tooltipInner">
+    <div class="tooltipIcon" id="tooltipIcon"></div>
+    <div class="tooltipName" id="tooltipName"></div>
+    <div class="tooltipEffect" id="tooltipEffect"></div>
+    <button id="closeGiftTooltip">關閉</button>
+  </div>
+</div>
+
 <!-- 鎖屏 -->
 <div id="lockscreen">
  <h2>🎄 聖誕種蘿蔔特別活動 🥕</h2>
@@ -461,6 +575,13 @@ for(let i=0;i<25;i++){
     <div class="xmasProgressOuter">
       <div id="xmasProgressBarFill"></div>
     </div>
+  </div>
+
+  <!-- 🎁 已換到的聖誕禮物展示區 -->
+  <div id="xmasOwnedFrame">
+    <div class="xmasOwnedTitle">🎄 換到的聖誕禮物 🎁</div>
+    <div class="xmasOwnedHint">（點擊禮物可以查看功用說明）</div>
+    <div id="xmasOwnedList"></div>
   </div>
 
   <div class="progress-container">
@@ -753,6 +874,14 @@ document.addEventListener("DOMContentLoaded",()=>{
     const xmasProgressText=document.getElementById("xmasProgressText");
     const xmasProgressBarFill=document.getElementById("xmasProgressBarFill");
 
+    // 🎁 已換禮物展示 Frame 元素
+    const xmasOwnedList = document.getElementById("xmasOwnedList");
+    const xmasGiftTooltip = document.getElementById("xmasGiftTooltip");
+    const tooltipIcon = document.getElementById("tooltipIcon");
+    const tooltipName = document.getElementById("tooltipName");
+    const tooltipEffect = document.getElementById("tooltipEffect");
+    const closeGiftTooltipBtn = document.getElementById("closeGiftTooltip");
+
     let eventQueue=[];
     let showingEventPopup=false;
 
@@ -869,6 +998,47 @@ document.addEventListener("DOMContentLoaded",()=>{
       xmasProgressBarFill.style.width = pct + "%";
     }
 
+    // 🎁 已換到禮物展示
+    function renderOwnedGifts(){
+      if(!xmasOwnedList) return;
+      xmasOwnedList.innerHTML = "";
+
+      XMAS_GIFTS.forEach(g=>{
+        if(items && items[g.id]){
+          const div=document.createElement("div");
+          div.className="xmasGiftIcon";
+          div.textContent=g.icon || "🎁";
+          div.title=g.name;
+          div.addEventListener("click",()=>openGiftTooltip(g));
+          xmasOwnedList.appendChild(div);
+        }
+      });
+
+      if(xmasOwnedList.children.length===0){
+        const span=document.createElement("span");
+        span.style.fontSize="13px";
+        span.style.color="#999";
+        span.textContent="暫時仲未換到禮物，努力種多啲蘿蔔啦～";
+        xmasOwnedList.appendChild(span);
+      }
+    }
+
+    function openGiftTooltip(gift){
+      tooltipIcon.textContent = gift.icon || "🎁";
+      tooltipName.textContent = gift.name;
+      tooltipEffect.textContent = gift.effect;
+      xmasGiftTooltip.style.display = "flex";
+    }
+
+    closeGiftTooltipBtn.addEventListener("click",()=>{
+      xmasGiftTooltip.style.display="none";
+    });
+    xmasGiftTooltip.addEventListener("click",(e)=>{
+      if(e.target===xmasGiftTooltip){
+        xmasGiftTooltip.style.display="none";
+      }
+    });
+
     function updateUI(){
       const growing=seeds.filter(p=>p.stage!=="grown").length;
       const total=growing+safeCarrot;
@@ -881,6 +1051,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       document.getElementById("waterBtn").textContent=`淋水 💧 (${waterLimit}/1)`;
       bar.style.width=rate+"%";
       updateXmasProgressUI();
+      renderOwnedGifts();   // 👈 更新聖誕禮物展示
     }
 
     function updatePlantRegen(){
