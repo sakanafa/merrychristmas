@@ -326,7 +326,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   padding:6px 14px;
 }
 
-/* ---------- 聖誕達標率 Progress（只保留一條） ---------- */
+/* ---------- 聖誕達標率 Progress ---------- */
 #xmasProgress{
   margin-top:6px;
 }
@@ -350,61 +350,47 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   border-radius:999px;
 }
 
-/* ---------- 🎁 聖誕禮物展示 Frame ---------- */
+/* ---------- 🎁 聖誕禮物展示 Frame（設計 B：粉底實線框） ---------- */
 #xmasOwnedFrame{
   margin-top:8px;
-  padding:10px;
-  border-radius:14px;
-  background:rgba(255,255,255,0.8);
-  border:2px dashed #c2185b;
-  box-shadow:0 0 8px rgba(194,24,91,0.18);
+  padding:10px 10px 12px;
+  border-radius:16px;
+  background:#ffeef1;
+  border:1px solid #b9404a;           /* 實線框，用 b9404a */
+  box-shadow:0 2px 6px rgba(185,64,74,0.22);
   text-align:center;
 }
 .xmasOwnedTitle{
   font-weight:bold;
-  color:#c2185b;
+  color:#b9404a;                       /* 標題字色 b9404a */
   margin-bottom:2px;
-}
-.xmasOwnedHint{
-  font-size:12px;
-  color:#777;
-  margin-bottom:6px;
 }
 #xmasOwnedList{
   display:flex;
   flex-wrap:wrap;
   justify-content:center;
-  gap:6px;
+  gap:8px;
   min-height:26px;
+  margin-top:6px;
 }
 .xmasGiftIcon{
   width:32px;
   height:32px;
-  border-radius:8px;
-  background:#fff5f8;
-  border:1px solid #f48fb1;
+  border-radius:50%;
+  background:#ffffff;
+  border:2px solid #b9404a;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:20px;
+  font-size:19px;
   cursor:pointer;
   position:relative;
-  box-shadow:0 1px 3px rgba(0,0,0,0.12);
-  transition:transform 0.1s ease, box-shadow 0.1s ease;
+  box-shadow:0 1px 3px rgba(0,0,0,0.16);
+  transition:transform 0.12s ease, box-shadow 0.12s ease;
 }
 .xmasGiftIcon:hover{
-  transform:translateY(-1px);
-  box-shadow:0 2px 5px rgba(0,0,0,0.16);
-}
-.xmasGiftIcon span.qty{
-  position:absolute;
-  right:-4px;
-  bottom:-4px;
-  background:#c2185b;
-  color:#fff;
-  font-size:10px;
-  padding:1px 3px;
-  border-radius:999px;
+  transform:translateY(-1px) scale(1.05);
+  box-shadow:0 3px 7px rgba(0,0,0,0.22);
 }
 
 /* 🎁 Gift Tooltip / 彈窗 */
@@ -436,7 +422,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 #xmasGiftTooltip .tooltipName{
   font-weight:bold;
   margin-bottom:4px;
-  color:#c2185b;
+  color:#b9404a;
 }
 #xmasGiftTooltip .tooltipEffect{
   font-size:13px;
@@ -448,7 +434,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   padding:6px 14px;
   border:none;
   border-radius:999px;
-  background:#c2185b;
+  background:#b9404a;
   color:#fff;
   font-size:13px;
   cursor:pointer;
@@ -469,7 +455,6 @@ for(let i=0;i<25;i++){
 
 <div id="music-control">🔊</div>
 
-<!-- 兩首歌：平日 bells.mp3，12/24 & 聖誕測試用 1224.mp3 -->
 <audio id="bgm-normal" loop preload="auto">
   <source src="bells.mp3" type="audio/mpeg">
 </audio>
@@ -534,7 +519,7 @@ for(let i=0;i<25;i++){
   </div>
 </div>
 
-<!-- 🎁 點擊禮物 icon 功用 Tooltip -->
+<!-- 點擊禮物 icon 功用 Tooltip -->
 <div id="xmasGiftTooltip">
   <div class="tooltipInner">
     <div class="tooltipIcon" id="tooltipIcon"></div>
@@ -567,7 +552,7 @@ for(let i=0;i<25;i++){
   <div class="value" id="backpack">🥕 背包：0</div>
   <div class="value" id="total">🥕🥕總收成：0根</div>
 
-  <!-- 聖誕達標率：只顯示一條 BAR -->
+  <!-- 聖誕達標率 -->
   <div id="xmasProgress">
     <div id="xmasProgressLabel">
       💳 換聖誕禮達標率：<span id="xmasProgressText">0/1888</span>
@@ -577,7 +562,7 @@ for(let i=0;i<25;i++){
     </div>
   </div>
 
-  <!-- 🎁 已換到的聖誕禮物展示區 -->
+  <!-- 🎁 已換到的聖誕禮物展示區（無提示行） -->
   <div id="xmasOwnedFrame">
     <div class="xmasOwnedTitle">🎄 換到的聖誕禮物 🎁</div>
     <div id="xmasOwnedList"></div>
@@ -640,59 +625,21 @@ document.addEventListener("DOMContentLoaded",()=>{
   const GAME_SAVE_KEY="carrotGame2025_v2";
   const LAST_LOGIN_KEY="carrotLastLogin";
 
-  // 🎯 聖誕目標由 2500 改為 1888
   const XMAS_TARGET_CARROTS = 1888;
 
-  // 聖誕禮品 + 功效說明
   const XMAS_GIFTS = [
-    {
-      id:"hat_rabbit",
-      name:"🎅 兔兔聖誕帽",
-      icon:"🎅",
-      cost:200,
-      type:"decor",
-      effect:"純裝飾限定小物，代表你已正式成為今年嘅聖誕小農夫～"
-    },
-    {
-      id:"rabbit_box",
-      name:"🎁 兔兔驚喜禮盒",
-      icon:"🎁",
-      cost:400,
-      type:"buff",
-      effect:"每次收成或放入背包時，有 20% 機會額外 +1 根蘿蔔放入背包。"
-    },
-    {
-      id:"tree_cat",
-      name:"🎄 貓貓聖誕樹",
-      icon:"🎄",
-      cost:600,
-      type:"buff",
-      effect:"令所有蘿蔔成長時間縮短約 10%，更快由種子變成成熟蘿蔔。"
-    },
-    {
-      id:"cat_heater",
-      name:"🕯️ 貓貓暖爐",
-      icon:"🕯️",
-      cost:500,
-      type:"buff",
-      effect:"遇到落雪事件時有 50% 機會完全免疫損失，保護你嘅蘿蔔不被雪埋。"
-    },
-    {
-      id:"cat_cookie",
-      name:"🍪 聖誕貓薄餅",
-      icon:"🍪",
-      cost:700,
-      type:"buff",
-      effect:"小貓原本會偷食蘿蔔時，有 50% 機會變成幫你淋水嘅好貓貓。"
-    },
-    {
-      id:"star_lights",
-      name:"⭐ 兔貓流星燈",
-      icon:"⭐",
-      cost:900,
-      type:"buff_decor",
-      effect:"之後每次種蘿蔔，有 5% 機會額外觸發一個隨機好事事件（加蘿蔔/幫忙）。"
-    }
+    { id:"hat_rabbit",  name:"🎅 兔兔聖誕帽",   icon:"🎅", cost:200, type:"decor",
+      effect:"純裝飾限定小物，代表你已正式成為今年嘅聖誕小農夫～" },
+    { id:"rabbit_box",  name:"🎁 兔兔驚喜禮盒", icon:"🎁", cost:400, type:"buff",
+      effect:"每次收成或放入背包時，有 20% 機會額外 +1 根蘿蔔放入背包。" },
+    { id:"tree_cat",    name:"🎄 貓貓聖誕樹",   icon:"🎄", cost:600, type:"buff",
+      effect:"令所有蘿蔔成長時間縮短約 10%，更快由種子變成成熟蘿蔔。" },
+    { id:"cat_heater",  name:"🕯️ 貓貓暖爐",   icon:"🕯️", cost:500, type:"buff",
+      effect:"遇到落雪事件時有 50% 機會完全免疫損失，保護你嘅蘿蔔不被雪埋。" },
+    { id:"cat_cookie",  name:"🍪 聖誕貓薄餅", icon:"🍪", cost:700, type:"buff",
+      effect:"小貓原本會偷食蘿蔔時，有 50% 機會變成幫你淋水嘅好貓貓。" },
+    { id:"star_lights", name:"⭐ 兔貓流星燈", icon:"⭐", cost:900, type:"buff_decor",
+      effect:"之後每次種蘿蔔，有 5% 機會額外觸發一個隨機好事事件（加蘿蔔/幫忙）。" }
   ];
 
   const cal=document.getElementById("calendar");
@@ -714,7 +661,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     }
     return days;
   }
-
   let data=loadCheckin();
 
   const countdownEl=document.getElementById("countdown");
@@ -733,14 +679,12 @@ document.addEventListener("DOMContentLoaded",()=>{
   updateCountdown();
   setInterval(updateCountdown,60000);
 
-  // ===== 音樂邏輯：平日 bells.mp3，12/24 + 聖誕測試 用 1224.mp3 =====
   const bgmNormal=document.getElementById("bgm-normal");
   const bgmXmas=document.getElementById("bgm-xmas");
   const musicBtn=document.getElementById("music-control");
   let currentBgm=bgmNormal;
   let musicOn=false;
 
-  // 由遊戲內更新聖誕測試狀態
   let globalXmasTest=false;
   function setGlobalXmasTest(v){ globalXmasTest=v; }
 
@@ -751,13 +695,11 @@ document.addEventListener("DOMContentLoaded",()=>{
   function shouldUseXmasMusic(){
     return isXmasDay() || globalXmasTest;
   }
-
   function chooseBgm(){
     currentBgm.pause();
     currentBgm.currentTime=0;
     currentBgm = shouldUseXmasMusic() ? bgmXmas : bgmNormal;
   }
-
   function tryPlayBgm(auto=false){
     currentBgm.volume=0.8;
     currentBgm.play()
@@ -772,7 +714,6 @@ document.addEventListener("DOMContentLoaded",()=>{
         }
       });
   }
-
   chooseBgm();
   tryPlayBgm(true);
 
@@ -873,13 +814,12 @@ document.addEventListener("DOMContentLoaded",()=>{
     const xmasProgressText=document.getElementById("xmasProgressText");
     const xmasProgressBarFill=document.getElementById("xmasProgressBarFill");
 
-    // 🎁 已換禮物展示 Frame 元素
-    const xmasOwnedList = document.getElementById("xmasOwnedList");
-    const xmasGiftTooltip = document.getElementById("xmasGiftTooltip");
-    const tooltipIcon = document.getElementById("tooltipIcon");
-    const tooltipName = document.getElementById("tooltipName");
-    const tooltipEffect = document.getElementById("tooltipEffect");
-    const closeGiftTooltipBtn = document.getElementById("closeGiftTooltip");
+    const xmasOwnedList=document.getElementById("xmasOwnedList");
+    const xmasGiftTooltip=document.getElementById("xmasGiftTooltip");
+    const tooltipIcon=document.getElementById("tooltipIcon");
+    const tooltipName=document.getElementById("tooltipName");
+    const tooltipEffect=document.getElementById("tooltipEffect");
+    const closeGiftTooltipBtn=document.getElementById("closeGiftTooltip");
 
     let eventQueue=[];
     let showingEventPopup=false;
@@ -890,7 +830,6 @@ document.addEventListener("DOMContentLoaded",()=>{
         displayNextEventPopup();
       }
     }
-
     function displayNextEventPopup(){
       const ev=eventQueue.shift();
       if(!ev){
@@ -997,11 +936,8 @@ document.addEventListener("DOMContentLoaded",()=>{
       xmasProgressBarFill.style.width = pct + "%";
     }
 
-    // 🎁 已換到禮物展示
     function renderOwnedGifts(){
-      if(!xmasOwnedList) return;
       xmasOwnedList.innerHTML = "";
-
       XMAS_GIFTS.forEach(g=>{
         if(items && items[g.id]){
           const div=document.createElement("div");
@@ -1012,7 +948,6 @@ document.addEventListener("DOMContentLoaded",()=>{
           xmasOwnedList.appendChild(div);
         }
       });
-
       if(xmasOwnedList.children.length===0){
         const span=document.createElement("span");
         span.style.fontSize="13px";
@@ -1028,7 +963,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       tooltipEffect.textContent = gift.effect;
       xmasGiftTooltip.style.display = "flex";
     }
-
     closeGiftTooltipBtn.addEventListener("click",()=>{
       xmasGiftTooltip.style.display="none";
     });
@@ -1050,7 +984,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       document.getElementById("waterBtn").textContent=`淋水 💧 (${waterLimit}/1)`;
       bar.style.width=rate+"%";
       updateXmasProgressUI();
-      renderOwnedGifts();   // 👈 更新聖誕禮物展示
+      renderOwnedGifts();
     }
 
     function updatePlantRegen(){
@@ -1198,7 +1132,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       const fn = positive[Math.floor(Math.random()*positive.length)];
       fn();
     }
-
     function triggerEvent(){
       const r=Math.random();
       if(r<0.15)      birdEvent();
@@ -1211,7 +1144,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       else if(r<0.9)  rabbitHelp();
       else            rabbitEat();
     }
-
     function scheduleLoginEvent(){
       if(loginEventTimer) clearTimeout(loginEventTimer);
       if(seeds.length===0) return;
@@ -1223,7 +1155,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       }, 2*60*1000);
     }
 
-    // ===== 聖誕禮品 UI =====
     function renderGiftList(){
       giftListEl.innerHTML = "";
       XMAS_GIFTS.forEach(g=>{
@@ -1291,7 +1222,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     function closeGiftShop(){
       giftShopOverlay.style.display="none";
     }
-
     closeGiftShopBtn.addEventListener("click", closeGiftShop);
     giftShopOverlay.addEventListener("click",(e)=>{
       if(e.target===giftShopOverlay) closeGiftShop();
@@ -1425,7 +1355,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       openGiftShop();
     };
 
-    // 🧪 測試：手動設定背包蘿蔔數量
     document.getElementById("setBackpackTestBtn").onclick=()=>{
       const v = prompt("輸入背包蘿蔔數量（只做測試用）：", backpackCarrot);
       if(v===null) return;
@@ -1434,7 +1363,6 @@ document.addEventListener("DOMContentLoaded",()=>{
         alert("請輸入 0 或以上嘅整數。");
         return;
       }
-      // 只改背包，不影響 totalCarrotCollected，方便你自由測試換購
       backpackCarrot = n;
       eventBox.textContent="🧪 已更新背包蘿蔔數量（測試模式）。";
       updateUI();
@@ -1506,7 +1434,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       }
     },45000);
 
-    // ===== 事件 =====
     function birdEvent(){
       if(seeds.length>0) seeds.pop();
       const b=document.createElement("div");
