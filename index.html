@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
@@ -255,6 +256,98 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   color:#777;
   margin-top:8px;
 }
+
+/* ---------- 聖誕禮品換購 Popup ---------- */
+#giftShopOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.4);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:2550;
+}
+#giftShop{
+  width:min(420px,92vw);
+  max-height:90vh;
+  background:#ffffff;
+  border-radius:16px;
+  padding:16px 18px 14px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.25);
+  text-align:left;
+  overflow-y:auto;
+}
+#giftShop h2{
+  text-align:center;
+  margin:4px 0 8px;
+}
+#giftShop .bp-line{
+  text-align:center;
+  margin-bottom:10px;
+  font-size:15px;
+}
+.gift-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.gift-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:8px 10px;
+  border-radius:10px;
+  background:#f5f7ff;
+  font-size:14px;
+}
+.gift-left{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.gift-icon{font-size:22px;}
+.gift-name{font-weight:600;}
+.gift-cost{font-size:13px;color:#555;}
+.gift-item button{
+  padding:6px 10px;
+  font-size:13px;
+  border-radius:999px;
+  background:#ff9999;
+}
+.gift-item button.claimed{
+  background:#9ccc65;
+}
+#closeGiftShop{
+  display:block;
+  margin:10px auto 4px;
+  background:#888;
+  font-size:14px;
+  padding:6px 14px;
+}
+
+/* ---------- 達標率 Progress ---------- */
+#xmasProgress{
+  margin-top:6px;
+}
+#xmasProgressLabel{
+  font-size:14px;
+  margin-bottom:4px;
+}
+.xmasProgressOuter{
+  width:90%;
+  height:14px;
+  margin:0 auto 4px;
+  border-radius:999px;
+  background:#e0e0e0;
+  overflow:hidden;
+}
+#xmasProgressBarFill{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#ffb74d,#f4511e);
+  transition:width 0.4s ease;
+  border-radius:999px;
+}
 </style>
 </head>
 <body>
@@ -326,6 +419,16 @@ for(let i=0;i<25;i++){
   </div>
 </div>
 
+<!-- 聖誕禮品 Popup -->
+<div id="giftShopOverlay">
+  <div id="giftShop">
+    <h2>🎁 聖誕禮品換購</h2>
+    <div class="bp-line">🥕 背包：<span id="bpCountInShop">0</span> 根</div>
+    <div class="gift-list" id="giftList"></div>
+    <button id="closeGiftShop">關閉</button>
+  </div>
+</div>
+
 <!-- 鎖屏 -->
 <div id="lockscreen">
  <h2>🎄 聖誕種蘿蔔特別活動 🥕</h2>
@@ -346,7 +449,19 @@ for(let i=0;i<25;i++){
   <div class="value" id="lastLoginText">上一次登入：--</div>
   <div class="value" id="wild">種植中🥕：0</div>
   <div class="value" id="safe">銀行儲值💳：0</div>
+  <div class="value" id="backpack">🥕 背包：0</div>
   <div class="value" id="total">🥕🥕總收成：0根</div>
+
+  <!-- 聖誕達標率 -->
+  <div id="xmasProgress">
+    <div id="xmasProgressLabel">
+      💳 換聖誕禮達標率：<span id="xmasProgressText">0/2500</span>
+    </div>
+    <div class="xmasProgressOuter">
+      <div id="xmasProgressBarFill"></div>
+    </div>
+  </div>
+
   <div class="progress-container">
     <div class="progress-bar" id="bar"></div>
   </div>
@@ -359,6 +474,8 @@ for(let i=0;i<25;i++){
    <button id="plantBtn">種蘿蔔 🌰 (20/20)</button>
    <button id="waterBtn">淋水 💧 (1/1)</button>
    <button id="bankBtn">存入銀行 💳</button>
+   <button id="toBackpackBtn" style="background:#ffb74d;">🥕 放入背包</button>
+   <button id="exchangeGiftBtn" style="background:#ab47bc;">🎁 換購聖誕禮品</button>
    <button id="resetBtn" style="background:#77bb77;">🔄 重新開始</button>
    <button id="testBtn" style="background:#59c;">🎄 聖誕測試</button>
    <button id="growTestBtn" style="background:#ffaa00;">🧪 下一階段測試</button>
@@ -400,6 +517,17 @@ document.addEventListener("DOMContentLoaded",()=>{
   const OLD_GAME_KEY="carrotGame2025";
   const GAME_SAVE_KEY="carrotGame2025_v2";
   const LAST_LOGIN_KEY="carrotLastLogin";
+
+  // 新增：背包、道具、總收成 key（沿用同一 GAME_SAVE_KEY 內部加字段）
+  const XMAS_TARGET_CARROTS = 2500;
+  const XMAS_GIFTS = [
+    { id:"hat_rabbit",  name:"🎅 兔兔聖誕帽",  icon:"🎅", cost:200, type:"decor" },
+    { id:"rabbit_box",  name:"🎁 兔兔驚喜禮盒", icon:"🎁", cost:400, type:"buff" },
+    { id:"tree_cat",    name:"🎄 貓貓聖誕樹",  icon:"🎄", cost:600, type:"buff" },
+    { id:"cat_heater",  name:"🕯️ 貓貓暖爐",  icon:"🕯️", cost:500, type:"buff" },
+    { id:"cat_cookie",  name:"🍪 聖誕貓薄餅",  icon:"🍪", cost:700, type:"buff" },
+    { id:"star_lights", name:"⭐ 兔貓流星燈",  icon:"⭐", cost:900, type:"buff_decor" }
+  ];
 
   const cal=document.getElementById("calendar");
 
@@ -483,17 +611,6 @@ document.addEventListener("DOMContentLoaded",()=>{
   chooseBgm();
   tryPlayBgm(true);
 
-  musicBtn.addEventListener("click",()=>{
-    musicOn=!musicOn;
-    if(musicOn){
-      chooseBgm();
-      tryPlayBgm(false);
-    }else{
-      currentBgm.pause();
-      musicBtn.textContent="🔊";
-    }
-  });
-
   for(let i=1;i<=24;i++){
     const d=document.createElement("div");
     d.className="day";d.textContent=i;
@@ -562,12 +679,18 @@ document.addEventListener("DOMContentLoaded",()=>{
     let xmasTest=false;
     let dailyEvents=0;
 
+    // 新增：背包、道具、總收成
+    let backpackCarrot=0;
+    let items={}; // {id: boolean}
+    let totalCarrotCollected=0;
+
     let loginEventTimer=null;   // ✅ 登入後 2 分鐘事件計時器
 
     const field=document.getElementById("field");
     const eventBox=document.getElementById("eventBox");
     const wildEl=document.getElementById("wild");
     const safeEl=document.getElementById("safe");
+    const backpackEl=document.getElementById("backpack");
     const totalEl=document.getElementById("total");
     const bar=document.getElementById("bar");
     const merryTitle=document.getElementById("merryTitle");
@@ -578,6 +701,15 @@ document.addEventListener("DOMContentLoaded",()=>{
     const eventPopupEmoji=document.getElementById("eventPopupEmoji");
     const eventPopupTitle=document.getElementById("eventPopupTitle");
     const eventPopupText=document.getElementById("eventPopupText");
+
+    // 聖誕禮品 Popup
+    const giftShopOverlay=document.getElementById("giftShopOverlay");
+    const giftListEl=document.getElementById("giftList");
+    const bpCountInShopEl=document.getElementById("bpCountInShop");
+    const closeGiftShopBtn=document.getElementById("closeGiftShop");
+
+    const xmasProgressText=document.getElementById("xmasProgressText");
+    const xmasProgressBarFill=document.getElementById("xmasProgressBarFill");
 
     // === 隨機事件 Popup helper ===
     let eventQueue=[];
@@ -633,6 +765,10 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     function random(min,max){return Math.random()*(max-min)+min;}
 
+    function hasItem(id){
+      return !!items[id];
+    }
+
     function updateFieldStyle(forceNormal=false){
       const now=new Date();
       const hour=now.getHours();
@@ -675,6 +811,29 @@ document.addEventListener("DOMContentLoaded",()=>{
           field.appendChild(st);
         }
       }
+
+      // 如果有 兔貓流星燈，可以將背景再稍微加強（可視需要調）
+      if(hasItem("star_lights") && !isXmas){
+        // 例如：晚上星多一點，這裡暫時不再重覆增加，避免太亂
+      }
+    }
+
+    function getDisplayProgress(){
+      const now=new Date();
+      const isAfterXmasEve = (now.getMonth()===11 && now.getDate()>=24);
+      let current = totalCarrotCollected;
+      const target = XMAS_TARGET_CARROTS;
+      if(isAfterXmasEve){
+        current = target; // 顯示上直接滿
+      }
+      return {current, target};
+    }
+
+    function updateXmasProgressUI(){
+      const {current, target} = getDisplayProgress();
+      xmasProgressText.textContent = `${current}/${target}`;
+      const pct = Math.min(100, (current/target)*100);
+      xmasProgressBarFill.style.width = pct + "%";
     }
 
     function updateUI(){
@@ -683,10 +842,12 @@ document.addEventListener("DOMContentLoaded",()=>{
       const rate=Math.min(Math.round((safeCarrot/400)*100),100);
       wildEl.textContent="種植中🥕："+growing;
       safeEl.textContent="銀行儲值💳："+safeCarrot;
+      backpackEl.textContent="🥕 背包："+backpackCarrot;
       totalEl.textContent="總收成："+total+"根";
       document.getElementById("plantBtn").textContent=`種蘿蔔 🌰 (${plantLimit}/${PLANT_MAX})`;
       document.getElementById("waterBtn").textContent=`淋水 💧 (${waterLimit}/1)`;
       bar.style.width=rate+"%";
+      updateXmasProgressUI();
     }
 
     function updatePlantRegen(){
@@ -729,7 +890,10 @@ document.addEventListener("DOMContentLoaded",()=>{
         plantLimit,
         waterLimit,
         plantRegenStart,
-        xmasTest
+        xmasTest,
+        backpackCarrot,
+        items,
+        totalCarrotCollected
       };
       localStorage.setItem(GAME_SAVE_KEY,JSON.stringify(data));
     }
@@ -750,6 +914,9 @@ document.addEventListener("DOMContentLoaded",()=>{
         waterLimit=data.waterLimit??1;
         plantRegenStart=data.plantRegenStart??null;
         xmasTest=data.xmasTest??false;
+        backpackCarrot=data.backpackCarrot??0;
+        items=data.items || {};
+        totalCarrotCollected=data.totalCarrotCollected ?? 0;
         setGlobalXmasTest(xmasTest); // ✅ 同步去音樂判斷
 
         seeds=(data.seeds||[]).map(p=>{
@@ -788,9 +955,20 @@ document.addEventListener("DOMContentLoaded",()=>{
       let changed=false;
       seeds.forEach(p=>{
         const elapsedSec=(now-p.plantedAt)/1000;
+
+        // 基礎 threshold
+        let three = THREE_HOURS;
+        let six = SIX_HOURS;
+
+        // 如果有貓貓聖誕樹，成長時間縮短 10%
+        if(hasItem("tree_cat")){
+          three = THREE_HOURS * 0.9;
+          six   = SIX_HOURS * 0.9;
+        }
+
         let newStage="seed";
-        if(elapsedSec>=SIX_HOURS) newStage="grown";
-        else if(elapsedSec>=THREE_HOURS) newStage="sprout";
+        if(elapsedSec>=six) newStage="grown";
+        else if(elapsedSec>=three) newStage="sprout";
 
         if(newStage!==p.stage || init){
           p.stage=newStage;
@@ -813,6 +991,13 @@ document.addEventListener("DOMContentLoaded",()=>{
         setXmasUI(true);
         saveGame();
       }
+    }
+
+    function triggerPositiveEvent(){
+      // 只揀正面事件：sunEvent, rainEvent, catWater, rabbitHelp
+      const positive = [sunEvent, rainEvent, catWater, rabbitHelp];
+      const fn = positive[Math.floor(Math.random()*positive.length)];
+      fn();
     }
 
     function triggerEvent(){
@@ -840,6 +1025,83 @@ document.addEventListener("DOMContentLoaded",()=>{
         loginEventTimer=null;
       }, 2*60*1000); // 2 分鐘
     }
+
+    // ======= 聖誕禮品換購 UI =======
+    function renderGiftList(){
+      giftListEl.innerHTML = "";
+      XMAS_GIFTS.forEach(g=>{
+        const itemDiv=document.createElement("div");
+        itemDiv.className="gift-item";
+        itemDiv.dataset.id=g.id;
+        itemDiv.dataset.cost=g.cost;
+
+        const leftDiv=document.createElement("div");
+        leftDiv.className="gift-left";
+
+        const iconSpan=document.createElement("span");
+        iconSpan.className="gift-icon";
+        iconSpan.textContent=g.icon;
+
+        const textWrap=document.createElement("div");
+        const nameDiv=document.createElement("div");
+        nameDiv.className="gift-name";
+        nameDiv.textContent=g.name;
+        const costDiv=document.createElement("div");
+        costDiv.className="gift-cost";
+        costDiv.textContent=`需要 🥕${g.cost} 根`;
+
+        textWrap.appendChild(nameDiv);
+        textWrap.appendChild(costDiv);
+
+        leftDiv.appendChild(iconSpan);
+        leftDiv.appendChild(textWrap);
+
+        const btn=document.createElement("button");
+        if(hasItem(g.id)){
+          btn.textContent="已換領";
+          btn.classList.add("claimed");
+          btn.disabled=true;
+        }else{
+          btn.textContent="換領";
+        }
+
+        btn.addEventListener("click",()=>{
+          if(hasItem(g.id)) return;
+          if(backpackCarrot < g.cost){
+            eventBox.textContent="🥕 背包蘿蔔唔夠，種多啲先啦～";
+            return;
+          }
+          backpackCarrot -= g.cost;
+          items[g.id] = true;
+          eventBox.textContent=`已換領：${g.name}！`;
+          updateUI();
+          saveGame();
+          bpCountInShopEl.textContent = backpackCarrot;
+          renderGiftList(); // 重新 render，更新已換領狀態
+        });
+
+        itemDiv.appendChild(leftDiv);
+        itemDiv.appendChild(btn);
+
+        giftListEl.appendChild(itemDiv);
+      });
+    }
+
+    function openGiftShop(){
+      bpCountInShopEl.textContent = backpackCarrot;
+      renderGiftList();
+      giftShopOverlay.style.display="flex";
+    }
+
+    function closeGiftShop(){
+      giftShopOverlay.style.display="none";
+    }
+
+    // 禮品 popup 關閉
+    closeGiftShopBtn.addEventListener("click", closeGiftShop);
+    giftShopOverlay.addEventListener("click",(e)=>{
+      if(e.target===giftShopOverlay) closeGiftShop();
+    });
 
     loadGame();
     updateFieldStyle(true);
@@ -871,6 +1133,12 @@ document.addEventListener("DOMContentLoaded",()=>{
         el
       });
       eventBox.textContent="🌱 新蘿蔔種下～";
+
+      // 如果有 兔貓流星燈：種植時 5% 機會觸發正面事件
+      if(hasItem("star_lights") && Math.random() < 0.05){
+        triggerPositiveEvent();
+      }
+
       updateUI();
       saveGame();
       scheduleLoginEvent();   // 如果之前冇安排，種咗之後都再安排
@@ -888,6 +1156,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       saveGame();
     };
 
+    // 「存入銀行 💳」
     document.getElementById("bankBtn").onclick=()=>{
       const today=new Date();
       const isXmas=(today.getMonth()==11 && today.getDate()==24)||xmasTest;
@@ -910,13 +1179,65 @@ document.addEventListener("DOMContentLoaded",()=>{
       if(harvested>0){
         safeCarrot+=harvested;
         bankStored+=harvested;
-        eventBox.textContent=`💳 收成 ${harvested} 根，存入銀行！`;
+        totalCarrotCollected += harvested;
+
+        // 兔兔驚喜禮盒：20% 機會額外 +1 根入背包
+        if(hasItem("rabbit_box") && Math.random()<0.2){
+          backpackCarrot += 1;
+          totalCarrotCollected += 1;
+          eventBox.textContent=`💳 收成 ${harvested} 根，存入銀行！禮盒加送 1 根入背包～`;
+        }else{
+          eventBox.textContent=`💳 收成 ${harvested} 根，存入銀行！`;
+        }
       }else{
         eventBox.textContent="冇成熟蘿蔔～";
       }
       updateUI();
       saveGame();
       scheduleLoginEvent(); // 收成之後如果仲有，確保計時存在
+    };
+
+    // 「放入背包」按鈕
+    document.getElementById("toBackpackBtn").onclick=()=>{
+      // 收集所有 grown 蘿蔔
+      let harvested=0;
+      seeds = seeds.filter(p=>{
+        if(p.stage==="grown"){
+          let add=1;
+          if(p.wateredSeed&&p.wateredSprout) add=5;
+          else if(p.wateredSeed||p.wateredSprout) add=3;
+          harvested+=add;
+          setTimeout(()=>p.el.remove(),500);
+          return false;
+        }
+        return true;
+      });
+
+      if(harvested<=0){
+        eventBox.textContent="暫時冇可以收成嘅蘿蔔～";
+        return;
+      }
+
+      backpackCarrot += harvested;
+      totalCarrotCollected += harvested;
+
+      // 兔兔驚喜禮盒：20% 機會額外 +1 根入背包
+      if(hasItem("rabbit_box") && Math.random()<0.2){
+        backpackCarrot += 1;
+        totalCarrotCollected += 1;
+        eventBox.textContent=`🥕 已將 ${harvested} 根蘿蔔放入背包！禮盒額外送 1 根～`;
+      }else{
+        eventBox.textContent=`🥕 已將 ${harvested} 根蘿蔔放入背包！`;
+      }
+
+      updateUI();
+      saveGame();
+      scheduleLoginEvent();
+    };
+
+    // 打開禮品換購頁
+    document.getElementById("exchangeGiftBtn").onclick=()=>{
+      openGiftShop();
     };
 
     document.getElementById("resetBtn").onclick=()=>{
@@ -1009,6 +1330,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       s.className="sun";s.textContent="☀️";
       field.appendChild(s);
       safeCarrot+=2;
+      totalCarrotCollected += 2;
       setTimeout(()=>s.remove(),4000);
 
       updateUI();saveGame();
@@ -1021,8 +1343,34 @@ document.addEventListener("DOMContentLoaded",()=>{
       );
     }
 
+    // ✅ 熔岩事件修改版：畫面立即只保留 1 棵 grown，其餘清空
     function lavaEvent(){
-      seeds=seeds.slice(0,1);
+      // 計出所有 grown 的 index
+      const grownIndices = seeds
+        .map((p,i)=>p.stage==="grown" ? i : -1)
+        .filter(i=>i!==-1);
+
+      if(grownIndices.length===0){
+        // 冇成熟蘿蔔，全部清空
+        seeds.forEach(p=>p.el.remove());
+        seeds=[];
+      }else{
+        // 隨機保留一棵 grown
+        const keepIndex = grownIndices[Math.floor(Math.random()*grownIndices.length)];
+        seeds.forEach((p,i)=>{
+          if(i===keepIndex){
+            // 保留一棵：顯示為 🥕
+            p.stage="grown";
+            p.el.textContent="🥕";
+          }else{
+            // 其他全部移除 DOM
+            p.el.remove();
+          }
+        });
+        // 只保留 keepIndex 那一棵
+        seeds = [seeds[keepIndex]];
+      }
+
       document.body.classList.add("flash");
       setTimeout(()=>document.body.classList.remove("flash"),10000);
 
@@ -1031,12 +1379,23 @@ document.addEventListener("DOMContentLoaded",()=>{
       showEventPopup(
         "🌋",
         "熔岩警報！",
-        "熔岩經過，把大部分蘿蔔都燒走，只剩返少少…",
-        "🌋 熔岩燒了蘿蔔！"
+        "熔岩經過，把大部分蘿蔔同種子都燒走，只剩返一棵！",
+        "🌋 熔岩燒了蘿蔔，只剩一棵！"
       );
     }
 
     function snowEvent(){
+      // 如果有貓貓暖爐：50% 免疫
+      if(hasItem("cat_heater") && Math.random()<0.5){
+        showEventPopup(
+          "🕯️",
+          "貓貓暖爐發功！",
+          "本來要落雪傷害蘿蔔，但有貓貓暖爐幫你擋住，今次冇損失～",
+          "🕯️ 暖爐保護，雪災免疫！"
+        );
+        return;
+      }
+
       if(seeds.length>0) seeds.pop();
       for(let i=0;i<15;i++){
         const s=document.createElement("div");
@@ -1058,6 +1417,7 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     function rainEvent(){
       safeCarrot+=2;
+      totalCarrotCollected += 2;
       for(let i=0;i<20;i++){
         const r=document.createElement("div");
         r.className="rain";r.textContent="💧";
@@ -1077,6 +1437,12 @@ document.addEventListener("DOMContentLoaded",()=>{
     }
 
     function catSteal(){
+      // 如果有聖誕貓薄餅：50% 機會變成 catWater
+      if(hasItem("cat_cookie") && Math.random()<0.5){
+        catWater(); // 直接執行好事
+        return;
+      }
+
       if(seeds.length>0) seeds.pop();
       const c=document.getElementById("cat");
       c.classList.add("run");
@@ -1094,6 +1460,7 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     function catWater(){
       safeCarrot+=1;
+      totalCarrotCollected += 1;
       const drop=document.createElement("div");
       drop.className="rain";drop.textContent="💧";
       drop.style.left="50%";drop.style.animationDuration="1s";
@@ -1112,6 +1479,7 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     function rabbitHelp(){
       safeCarrot+=1;
+      totalCarrotCollected += 1;
       const r=document.getElementById("rabbit");
       r.classList.add("run");
       setTimeout(()=>r.classList.remove("run"),4000);
@@ -1146,3 +1514,4 @@ document.addEventListener("DOMContentLoaded",()=>{
 </script>
 </body>
 </html>
+```
