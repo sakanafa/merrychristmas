@@ -28,6 +28,20 @@ body{
   background:rgba(255,255,255,0.85);display:flex;justify-content:center;align-items:center;
   font-size:22px;cursor:pointer;box-shadow:0 0 8px rgba(0,0,0,0.3);z-index:2100;
 }
+
+/* 地震震動效果 */
+.shake{
+  animation:shakeScreen 0.5s linear 3;
+}
+@keyframes shakeScreen{
+  0%{transform:translate(0,0);}
+  20%{transform:translate(-4px,2px);}
+  40%{transform:translate(4px,-2px);}
+  60%{transform:translate(-3px,1px);}
+  80%{transform:translate(3px,-1px);}
+  100%{transform:translate(0,0);}
+}
+
 /* ---------- 鎖屏 ---------- */
 #lockscreen{
   margin:60px auto;width:90%;max-width:420px;padding:25px;background:rgba(255,255,255,0.9);
@@ -42,6 +56,7 @@ input[type=password]{padding:10px;width:80%;border-radius:8px;border:1.8px solid
 button{padding:10px 14px;margin:6px 5px;border:none;border-radius:8px;background:#ff9999;color:white;font-size:16px;cursor:pointer;}
 button:hover{filter:brightness(1.08);}
 button:disabled{opacity:0.5;cursor:not-allowed;}
+
 /* ---------- 遊戲主畫面 ---------- */
 #game{display:none;position:relative;z-index:1000;}
 #merryTitle{
@@ -620,17 +635,18 @@ for(let i=0;i<25;i++){
     &nbsp;&nbsp;&nbsp;• ⭐ 兔貓流星燈：每次種蘿蔔，有 5% 機會觸發額外好事事件。<br>
     <br>
     【隨機事件】<br>
-    🔟 遊戲途中會不定時出現事件（小鳥、太陽、落雪、小貓、小兔等）：<br>
+    🔟 遊戲途中會不定時出現事件（小鳥、太陽、落雪、小貓、小兔、地震等）：<br>
     &nbsp;&nbsp;&nbsp;• 有啲會增加銀行蘿蔔；<br>
     &nbsp;&nbsp;&nbsp;• 有啲會偷走田裡嘅蘿蔔；<br>
-    &nbsp;&nbsp;&nbsp;• 有啲會幫你淋水或加速成長。<br>
+    &nbsp;&nbsp;&nbsp;• 有啲會幫你淋水或加速成長；<br>
+    &nbsp;&nbsp;&nbsp;• 🌋 地震：畫面會震動，並且會令田裡大約一半農作物消失。<br>
     &nbsp;&nbsp;&nbsp;詳細效果會彈出提示視窗話你知～<br>
     <br>
     【聖誕特別】<br>
     1️⃣1️⃣ 12 月 24 日（或開啟聖誕測試模式）時：<br>
-    &nbsp;&nbsp;&nbsp;• 田裡所有蘿蔔會變成 🎄 聖誕樹；<br>
-    &nbsp;&nbsp;&nbsp;• 會彈出聖誕祝福視窗；<br>
-    &nbsp;&nbsp;&nbsp;• 可以檢查「聖誕達標率」以及「已換到的聖誕禮物」。<br>
+    &nbsp;&nbsp;&nbsp;• 田裡所有蘿蔔會變成 🎄 聖誕樹，最少保持 50 棵，畫面更豐富；<br>
+    &nbsp;&nbsp;&nbsp;• 聖誕禮物進度條（1888）會自動充滿；<br>
+    &nbsp;&nbsp;&nbsp;• 會彈出聖誕祝福視窗。<br>
   </div>
   <div id="eventBox">🌤 歡迎回來，小農夫～</div>
  </div>
@@ -1093,7 +1109,8 @@ document.addEventListener("DOMContentLoaded",()=>{
 
         recomputeGrowth(true);
         if(xmasTest){
-          seeds.forEach(p=>p.el.textContent="🎄");
+          // 進入時如果係測試聖誕模式，都要套用「最少 50 棵聖誕樹 + BAR 滿」邏輯
+          ensureXmasVisuals();
           setXmasUI(true);
         }
         if(fromOld){
@@ -1137,11 +1154,45 @@ document.addEventListener("DOMContentLoaded",()=>{
       updateUI();
     }
 
+    // 聖誕畫面：至少 50 棵聖誕樹 + BAR 滿
+    function ensureXmasVisuals(){
+      const MIN_TREES = 50;
+      const now = Date.now();
+
+      // 1) 現有所有種植改成聖誕樹
+      seeds.forEach(p=>{
+        p.stage = "grown";
+        p.el.textContent = "🎄";
+      });
+
+      // 2) 如果唔夠 50 棵，就額外補足到 50 棵（純畫面，不計入收成）
+      const need = MIN_TREES - seeds.length;
+      for(let i=0;i<need;i++){
+        const el=document.createElement("div");
+        el.className="plant show";
+        el.textContent="🎄";
+        el.style.left=random(5,85)+"%";
+        el.style.bottom=random(25,40)+"%";
+        field.appendChild(el);
+        seeds.push({
+          stage:"grown",
+          wateredSeed:false,
+          wateredSprout:false,
+          plantedAt:now,
+          el
+        });
+      }
+
+      // 3) 聖誕 BAR 直接變滿：totalCarrotCollected 調到目標
+      totalCarrotCollected = Math.max(totalCarrotCollected, XMAS_TARGET_CARROTS);
+      updateXmasProgressUI();
+    }
+
     function checkXmasAuto(){
       const date=new Date();
       if(date.getMonth()==11 && date.getDate()==24 && !xmasTest){
-        seeds.forEach(p=>p.el.textContent="🎄");
-        eventBox.textContent="🎄 聖誕節到！所有蘿蔔變成聖誕樹！";
+        ensureXmasVisuals();
+        eventBox.textContent="🎄 聖誕節到！田裡都變成聖誕森林啦～";
         updateFieldStyle();
         setXmasUI(true);
         saveGame();
@@ -1155,15 +1206,16 @@ document.addEventListener("DOMContentLoaded",()=>{
     }
     function triggerEvent(){
       const r=Math.random();
-      if(r<0.15)      birdEvent();
-      else if(r<0.3)  sunEvent();
-      else if(r<0.4)  lavaEvent();
-      else if(r<0.5)  snowEvent();
-      else if(r<0.6)  rainEvent();
-      else if(r<0.7)  catSteal();
-      else if(r<0.8)  catWater();
-      else if(r<0.9)  rabbitHelp();
-      else            rabbitEat();
+      if(r<0.13)      birdEvent();
+      else if(r<0.26) sunEvent();
+      else if(r<0.36) lavaEvent();
+      else if(r<0.46) snowEvent();
+      else if(r<0.56) rainEvent();
+      else if(r<0.66) catSteal();
+      else if(r<0.76) catWater();
+      else if(r<0.86) rabbitHelp();
+      else if(r<0.96) rabbitEat();
+      else            quakeEvent();   // 新增：地震
     }
     function scheduleLoginEvent(){
       if(loginEventTimer) clearTimeout(loginEventTimer);
@@ -1302,6 +1354,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       const today=new Date();
       const isXmas=(today.getMonth()==11 && today.getDate()==24)||xmasTest;
       if(isXmas){
+        // 聖誕模式入銀行只顯示祝福
         eventBox.innerHTML="<span class='bible-text'>🎁 聖誕快樂！去銀行看禮物～</span>";
         return;
       }
@@ -1408,8 +1461,8 @@ document.addEventListener("DOMContentLoaded",()=>{
       const isRealXmas=(now.getMonth()==11 && now.getDate()==24);
       const isXmasMode=isRealXmas||xmasTest;
       if(isXmasMode){
-        seeds.forEach(p=>p.el.textContent="🎄");
-        eventBox.textContent="🧪 已開啟聖誕測試模式，蘿蔔變成聖誕樹～";
+        ensureXmasVisuals();  // 測試模式都套用 50 棵聖誕樹 + BAR 滿
+        eventBox.textContent="🧪 已開啟聖誕測試模式，變成聖誕森林啦～";
         setXmasUI(true);
       }else{
         recomputeGrowth(true);
@@ -1437,7 +1490,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       const date=new Date();
       const isXmas=(date.getMonth()==11 && date.getDate()==24)||xmasTest;
       if(isXmas){
-        seeds.forEach(p=>p.el.textContent="🎄");
+        ensureXmasVisuals();
         updateFieldStyle();
         return;
       }
@@ -1455,8 +1508,12 @@ document.addEventListener("DOMContentLoaded",()=>{
       }
     },45000);
 
+    /* ---------- 各種事件 ---------- */
     function birdEvent(){
-      if(seeds.length>0) seeds.pop();
+      if(seeds.length>0){
+        const p = seeds.pop();
+        if(p && p.el) p.el.remove();
+      }
       const b=document.createElement("div");
       b.className="bird";b.textContent="🐦";
       field.appendChild(b);
@@ -1509,7 +1566,10 @@ document.addEventListener("DOMContentLoaded",()=>{
         showEventPopup("🕯️","貓貓暖爐發功！","本來要落雪傷害蘿蔔，但有貓貓暖爐幫你擋住，今次冇損失～","🕯️ 暖爐保護，雪災免疫！");
         return;
       }
-      if(seeds.length>0) seeds.pop();
+      if(seeds.length>0){
+        const p = seeds.pop();
+        if(p && p.el) p.el.remove();
+      }
       for(let i=0;i<15;i++){
         const s=document.createElement("div");
         s.className="snowflake";s.textContent="❄️";
@@ -1540,7 +1600,10 @@ document.addEventListener("DOMContentLoaded",()=>{
         catWater();
         return;
       }
-      if(seeds.length>0) seeds.pop();
+      if(seeds.length>0){
+        const p = seeds.pop();
+        if(p && p.el) p.el.remove();
+      }
       const c=document.getElementById("cat");
       c.classList.add("run");
       setTimeout(()=>c.classList.remove("run"),4000);
@@ -1571,12 +1634,42 @@ document.addEventListener("DOMContentLoaded",()=>{
     }
 
     function rabbitEat(){
-      if(seeds.length>0) seeds.pop();
+      if(seeds.length>0){
+        const p = seeds.pop();
+        if(p && p.el) p.el.remove();
+      }
       const r=document.getElementById("rabbit");
       r.classList.add("run");
       setTimeout(()=>r.classList.remove("run"),4000);
       updateUI();saveGame();
       showEventPopup("🐇","小兔貪食！","小兔太肚餓，忍唔住咬咗你一棵蘿蔔。","🐇 小兔子貪食 咬蘿蔔🥕 ");
+    }
+
+    // 新增：地震事件，畫面震動 + 農作物減半
+    function quakeEvent(){
+      // 畫面震動（加 body 上的 shake class）
+      document.body.classList.add("shake");
+      setTimeout(()=>document.body.classList.remove("shake"),1500);
+
+      if(seeds.length>0){
+        const original = [...seeds];
+        const half = Math.floor(original.length/2);
+        // random shuffle
+        for(let i=original.length-1;i>0;i--){
+          const j = Math.floor(Math.random()*(i+1));
+          [original[i],original[j]]=[original[j],original[i]];
+        }
+        const removed = original.slice(0,half);
+        const remain  = original.slice(half);
+
+        removed.forEach(p=>{
+          if(p && p.el) p.el.remove();
+        });
+        seeds = remain;
+      }
+
+      updateUI();saveGame();
+      showEventPopup("🌏","地震發生！","大地震令田裡搖來搖去，大約一半農作物被震走咗！","🌏 地震令農作物減少一半");
     }
   }
 });
