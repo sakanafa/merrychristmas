@@ -71,7 +71,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   color:#ff5b5b;
   text-shadow:0 0 12px rgba(255,120,120,0.7);
   z-index:100;
-  animation:xmasFloatIn 1.2s.ease-out forwards,
+  animation:xmasFloatIn 1.2s ease-out forwards,
            xmasGlow 2.5s ease-in-out infinite alternate;
 }
 @keyframes xmasFloatIn{
@@ -112,7 +112,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 
 .controls{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:10px;}
 .controls button{flex:1 1 45%;min-width:110px;}
-@media(max-width:420px){.controls.button{flex:1 1 100%;width:90%;}}
+@media(max-width:420px){.controls button{flex:1 1 100%;width:90%;}}
 #rule-box{
   background:#eef;padding:8px;border-radius:8px;margin-top:6px;font-size:15px;
   line-height:1.4;display:none;text-align:left;
@@ -125,7 +125,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 .bible-text{color:#c33;font-weight:bold;animation:shine 1s ease-in-out infinite alternate;}
 @keyframes shine{0%{color:#c33;}100%{color:#f66;}}
 
-/* ---------- 首次登入 / 行長角色層：左右排版 ---------- */
+/* ---------- Intro：白色對白框置中 + 黃色BTN喺下面 + 右邊大兔貓 ---------- */
 #introCharacters{
   position:absolute;
   inset:0;
@@ -134,52 +134,51 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   display:none;
 }
 
-/* 整個 layout：左文字右角色 */
+/* 整個 layout：上面文字 + 按鈕，中間留空，右下係兔貓 */
 .intro-layout{
   position:absolute;
   inset:0;
   display:flex;
-  align-items:flex-end;
+  flex-direction:column;
   justify-content:space-between;
-  padding:20px 26px 30px;
+  padding:18px 24px 26px;
   box-sizing:border-box;
 }
 
-/* 左邊：對白 + 按鈕 */
-.intro-left{
+/* 上半：對白 + 按鈕垂直排，置中 */
+.intro-top{
   display:flex;
   flex-direction:column;
+  align-items:center;
   gap:14px;
-  max-width:55%;
+  margin-top:4px;         /* ← 想對白再高少少 / 低少少可以調呢度 */
 }
 
 /* 對白氣泡 */
 #introSpeech{
-  background:#ffffffdd;
+  background:#ffffffee;
   border-radius:999px;
-  padding:10px 18px;
+  padding:10px 22px;
   font-size:13px;
   line-height:1.5;
   color:#2e7d32;
-  box-shadow:0 4px 10px rgba(0,0,0,0.18);
+  box-shadow:0 4px 12px rgba(0,0,0,0.2);
   opacity:0;
-  transform:translateY(6px);
+  transform:translateY(8px);
   transition:opacity .25s ease, transform .25s ease;
   pointer-events:auto;
+  max-width:88%;
 }
 #introSpeech.show{
   opacity:1;
   transform:translateY(0);
 }
-#introSpeech p{
-  margin:2px 0;
-}
+#introSpeech p{margin:2px 0;}
 
-/* 黃色按鈕靠左 */
+/* 黃色按鈕：喺對白下面置中 */
 #introStartBtn{
-  align-self:flex-start;
-  padding:8px 18px;
-  font-size:13px;
+  padding:8px 22px;
+  font-size:14px;
   border-radius:999px;
   background:#ffd54f;
   color:#7b5a00;
@@ -199,38 +198,39 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   filter:brightness(1.05);
 }
 
-/* 右邊：貓 + 兔 */
-.intro-right{
-  position:relative;
-  max-width:40%;
+/* 下半：右邊大兔貓 */
+.intro-bottom{
   display:flex;
-  align-items:flex-end;
   justify-content:flex-end;
-  gap:8px;
-  pointer-events:none;
+  align-items:flex-end;
+  gap:10px;
+  height:100px; /* 只控制下方高度，兔貓會自己貼地 */
 }
 .intro-char{
   filter:drop-shadow(0 4px 6px rgba(0,0,0,0.25));
   opacity:0;
   transform-origin:bottom center;
 }
+
+/* ★ 想放大 / 縮細兔貓：改呢兩個 width 即可 ★ */
 #introCat{
-  width:90px;
+  width:110px;   /* ← 粉紅貓大小 */
   z-index:2;
 }
 #introRabbit{
-  width:150px;
+  width:190px;   /* ← 藍兔大小（比貓大） */
   z-index:1;
+  margin-left:2px;
 }
 
-/* 貓兔入場動畫（由畫面外行入右邊） */
+/* 兔貓由右邊行入場 */
 @keyframes introCatWalk{
-  from{ transform:translateX(80px); opacity:0; }
-  to  { transform:translateX(0);   opacity:1; }
+  from{ transform:translateX(140px); opacity:0; }
+  to  { transform:translateX(0);     opacity:1; }
 }
 @keyframes introRabbitWalk{
-  from{ transform:translateX(120px); opacity:0; }
-  to  { transform:translateX(0);    opacity:1; }
+  from{ transform:translateX(180px); opacity:0; }
+  to  { transform:translateX(0);     opacity:1; }
 }
 
 /* 細小持續彈跳動畫 */
@@ -240,40 +240,29 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   100%{ transform:translateY(0); }
 }
 
-/* 手機窄屏：上下排，仍然左文右圖感覺 */
+/* 手機窄屏處理 */
 @media (max-width:700px){
   .intro-layout{
-    flex-direction:column;
-    align-items:center;
-    justify-content:flex-end;
-    padding:14px 14px 24px;
-    gap:10px;
-  }
-  .intro-left{
-    max-width:100%;
-    align-items:center;
+    padding:12px 10px 20px;
   }
   #introSpeech{
-    border-radius:16px;
-    text-align:center;
+    font-size:12px;
+    padding:8px 14px;
+    border-radius:18px;
   }
   #introStartBtn{
-    align-self:center;
-  }
-  .intro-right{
-    max-width:100%;
-    justify-content:center;
+    font-size:13px;
   }
   #introCat{
-    width:72px;
+    width:80px;   /* ← 手機版貓大小 */
   }
   #introRabbit{
-    width:120px;
+    width:140px;  /* ← 手機版兔大小 */
   }
 }
 
 /* ---------- 天氣 & 特效 ---------- */
-.star{position:absolute;width:2px;height:2px;background:white;border-radius:50%;animation:twinkle 2s infinite.ease-in-out;}
+.star{position:absolute;width:2px;height:2px;background:white;border-radius:50%;animation:twinkle 2s infinite ease-in-out;}
 @keyframes twinkle{0%,100%{opacity:0.5;}50%{opacity:1;}}
 .meteor{
   position:absolute;width:100px;height:2px;
@@ -285,8 +274,20 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   10%{opacity:1;}
   100%{right:110%;top:100%;opacity:0;}
 }
-.bird{position:absolute;top:20px;left:-50px;font-size:1.6em;animation:birdfly 4s linear;}
-@keyframes birdfly{0%{left:-50px;opacity:1;}100%{left:110%;opacity:0;}}
+
+/* 🐦 小鳥由右飛去左 */
+.bird{
+  position:absolute;
+  top:20px;
+  right:-50px;
+  font-size:1.6em;
+  animation:birdfly 4s linear;
+}
+@keyframes birdfly{
+  0%  { right:-50px; opacity:1; }
+  100%{ right:110%; opacity:0; }
+}
+
 .sun{position:absolute;top:10px;right:10px;font-size:2em;animation:shineSun 2s ease-in-out infinite alternate;}
 @keyframes shineSun{from{filter:brightness(1);}to{filter:brightness(1.5);}}
 .snowflake{position:absolute;color:white;animation:dropSnow 4s linear;}
@@ -320,7 +321,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   border-radius:18px;
   padding:22px 22px 20px;
   box-shadow:0 12px 30px rgba(0,0,0,0.18);
-  animation:xmasPopupIn .45s ease-out;
+  animation:xmasPopupIn .45s.ease-out;
   overflow:hidden;
 }
 #xmasPopupClose{
@@ -750,14 +751,14 @@ for(let i=0;i<25;i++){
     <div class="icon" id="rabbit">🐇</div>
     <div class="icon" id="cat">🐈</div>
 
-    <!-- 首次登入 / 行長事件角色層：左字右圖 -->
+    <!-- 首次登入 / 行長事件：白氣泡 + 黃掣 + 右下大兔貓 -->
     <div id="introCharacters">
       <div class="intro-layout">
-        <div class="intro-left">
+        <div class="intro-top">
           <div id="introSpeech"></div>
           <button id="introStartBtn">開始種蘿蔔</button>
         </div>
-        <div class="intro-right">
+        <div class="intro-bottom">
           <img src="88.png" alt="pink cat" class="intro-char" id="introCat">
           <img src="600.png" alt="blue rabbit" class="intro-char" id="introRabbit">
         </div>
@@ -775,6 +776,7 @@ for(let i=0;i<25;i++){
    <button id="resetBtn" style="background:#77bb77;">🔄 重新開始</button>
    <button id="testBtn" style="background:#59c;">🎄 聖誕測試</button>
    <button id="growTestBtn" style="background:#ffaa00;">🧪 下一階段測試</button>
+   <button id="introTestBtn" style="background:#ff7070;">🧪 測試貓兔出場</button>
   </div>
   <button id="toggle-rule">🌱 種植規則</button>
   <div id="rule-box">
@@ -955,21 +957,19 @@ document.addEventListener("DOMContentLoaded",()=>{
     if(!introWrap) return;
     introWrap.style.display = "block";
 
-    // ★ 首次登入歡迎對白（你要求嗰兩句）
+    // 首次登入歡迎對白
     introSpeech.innerHTML = `
       <p>歡迎嚟到 FRFARMLAND BANK 其下的聖誕蘿蔔農場，</p>
       <p>希望你「種瓜得瓜，種蘿蔔得蘿蔔」。</p>
     `;
     introStartBtn.textContent = "開始種蘿蔔";
 
-    // reset 動畫狀態
     introCat.style.animation = "none";
     introRabbit.style.animation = "none";
     introSpeech.classList.remove("show");
     introStartBtn.classList.remove("show");
     void introCat.offsetWidth;
 
-    // 行入場
     requestAnimationFrame(()=>{
       introCat.style.animation =
         "introCatWalk 1.1s ease-out forwards";
@@ -977,12 +977,11 @@ document.addEventListener("DOMContentLoaded",()=>{
         "introRabbitWalk 1.1s ease-out forwards";
     });
 
-    // 彈跳 + 顯示對白 / 按鈕
     setTimeout(()=>{
       introCat.style.animation =
         "introSmallBounce 0.8s ease-in-out infinite";
       introRabbit.style.animation =
-        "introSmallBounce 0.8s.ease-in-out infinite";
+        "introSmallBounce 0.8s ease-in-out infinite";
       introSpeech.classList.add("show");
       introStartBtn.classList.add("show");
     },1200);
@@ -1758,6 +1757,53 @@ document.addEventListener("DOMContentLoaded",()=>{
       eventBox.textContent="🧪 所有植物前進一個階段";
       saveGame();
       updateUI();
+    };
+
+    // 🧪 測試貓兔出場按鈕
+    document.getElementById("introTestBtn").onclick = ()=>{
+      const introWrap   = document.getElementById("introCharacters");
+      const introSpeech = document.getElementById("introSpeech");
+      const introStartBtn = document.getElementById("introStartBtn");
+      const introCat    = document.getElementById("introCat");
+      const introRabbit = document.getElementById("introRabbit");
+
+      introWrap.style.display = "block";
+
+      introSpeech.innerHTML = `
+        <p>歡迎嚟到 FRFARMLAND BANK 其下的聖誕蘿蔔農場，</p>
+        <p>希望你「種瓜得瓜，種蘿蔔得蘿蔔」。</p>
+      `;
+      introStartBtn.textContent = "開始種蘿蔔";
+
+      introCat.style.animation = "none";
+      introRabbit.style.animation = "none";
+      introSpeech.classList.remove("show");
+      introStartBtn.classList.remove("show");
+      void introCat.offsetWidth;
+
+      requestAnimationFrame(()=>{
+        introCat.style.animation =
+          "introCatWalk 1.1s ease-out forwards";
+        introRabbit.style.animation =
+          "introRabbitWalk 1.1s ease-out forwards";
+      });
+
+      setTimeout(()=>{
+        introCat.style.animation =
+          "introSmallBounce 0.8s ease-in-out infinite";
+        introRabbit.style.animation =
+          "introSmallBounce 0.8s ease-in-out infinite";
+        introSpeech.classList.add("show");
+        introStartBtn.classList.add("show");
+      },1200);
+
+      const clickHandler = ()=>{
+        introWrap.style.display="none";
+        introCat.style.animation = "none";
+        introRabbit.style.animation = "none";
+        introStartBtn.removeEventListener("click",clickHandler);
+      };
+      introStartBtn.addEventListener("click",clickHandler);
     };
 
     setInterval(()=>{
