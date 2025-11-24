@@ -471,7 +471,24 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   transition:width 0.4s.ease;
   border-radius:999px;
 }
+/* ----------  banner Frame ---------- */
+/* 田下面嗰張 JPG Banner */
+#bottomBanner{
+  margin-top:10px;
+  border-radius:12px;
+  overflow:hidden;
+  /* 同 container 寬度對齊 */
+  max-width:520px;
+  margin-left:auto;
+  margin-right:auto;
+}
 
+#bottomBanner img{
+  display:block;
+  width:100%;
+  height:auto;
+}
+  
 /* ---------- 🎁 聖誕禮物展示 Frame ---------- */
 #xmasOwnedFrame{
   margin-top:8px;
@@ -692,6 +709,27 @@ for(let i=0;i<25;i++){
   </div>
 
   <div id="field">
+    
+    <div class="ground"></div>
+    <div class="icon" id="rabbit">🐇</div>
+    <div class="icon" id="cat">🐈</div>
+
+    <!-- 首次登入 / 行長事件：白氣泡 + 黃掣 -->
+    <div id="introCharacters">
+      <div class="intro-layout">
+        <div class="intro-top">
+          <div id="introSpeech"></div>
+          <button id="introStartBtn">開始種蘿蔔</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔻 新增：田下面的 JPG 圖片區塊 -->
+  <div id="bottomBanner">
+    <img src="bann1.png" alt="兔兔貓貓Banner">
+  </div>
+   
     <div class="ground"></div>
     <div class="icon" id="rabbit">🐇</div>
     <div class="icon" id="cat">🐈</div>
