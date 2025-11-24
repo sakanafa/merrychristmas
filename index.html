@@ -1144,8 +1144,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     // 根據場地升級 level 設定圖片
     function applyFieldBannerByLevel(){
       if(!bottomBannerImg) return;
-      // level 0: 正常流程係 intro 後用 bann2.png（已喺 showIntroIfFirstTime 控制）
-      // upgrade 1 → bann3, 2 → bann4, 3 → bann5
+      // level 0: intro 之後 bann2.png（由 showIntroIfFirstTime 控制）
       if(fieldUpgradeLevel===1){
         bottomBannerImg.src="bann3.png";
       }else if(fieldUpgradeLevel===2){
@@ -1397,7 +1396,6 @@ document.addEventListener("DOMContentLoaded",()=>{
         if(raw) fromOld=true;
       }
       if(!raw) {
-        // 只係冇 game data，都要套返場地升級圖
         applyFieldBannerByLevel();
         return;
       }
@@ -1635,8 +1633,8 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     // ====== 升級場地相關 =======
     function getNextUpgradeCost(level){
-      // level 0->1: 150, 1->2: 300, 2->3: 600
-      if(level===0) return 150;
+      // level 0->1: 600, 1->2: 300, 2->3: 600
+      if(level===0) return 600;
       if(level===1) return 300;
       if(level===2) return 600;
       return null;
@@ -1649,7 +1647,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       }
       const cost = getNextUpgradeCost(fieldUpgradeLevel);
       upgradePopupText.textContent =
-        `是否升級六八與花行長的場地？需要 ${cost} 個銀行蘿蔔。`;
+        `是否升級 600 與花行長的場地？需要 ${cost} 個銀行蘿蔔。`;
       upgradePopupOverlay.style.display="flex";
     }
 
@@ -1668,14 +1666,14 @@ document.addEventListener("DOMContentLoaded",()=>{
         upgradePopupOverlay.style.display="none";
         return;
       }
-      // 改用「銀行蘿蔔 safeCarrot」付款
+      // 撳「升級」先檢查銀行蘿蔔
       if(safeCarrot < cost){
         upgradePopupOverlay.style.display="none";
         eventBox.textContent = "銀行蘿蔔唔夠升級，請努力種蘿蔔！";
         return;
       }
       safeCarrot -= cost;
-      // bankStored 係「歷史累積存入」數字，為免改壞達標率，唔扣佢
+      // bankStored 係歷史累積存入數字，唔扣，避免影響達標率
       fieldUpgradeLevel++;
       applyFieldBannerByLevel();
       eventBox.textContent=`🏗 場地已升級！已使用 ${cost} 個銀行蘿蔔。`;
