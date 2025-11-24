@@ -184,7 +184,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   animation:introSpeechPop 0.55s cubic-bezier(0.18,0.89,0.32,1.28) forwards;
 }
 
-/* ⭐ 首次「開始種蘿蔔」按鈕（黃色，落少少） */
+/* ⭐ 黃色按鈕 */
 #introStartBtn{
   position:absolute;
   left:50%;
@@ -218,19 +218,17 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   to  { right:5%;     opacity:1; }
 }
 
-/* ⭐ 新增：細小持續彈跳動畫（顯得一路跳） */
+/* 細小持續彈跳動畫 */
 @keyframes introSmallBounce{
   0%  { transform:translateY(0); }
   50% { transform:translateY(-6px); }
   100%{ transform:translateY(0); }
 }
 
-/* 不再用舊的 introBounce，保留以防其他地方用到 */
 @keyframes introBounce{
   from{ transform:translateY(0); }
   to  { transform:translateY(-6px); }
 }
-
 @keyframes introSpeechPop{
   0%{ opacity:0; transform:translateX(-50%) scale(0.6) translateY(8px); }
   60%{ opacity:1; transform:translateX(-50%) scale(1.02) translateY(0); }
@@ -492,7 +490,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   height:100%;
   width:0%;
   background:linear-gradient(90deg,#ffb74d,#f4511e);
-  transition:width 0.4s.ease;
+  transition:width 0.4s ease;
   border-radius:999px;
 }
 
@@ -725,13 +723,11 @@ for(let i=0;i<25;i++){
       <img src="88.png" alt="粉紅貓" id="introCat" class="intro-char intro-cat">
       <img src="600.png" alt="藍色兔子" id="introRabbit" class="intro-char intro-rabbit">
 
-      <!-- 對白內容 -->
       <div id="introSpeech">
         <p>歡迎嚟到 <strong>FRFARMLAND BANK</strong> 嘅聖誕蘿蔔農場，</p>
         <p>希望你「種瓜得瓜，種蘿蔔得蘿蔔」。</p>
       </div>
 
-      <!-- 對白框下方開始 / 謝謝 按鈕（黃色） -->
       <button id="introStartBtn">開始種蘿蔔</button>
     </div>
   </div>
@@ -873,6 +869,17 @@ document.addEventListener("DOMContentLoaded",()=>{
   chooseBgm();
   tryPlayBgm(true);
 
+  // 音樂按鈕
+  musicBtn.addEventListener("click",()=>{
+    if(!musicOn){
+      tryPlayBgm(false);
+    }else{
+      currentBgm.pause();
+      musicOn=false;
+      musicBtn.textContent="🔊";
+    }
+  });
+
   for(let i=1;i<=24;i++){
     const d=document.createElement("div");
     d.className="day";d.textContent=i;
@@ -889,6 +896,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     return `${y}-${m}-${d} ${hh}:${mm}`;
   }
 
+  /* ========= 首次登入：粉紅貓 + 藍兔 ========= */
   function showIntroIfFirstTime(){
     const seen = localStorage.getItem(INTRO_FLAG_KEY);
     const gameEl = document.getElementById("game");
@@ -904,28 +912,38 @@ document.addEventListener("DOMContentLoaded",()=>{
       void introCat.offsetWidth;
     }
 
+    gameEl.style.display = "block";
+
     if(seen){
-      gameEl.style.display = "block";
       if(introWrap) introWrap.style.display = "none";
       return;
     }
 
-    gameEl.style.display = "block";
     if(!introWrap) return;
     introWrap.style.display = "block";
+    introStartBtn.textContent = "開始種蘿蔔";
 
+    // reset 動畫
+    introCat.style.animation = "none";
+    introRabbit.style.animation = "none";
+    introSpeech.classList.remove("show");
+    introStartBtn.classList.remove("show");
+    void introCat.offsetWidth;
+
+    // 行入場
     requestAnimationFrame(()=>{
       introCat.style.animation =
-        "introCatWalk 1.1s.ease-out forwards";
+        "introCatWalk 1.1s ease-out forwards";
       introRabbit.style.animation =
-        "introRabbitWalk 1.1s.ease-out forwards";
+        "introRabbitWalk 1.1s ease-out forwards";
     });
 
+    // 彈跳 + 顯示對白 / 按鈕
     setTimeout(()=>{
       introCat.style.animation =
-        "introSmallBounce 0.8s.ease-in-out infinite";
+        "introSmallBounce 0.8s ease-in-out infinite";
       introRabbit.style.animation =
-        "introSmallBounce 0.8s.ease-in-out infinite";
+        "introSmallBounce 0.8s ease-in-out infinite";
       introSpeech.classList.add("show");
       introStartBtn.classList.add("show");
     },1200);
@@ -1095,21 +1113,22 @@ document.addEventListener("DOMContentLoaded",()=>{
     function random(min,max){return Math.random()*(max-min)+min;}
     function hasItem(id){return !!items[id];}
 
-    // ⭐ 這裡已改：12月24日 & 測試模式 = 夜景 + 星空
+    /* === 夜空 + 雪地，12月24 或 聖誕測試一致 === */
     function updateFieldStyle(forceNormal=false){
       const now=new Date();
       const hour=now.getHours();
       const isRealXmas=(now.getMonth()==11 && now.getDate()==24);
-      const isXmas=(!forceNormal)&&(isRealXmas||xmasTest);
+      const isXmasMode = (!forceNormal) && (isRealXmas || xmasTest);
 
+      // 清走舊星星 / 流星
       field.querySelectorAll('.star,.meteor').forEach(e=>e.remove());
 
-      if(isXmas){
-        // 夜空：深藍紫天空 + 深色地面
-        field.style.background="linear-gradient(#020824 0%, #071739 40%, #18331a 40%, #18331a 100%)";
+      if(isXmasMode){
+        // 夜空 + 雪地
+        field.style.background="linear-gradient(#020824 0%, #071739 45%, #e3f4ff 45%, #e3f4ff 100%)";
         field.querySelector(".ground").style.background=
-          "repeating-linear-gradient(45deg,#2c512c,#1e381e 12px)";
-        // 多一啲星星
+          "repeating-linear-gradient(45deg,#f5fbff,#ddefff 12px)";
+
         for(let i=0;i<45;i++){
           let st=document.createElement("div");
           st.className="star";
@@ -1118,7 +1137,6 @@ document.addEventListener("DOMContentLoaded",()=>{
           st.style.animationDelay=(Math.random()*2)+"s";
           field.appendChild(st);
         }
-        // 有機會有流星
         if(Math.random()<0.5){
           let m=document.createElement("div");
           m.className="meteor";
@@ -1388,7 +1406,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       const date=new Date();
       if(date.getMonth()==11 && date.getDate()==24 && !xmasTest){
         ensureXmasVisuals();
-        eventBox.textContent="🎄 聖誕節到！田裡都變成聖誕森林啦～";
+        eventBox.textContent="🎄 聖誕節到！田裡變成聖誕森林雪地啦～";
         updateFieldStyle();
         setXmasUI(true);
         saveGame();
@@ -1682,7 +1700,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       const isXmasMode=isRealXmas||xmasTest;
       if(isXmasMode){
         ensureXmasVisuals();
-        eventBox.textContent="🧪 已開啟聖誕測試模式，變成聖誕森林夜景啦～";
+        eventBox.textContent="🧪 已開啟聖誕測試模式：夜空 + 雪地下的聖誕森林～";
         setXmasUI(true);
       }else{
         recomputeGrowth(true);
@@ -1996,15 +2014,15 @@ document.addEventListener("DOMContentLoaded",()=>{
       void introCat.offsetWidth;
 
       introCat.style.animation =
-        "introCatWalk 1.1s.ease-out forwards";
+        "introCatWalk 1.1s ease-out forwards";
       introRabbit.style.animation =
         "introRabbitWalk 1.1s.ease-out forwards";
 
       setTimeout(()=>{
         introCat.style.animation =
-          "introSmallBounce 0.8s.ease-in-out infinite";
+          "introSmallBounce 0.8s ease-in-out infinite";
         introRabbit.style.animation =
-          "introSmallBounce 0.8s.ease-in-out infinite";
+          "introSmallBounce 0.8s ease-in-out infinite";
         introSpeech.classList.add("show");
         introStartBtn.classList.add("show");
       },1100);
