@@ -154,46 +154,72 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 .intro-rabbit{
   right:-180px;
 }
+
+/* ⭐ 對白框縮細一半（重點修改） */
 #introSpeech{
   position:absolute;
   left:50%;
-  top:12%;                 /* 對白框高少少 */
+  top:10%;                 /* 略微靠上 */
   transform:translateX(-50%) scale(0.9);
-  min-width:72%;
-  max-width:88%;
+  min-width:38%;           /* 原本大約一半，收窄 */
+  max-width:50%;           /* 控制唔好太闊 */
   background:#ffffff;
-  border-radius:18px;
-  padding:12px 16px 10px;
-  font-size:14px;
-  line-height:1.6;
-  box-shadow:0 6px 18px rgba(0,0,0,0.18);
+  border-radius:14px;
+  padding:8px 10px 6px;    /* 較細 padding */
+  font-size:11px;          /* 字體縮細 */
+  line-height:1.4;
+  box-shadow:0 5px 14px rgba(0,0,0,0.18);
   opacity:0;
   pointer-events:auto;
-  color:#2e7d32;           /* 綠字 */
+  color:#2e7d32;
 }
 #introSpeech::after{
   content:"";
   position:absolute;
   left:50%;
-  bottom:-10px;
+  bottom:-8px;
   transform:translateX(-50%);
-  width:18px;
-  height:10px;
+  width:14px;
+  height:8px;
   background:#ffffff;
-  clip-path:polygon(50% 100%,0 0,100% 0); /* 三角箭嘴 */
+  clip-path:polygon(50% 100%,0 0,100% 0);
 }
-#introSpeech button{
-  margin-top:8px;
-  font-size:14px;
-  padding:6px 14px;
-  background:#43a047;
-}
-#introSpeech button:hover{
-  filter:brightness(1.05);
-}
+
+/* 對白框彈出動畫 */
 #introSpeech.show{
   animation:introSpeechPop 0.55s cubic-bezier(0.18,0.89,0.32,1.28) forwards;
 }
+
+/* ⭐ 對白框下方「開始種蘿蔔」按鈕（新樣式） */
+#introStartBtn{
+  position:absolute;
+  left:50%;
+  top:calc(10% + 70px);     /* 依據對白框位置向下少少 */
+  transform:translateX(-50%);
+  padding:6px 14px;
+  font-size:12px;
+  border-radius:999px;
+  background:#43a047;
+  color:#fff;
+  border:none;
+  box-shadow:0 3px 8px rgba(0,0,0,0.15);
+  cursor:pointer;
+  opacity:0;
+  pointer-events:auto;
+}
+#introStartBtn.show{
+  animation:introBtnPop 0.5s ease-out forwards;
+}
+#introStartBtn:hover{
+  filter:brightness(1.05);
+}
+
+/* 文字排版用內層（方便縮細對白框時控制行距） */
+#introSpeech p{
+  margin:2px 0;
+}
+
+/* 角色動畫 */
 @keyframes introCatWalk{
   from{ left:-160px; opacity:0; }
   to  { left:5%;     opacity:1; }
@@ -207,9 +233,14 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   to  { transform:translateY(-6px); }
 }
 @keyframes introSpeechPop{
-  0%{ opacity:0; transform:translateX(-50%) scale(0.7) translateY(8px); }
-  60%{ opacity:1; transform:translateX(-50%) scale(1.03) translateY(0); }
+  0%{ opacity:0; transform:translateX(-50%) scale(0.6) translateY(8px); }
+  60%{ opacity:1; transform:translateX(-50%) scale(1.02) translateY(0); }
   100%{ opacity:1; transform:translateX(-50%) scale(1) translateY(0); }
+}
+@keyframes introBtnPop{
+  0%{ opacity:0; transform:translateX(-50%) translateY(8px) scale(0.8); }
+  60%{ opacity:1; transform:translateX(-50%) translateY(0) scale(1.03); }
+  100%{ opacity:1; transform:translateX(-50%) translateY(0) scale(1); }
 }
 
 /* ---------- 天氣 & 特效 ---------- */
@@ -694,11 +725,15 @@ for(let i=0;i<25;i++){
     <div id="introCharacters">
       <img src="88.png" alt="粉紅貓" id="introCat" class="intro-char intro-cat">
       <img src="600.png" alt="藍色兔子" id="introRabbit" class="intro-char intro-rabbit">
+
+      <!-- 對白內容 -->
       <div id="introSpeech">
-        <p>歡迎嚟到 <strong>FRFARMLAND BANK</strong> 其下的聖誕蘿蔔農場，</p>
+        <p>歡迎嚟到 <strong>FRFARMLAND BANK</strong> 嘅聖誕蘿蔔農場，</p>
         <p>希望你「種瓜得瓜，種蘿蔔得蘿蔔」。</p>
-        <button id="introStartBtn">開始種蘿蔔</button>
       </div>
+
+      <!-- 對白框下方開始按鈕 -->
+      <button id="introStartBtn">開始種蘿蔔</button>
     </div>
   </div>
 
@@ -715,7 +750,6 @@ for(let i=0;i<25;i++){
   </div>
   <button id="toggle-rule">🌱 種植規則</button>
   <div id="rule-box">
-    <!-- 規則內容保持不變，略 -->
     <p><strong>【基本種植】</strong></p>
     <ul>
       <li>最初你有 <strong>20 粒種子</strong>（按「種蘿蔔 🌰」會用 1 粒）。</li>
@@ -730,7 +764,6 @@ for(let i=0;i<25;i++){
       <li>正常情況下，約 <strong>1.5 小時</strong>由 🌰 變 🌿，再多 <strong>1.5 小時</strong>由 🌿 變 🥕。</li>
       <li>如果你之後買咗 <strong>🎄 貓貓聖誕樹</strong>，成長時間會縮短一半。</li>
     </ul>
-    <!-- 其餘規則照舊 -->
   </div>
   <div id="eventBox">🌤 歡迎回來，小農夫～</div>
  </div>
@@ -887,6 +920,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     // 行完先彈出對白框
     setTimeout(()=>{
       introSpeech.classList.add("show");
+      introStartBtn.classList.add("show");
     },1200);
 
     introStartBtn.addEventListener("click",()=>{
