@@ -184,16 +184,16 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   animation:introSpeechPop 0.55s cubic-bezier(0.18,0.89,0.32,1.28) forwards;
 }
 
-/* ⭐ 首次「開始種蘿蔔」按鈕（改黃、落少少） */
+/* ⭐ 首次「開始種蘿蔔」按鈕（黃色，落少少） */
 #introStartBtn{
   position:absolute;
   left:50%;
-  top:calc(10% + 80px);  /* 原本 70px，向下少少 */
+  top:calc(10% + 80px);
   transform:translateX(-50%);
   padding:7px 16px;
   font-size:12px;
   border-radius:999px;
-  background:#ffd54f;    /* 黃色 */
+  background:#ffd54f;
   color:#7b5a00;
   border:none;
   box-shadow:0 3px 8px rgba(0,0,0,0.18);
@@ -217,10 +217,20 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   from{ right:-180px; opacity:0; }
   to  { right:5%;     opacity:1; }
 }
+
+/* ⭐ 新增：細小持續彈跳動畫（顯得一路跳） */
+@keyframes introSmallBounce{
+  0%  { transform:translateY(0); }
+  50% { transform:translateY(-6px); }
+  100%{ transform:translateY(0); }
+}
+
+/* 不再用舊的 introBounce，保留以防其他地方用到 */
 @keyframes introBounce{
   from{ transform:translateY(0); }
   to  { transform:translateY(-6px); }
 }
+
 @keyframes introSpeechPop{
   0%{ opacity:0; transform:translateX(-50%) scale(0.6) translateY(8px); }
   60%{ opacity:1; transform:translateX(-50%) scale(1.02) translateY(0); }
@@ -482,7 +492,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   height:100%;
   width:0%;
   background:linear-gradient(90deg,#ffb74d,#f4511e);
-  transition:width 0.4s ease;
+  transition:width 0.4s.ease;
   border-radius:999px;
 }
 
@@ -710,7 +720,7 @@ for(let i=0;i<25;i++){
     <div class="icon" id="rabbit">🐇</div>
     <div class="icon" id="cat">🐈</div>
 
-    <!-- 首次登入：角色由左右彈入農田 + 對白框 -->
+    <!-- 首次登入 / 行長事件：粉紅貓 + 藍兔 + 對白框 -->
     <div id="introCharacters">
       <img src="88.png" alt="粉紅貓" id="introCat" class="intro-char intro-cat">
       <img src="600.png" alt="藍色兔子" id="introRabbit" class="intro-char intro-rabbit">
@@ -721,7 +731,7 @@ for(let i=0;i<25;i++){
         <p>希望你「種瓜得瓜，種蘿蔔得蘿蔔」。</p>
       </div>
 
-      <!-- 對白框下方開始按鈕（黃色） -->
+      <!-- 對白框下方開始 / 謝謝 按鈕（黃色） -->
       <button id="introStartBtn">開始種蘿蔔</button>
     </div>
   </div>
@@ -888,6 +898,12 @@ document.addEventListener("DOMContentLoaded",()=>{
     const introCat = document.getElementById("introCat");
     const introRabbit = document.getElementById("introRabbit");
 
+    function stopCharactersBounce(){
+      introCat.style.animation = "none";
+      introRabbit.style.animation = "none";
+      void introCat.offsetWidth;
+    }
+
     if(seen){
       gameEl.style.display = "block";
       if(introWrap) introWrap.style.display = "none";
@@ -898,16 +914,18 @@ document.addEventListener("DOMContentLoaded",()=>{
     if(!introWrap) return;
     introWrap.style.display = "block";
 
-    // 角色先行入場
     requestAnimationFrame(()=>{
       introCat.style.animation =
-        "introCatWalk 1.1s ease-out forwards, introBounce 0.6s ease-in-out 1.1s 3 alternate";
+        "introCatWalk 1.1s.ease-out forwards";
       introRabbit.style.animation =
-        "introRabbitWalk 1.1s ease-out forwards, introBounce 0.6s ease-in-out 1.1s 3 alternate";
+        "introRabbitWalk 1.1s.ease-out forwards";
     });
 
-    // 行完先彈出對白框 + 黃色掣
     setTimeout(()=>{
+      introCat.style.animation =
+        "introSmallBounce 0.8s.ease-in-out infinite";
+      introRabbit.style.animation =
+        "introSmallBounce 0.8s.ease-in-out infinite";
       introSpeech.classList.add("show");
       introStartBtn.classList.add("show");
     },1200);
@@ -915,6 +933,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     introStartBtn.addEventListener("click",()=>{
       localStorage.setItem(INTRO_FLAG_KEY,"1");
       introWrap.style.display="none";
+      stopCharactersBounce();
     },{once:true});
   }
 
@@ -981,7 +1000,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     let loginEventCount=0;
     let intervalEventTimer=null;
 
-    /* ⭐ 控制 FRFARMLAND BANK 銀行行長（藍兔+粉貓）事件獨佔 */
     let managerEventActive = false;
 
     const field=document.getElementById("field");
@@ -1024,7 +1042,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     }
 
     function showEventPopup(emoji,title,text,finalText,onClose){
-      if(managerEventActive) return; // 經理事件期間唔再疊一般 Popup
+      if(managerEventActive) return;
       eventQueue.push({emoji,title,text,finalText,onClose});
       if(!showingEventPopup){
         displayNextEventPopup();
@@ -1077,6 +1095,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     function random(min,max){return Math.random()*(max-min)+min;}
     function hasItem(id){return !!items[id];}
 
+    // ⭐ 這裡已改：12月24日 & 測試模式 = 夜景 + 星空
     function updateFieldStyle(forceNormal=false){
       const now=new Date();
       const hour=now.getHours();
@@ -1086,10 +1105,12 @@ document.addEventListener("DOMContentLoaded",()=>{
       field.querySelectorAll('.star,.meteor').forEach(e=>e.remove());
 
       if(isXmas){
-        field.style.background="linear-gradient(#aee7ff 0%, #aee7ff 40%, #eef5ff 40%, #eef5ff 100%)";
+        // 夜空：深藍紫天空 + 深色地面
+        field.style.background="linear-gradient(#020824 0%, #071739 40%, #18331a 40%, #18331a 100%)";
         field.querySelector(".ground").style.background=
-          "repeating-linear-gradient(45deg,#ccd,#eef 12px)";
-        for(let i=0;i<40;i++){
+          "repeating-linear-gradient(45deg,#2c512c,#1e381e 12px)";
+        // 多一啲星星
+        for(let i=0;i<45;i++){
           let st=document.createElement("div");
           st.className="star";
           st.style.left=Math.random()*100+"%";
@@ -1097,7 +1118,8 @@ document.addEventListener("DOMContentLoaded",()=>{
           st.style.animationDelay=(Math.random()*2)+"s";
           field.appendChild(st);
         }
-        if(Math.random()<0.4){
+        // 有機會有流星
+        if(Math.random()<0.5){
           let m=document.createElement("div");
           m.className="meteor";
           field.appendChild(m);
@@ -1381,7 +1403,7 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     function triggerEvent(){
       if(isEventDisabledToday()) return;
-      if(managerEventActive) return;       // ⭐ 經理事件期間停晒
+      if(managerEventActive) return;
       if(loginEventCount >= 2) return;
       loginEventCount++;
 
@@ -1396,8 +1418,8 @@ document.addEventListener("DOMContentLoaded",()=>{
       else if(r<0.70)     rabbitHelp();
       else if(r<0.78)     rabbitEat();
       else if(r<0.86)     quakeEvent();
-      else if(r<0.93)     managerPraiseEvent();   // ⭐ 新事件：有作物 -> 行長滿意
-      else                managerHelpPlantEvent(); // ⭐ 新事件：冇作物 -> 幫你種子
+      else if(r<0.93)     managerPraiseEvent();
+      else                managerHelpPlantEvent();
     }
 
     function scheduleLoginEvent(){
@@ -1660,7 +1682,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       const isXmasMode=isRealXmas||xmasTest;
       if(isXmasMode){
         ensureXmasVisuals();
-        eventBox.textContent="🧪 已開啟聖誕測試模式，變成聖誕森林啦～";
+        eventBox.textContent="🧪 已開啟聖誕測試模式，變成聖誕森林夜景啦～";
         setXmasUI(true);
       }else{
         recomputeGrowth(true);
@@ -1701,7 +1723,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       updateWaterRegen();
     },10000);
 
-    /* ⭐ 把 45 秒輪詢事件 handle 儲起嚟，方便暫停 / 恢復 */
     intervalEventTimer = setInterval(()=>{
       if(isEventDisabledToday()) return;
       if(managerEventActive) return;
@@ -1711,7 +1732,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       }
     },45000);
 
-    /* ---------- 各種事件 ---------- */
     function birdEvent(){
       showEventPopup(
         "🐦",
@@ -1935,25 +1955,19 @@ document.addEventListener("DOMContentLoaded",()=>{
       );
     }
 
-    /* ⭐⭐⭐ FRFARMLAND BANK 銀行行長（藍兔 + 粉貓）事件控制 */
-
-    // 停止所有隨機事件（登入嗰個 + interval 嗰個）
     function pauseRandomEvents(){
       managerEventActive = true;
       if(loginEventTimer){
         clearTimeout(loginEventTimer);
         loginEventTimer = null;
       }
-      // intervalEventTimer 係 setInterval，唔好 clear 掉，喺 handler 裏面已經 check managerEventActive
     }
 
-    // 恢復隨機事件（喺按完黃色 BTN 「謝謝」之後叫）
     function resumeRandomEvents(){
       managerEventActive = false;
       scheduleLoginEvent();
     }
 
-    // 共用：顯示「藍兔 + 粉貓 + 對白框 + 黃色謝謝掣」
     function showManagerSpeech(lines, onThanks){
       pauseRandomEvents();
 
@@ -1963,10 +1977,8 @@ document.addEventListener("DOMContentLoaded",()=>{
       const introRabbit = document.getElementById("introRabbit");
       const introStartBtn = document.getElementById("introStartBtn");
 
-      // 令 introCharacters 顯示，用同一套動畫
       introWrap.style.display = "block";
 
-      // 更新對白內容
       introSpeech.innerHTML = "";
       lines.forEach(t=>{
         const p=document.createElement("p");
@@ -1974,31 +1986,34 @@ document.addEventListener("DOMContentLoaded",()=>{
         introSpeech.appendChild(p);
       });
 
-      // 先 reset 動畫
       introCat.style.animation = "none";
       introRabbit.style.animation = "none";
       introSpeech.classList.remove("show");
       introStartBtn.classList.remove("show");
 
-      // 更改黃色掣文字做「謝謝」
       introStartBtn.textContent = "謝謝";
 
-      // 強制 reflow
       void introCat.offsetWidth;
 
-      // 再播放動畫，角色行入場
       introCat.style.animation =
-        "introCatWalk 1.1s ease-out forwards, introBounce 0.6s ease-in-out 1.1s 3 alternate";
+        "introCatWalk 1.1s.ease-out forwards";
       introRabbit.style.animation =
-        "introRabbitWalk 1.1s ease-out forwards, introBounce 0.6s ease-in-out 1.1s 3 alternate";
+        "introRabbitWalk 1.1s.ease-out forwards";
 
-      // 少少 delay 彈出對白同黃色掣
       setTimeout(()=>{
+        introCat.style.animation =
+          "introSmallBounce 0.8s.ease-in-out infinite";
+        introRabbit.style.animation =
+          "introSmallBounce 0.8s.ease-in-out infinite";
         introSpeech.classList.add("show");
         introStartBtn.classList.add("show");
       },1100);
 
       const clickHandler = ()=>{
+        introCat.style.animation = "none";
+        introRabbit.style.animation = "none";
+        void introCat.offsetWidth;
+
         introWrap.style.display="none";
         introStartBtn.removeEventListener("click",clickHandler);
         if(typeof onThanks === "function") onThanks();
@@ -2007,9 +2022,8 @@ document.addEventListener("DOMContentLoaded",()=>{
       introStartBtn.addEventListener("click",clickHandler);
     }
 
-    // 1️⃣ 有農作物：行長滿意 +100 銀行蘿蔔
     function managerPraiseEvent(){
-      if(seeds.length === 0) return;  // 冇作物就唔出呢個，可能俾另一個事件用
+      if(seeds.length === 0) return;
       showManagerSpeech(
         [
           "FRFARMLAND BANK 銀行行長經過，",
@@ -2026,9 +2040,8 @@ document.addEventListener("DOMContentLoaded",()=>{
       );
     }
 
-    // 2️⃣ 冇農作物：行長話田荒廢，幫你種 20 粒種子
     function managerHelpPlantEvent(){
-      if(seeds.length > 0) return;  // 有作物唔出呢個
+      if(seeds.length > 0) return;
       showManagerSpeech(
         [
           "FRFARMLAND BANK 銀行行長經過，",
