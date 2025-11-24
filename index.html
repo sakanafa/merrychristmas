@@ -98,11 +98,19 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 .plant{position:absolute;transition:all .5s ease;font-size:2em;opacity:0;}
 .plant.show{opacity:1;}
 .icon{position:absolute;font-size:2em;opacity:0;}
+/* 由右至左：由畫面右側走入畫面左邊 */
 #rabbit,#cat{bottom:40px;}
 #rabbit.run{animation:rabbit 4s linear;}
 #cat.run{animation:cat 4s linear;}
-@keyframes rabbit{0%{right:-50px;opacity:1;}100%{right:110%;opacity:0;}}
-@keyframes cat{0%{left:110%;opacity:1;}100%{left:-50px;opacity:0;}}
+@keyframes rabbit{
+  0%{right:-50px;opacity:1;}
+  100%{right:110%;opacity:0;}
+}
+@keyframes cat{
+  0%{right:-50px;opacity:1;}
+  100%{right:110%;opacity:0;}
+}
+
 .controls{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:10px;}
 .controls button{flex:1 1 45%;min-width:110px;}
 @media(max-width:420px){.controls button{flex:1 1 100%;width:90%;}}
@@ -136,8 +144,16 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 @keyframes shineSun{from{filter:brightness(1);}to{filter:brightness(1.5);}}
 .snowflake{position:absolute;color:white;animation:dropSnow 4s linear;}
 @keyframes dropSnow{0%{top:-10px;opacity:1;}100%{top:100%;opacity:0;}}
-.rain{position:absolute;color:#00f;animation:dropRain 2s linear;}
-@keyframes dropRain{0%{top:-10px;opacity:1;}100%{top:100%;opacity:0;}}
+.rain{
+  position:absolute;
+  color:#00f;
+  /* ⏱️ 雨滴時間加長，令淋水動畫播耐啲 */
+  animation:dropRain 3.5s linear;
+}
+@keyframes dropRain{
+  0%{top:-10px;opacity:1;}
+  100%{top:100%;opacity:0;}
+}
 .flash{animation:flashRed 0.2s alternate 10;}
 @keyframes flashRed{from{filter:brightness(1);}to{filter:brightness(1.5) sepia(1) hue-rotate(-20deg);}}
 /* ---------- 聖誕 Popup ---------- */
@@ -589,7 +605,7 @@ for(let i=0;i<25;i++){
   </div>
   <div class="controls">
    <button id="plantBtn">種蘿蔔 🌰 (20/20)</button>
-   <button id="waterBtn">淋水 💧 (1/1)</button>
+   <button id="waterBtn">淋水 💧 (2/2)</button>
    <button id="bankBtn">存入銀行 💳</button>
    <button id="toBackpackBtn" style="background:#ffb74d;">🥕 放入背包</button>
    <button id="exchangeGiftBtn" style="background:#ab47bc;">🎁 換購聖誕禮品</button>
@@ -600,7 +616,82 @@ for(let i=0;i<25;i++){
   </div>
   <button id="toggle-rule">🌱 種植規則</button>
   <div id="rule-box">
-    <!-- 規則內容同你原本一樣，略 -->
+    <p><strong>【基本種植】</strong></p>
+    <ul>
+      <li>最初你有 <strong>20 粒種子</strong>（按「種蘿蔔 🌰」會用 1 粒）。</li>
+      <li>種子用完之後，<strong>每 5 分鐘</strong>會自動回復 <strong>1 粒</strong>，最多回到 <strong>20/20</strong>。</li>
+      <li>種咗落田嘅蘿蔔會分三個階段：
+        <ul>
+          <li>🌰 種子</li>
+          <li>🌿 幼苗</li>
+          <li>🥕 成熟蘿蔔</li>
+        </ul>
+      </li>
+      <li>正常情況下，約 <strong>1.5 小時</strong>由 🌰 變 🌿，再多 <strong>1.5 小時</strong>由 🌿 變 🥕。</li>
+      <li>如果你之後買咗 <strong>🎄 貓貓聖誕樹</strong>，成長時間會縮短一半。</li>
+    </ul>
+
+    <p><strong>【淋水（每天限用）】</strong></p>
+    <ul>
+      <li>「淋水 💧」會同時淋晒田入面所有蘿蔔。</li>
+      <li>你有 <strong>2/2</strong> 次淋水次數。按一次會用 1 次，全部用完之後要等 <strong>6 小時</strong>先會自動回復到 <strong>2/2</strong>。</li>
+      <li>被淋過水嘅蘿蔔，在收成時會有加乘：
+        <ul>
+          <li>冇淋水：1 棵 = 1 根</li>
+          <li>淋過一次（水在種子或幼苗階段其中一個）：1 棵 = 3 根</li>
+          <li>種子 + 幼苗都淋過水：1 棵 = 5 根</li>
+        </ul>
+      </li>
+    </ul>
+
+    <p><strong>【收成＆銀行 / 背包】</strong></p>
+    <ul>
+      <li>當蘿蔔變成 🥕 時，可以：
+        <ul>
+          <li>按「存入銀行 💳」：收成所有成熟蘿蔔，<strong>計入銀行儲值</strong>；<br>
+              銀行累積蘿蔔會計入 <strong>聖誕達標率 1888 根</strong>。</li>
+          <li>按「🥕 放入背包」：收成所有成熟蘿蔔，<strong>放入背包</strong>，用嚟之後換聖誕禮品。</li>
+        </ul>
+      </li>
+      <li>聖誕節（12 月 24 日）之後，達標率會自動視為已滿條。</li>
+    </ul>
+
+    <p><strong>【隨機事件（12 月 1–23 日有效）】</strong></p>
+    <ul>
+      <li>喺 12 月 1–23 日期間，你逗留喺遊戲畫面內，有機會遇到：
+        <ul>
+          <li>☀️ 陽光普照：銀行 +10 根</li>
+          <li>💧 落雨：銀行 +12 根</li>
+          <li>❄️ 下雪：最多埋走 10 棵蘿蔔</li>
+          <li>🌋 熔岩：最後只剩 1 棵成熟蘿蔔</li>
+          <li>🌏 地震：田入面蘿蔔隨機減少一半</li>
+          <li>🐦 小鳥、🐇 小兔、🐈 小貓：有機會幫手 / 偷食</li>
+        </ul>
+      </li>
+      <li>每次登入，自動觸發嘅事件<strong>最多 2 次</strong>，之後唔會再亂彈。</li>
+      <li><strong>12 月 24 日當日會停止所有隨機事件</strong>，你可以安心睇住自己嘅聖誕森林同禮物。</li>
+    </ul>
+
+    <p><strong>【聖誕禮物＆道具】</strong></p>
+    <ul>
+      <li>用背包入面嘅蘿蔔可以喺「🎁 換購聖誕禮品」入面換道具。</li>
+      <li>唔同禮物有唔同效果，例如：
+        <ul>
+          <li>🎁 兔兔驚喜禮盒：收成/放背包時 20% 機會額外 +20 根入背包</li>
+          <li>🎄 貓貓聖誕樹：縮短蘿蔔成長時間</li>
+          <li>🕯️ 貓貓暖爐：有機會幫你擋住落雪損失</li>
+          <li>🍪 聖誕貓薄餅：小貓偷食時，有機會變成幫你淋水</li>
+          <li>⭐ 兔貓流星燈：種蘿蔔時有少量機率觸發額外好事事件</li>
+        </ul>
+      </li>
+    </ul>
+
+    <p><strong>【其他】</strong></p>
+    <ul>
+      <li>「🎄 聖誕測試」係你專用嘅測試鍵，可以人為開/關聖誕場景。</li>
+      <li>「🧪 下一階段測試」會令所有蘿蔔即刻升級一個成長階段（方便你試玩法）。</li>
+      <li>資料只會儲存在你自己瀏覽器（localStorage），按「🔄 重新開始」會清晒本機紀錄。</li>
+    </ul>
   </div>
   <div id="eventBox">🌤 歡迎回來，小農夫～</div>
  </div>
@@ -767,12 +858,16 @@ document.addEventListener("DOMContentLoaded",()=>{
     const PLANT_MAX=20;
     const PLANT_REGEN_INTERVAL=5*60*1000;
 
+    const WATER_MAX = 2;
+    const WATER_REGEN_INTERVAL = 6*60*60*1000; // ⏱️ 6 小時重置
+
     let seeds=[];
     let safeCarrot=0;
-    let bankStored=0;        // 用嚟計達標率（銀行累計）
+    let bankStored=0;
     let plantLimit=PLANT_MAX;
-    let waterLimit=1;
+    let waterLimit=WATER_MAX;
     let plantRegenStart=null;
+    let waterRegenAt=null; // 下一次恢復淋水時間
     let xmasTest=false;
 
     let backpackCarrot=0;
@@ -780,7 +875,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     let totalCarrotCollected=0;
 
     let loginEventTimer=null;
-    let loginEventCount=0;   // ✅ 每次登入最多 2 次隨機事件（不計道具）
+    let loginEventCount=0;
 
     const field=document.getElementById("field");
     const eventBox=document.getElementById("eventBox");
@@ -815,7 +910,12 @@ document.addEventListener("DOMContentLoaded",()=>{
     let eventQueue=[];
     let showingEventPopup=false;
 
-    // showEventPopup 支援 onClose callback
+    function isEventDisabledToday(){
+      const now = new Date();
+      const isRealXmasEve = (now.getMonth()===11 && now.getDate()===24);
+      return isRealXmasEve && !xmasTest; // 真正 12/24 先停，測試模式仍可
+    }
+
     function showEventPopup(emoji,title,text,finalText,onClose){
       eventQueue.push({emoji,title,text,finalText,onClose});
       if(!showingEventPopup){
@@ -975,7 +1075,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       backpackEl.textContent="🥕 背包："+backpackCarrot;
       totalEl.textContent="總收成："+total+"根";
       document.getElementById("plantBtn").textContent=`種蘿蔔 🌰 (${plantLimit}/${PLANT_MAX})`;
-      document.getElementById("waterBtn").textContent=`淋水 💧 (${waterLimit}/1)`;
+      document.getElementById("waterBtn").textContent=`淋水 💧 (${waterLimit}/${WATER_MAX})`;
       updateXmasProgressUI();
       renderOwnedGifts();
     }
@@ -1004,6 +1104,17 @@ document.addEventListener("DOMContentLoaded",()=>{
       saveGame();
     }
 
+    function updateWaterRegen(){
+      if(waterLimit >= WATER_MAX || !waterRegenAt) return;
+      const now = Date.now();
+      if(now >= waterRegenAt){
+        waterLimit = WATER_MAX;
+        waterRegenAt = null;
+        updateUI();
+        saveGame();
+      }
+    }
+
     function saveGame(){
       const simpleSeeds=seeds.map(p=>({
         stage:p.stage,
@@ -1020,6 +1131,7 @@ document.addEventListener("DOMContentLoaded",()=>{
         plantLimit,
         waterLimit,
         plantRegenStart,
+        waterRegenAt,
         xmasTest,
         backpackCarrot,
         items,
@@ -1041,8 +1153,9 @@ document.addEventListener("DOMContentLoaded",()=>{
         safeCarrot=data.safeCarrot??0;
         bankStored=data.bankStored??0;
         plantLimit=data.plantLimit??PLANT_MAX;
-        waterLimit=data.waterLimit??1;
+        waterLimit=data.waterLimit!=null?data.waterLimit:WATER_MAX;
         plantRegenStart=data.plantRegenStart??null;
+        waterRegenAt=data.waterRegenAt??null;
         xmasTest=data.xmasTest??false;
         backpackCarrot=data.backpackCarrot??0;
         items=data.items || {};
@@ -1073,6 +1186,9 @@ document.addEventListener("DOMContentLoaded",()=>{
         if(fromOld){
           saveGame();
         }
+
+        // 進入遊戲時，即時計算淋水是否已經可以回滿
+        updateWaterRegen();
       }catch(e){
         console.error("Load game failed:",e);
       }
@@ -1156,6 +1272,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       fn();
     }
     function triggerEvent(){
+      if(isEventDisabledToday()) return;
       if(loginEventCount >= 2) return;
       loginEventCount++;
 
@@ -1172,6 +1289,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       else            quakeEvent();
     }
     function scheduleLoginEvent(){
+      if(isEventDisabledToday()) return;
       if(loginEventTimer) clearTimeout(loginEventTimer);
       if(seeds.length===0) return;
       if(loginEventCount >= 2) return;
@@ -1294,8 +1412,22 @@ document.addEventListener("DOMContentLoaded",()=>{
     };
 
     document.getElementById("waterBtn").onclick=()=>{
-      if(waterLimit<=0)return;
+      if(waterLimit<=0){
+        const now = new Date();
+        if(isEventDisabledToday()){
+          eventBox.textContent="💧 今日淋水次數用完，要等過咗 12 月 24 日先可以回復～";
+        }else{
+          eventBox.textContent="💧 今日淋水次數用完，要等一等先會自動回復～";
+        }
+        return;
+      }
       waterLimit--;
+
+      // 用晒 / 剩一啲都重新計 6 小時
+      if(waterLimit < WATER_MAX){
+        waterRegenAt = Date.now() + WATER_REGEN_INTERVAL;
+      }
+
       seeds.forEach(p=>{
         if(p.stage==="seed") p.wateredSeed=true;
         else if(p.stage==="sprout") p.wateredSprout=true;
@@ -1452,16 +1584,20 @@ document.addEventListener("DOMContentLoaded",()=>{
       updateFieldStyle();
     },60000);
 
-    setInterval(()=>{updatePlantRegen();},10000);
+    setInterval(()=>{
+      updatePlantRegen();
+      updateWaterRegen();
+    },10000);
 
     setInterval(()=>{
+      if(isEventDisabledToday()) return;
       if(loginEventCount >= 2) return;
       if(Math.random()<0.3){
         triggerEvent();
       }
     },45000);
 
-    /* ---------- 各種事件：Popup 完先扣 / 加 & 播動畫 ---------- */
+    /* ---------- 各種事件 ---------- */
     function birdEvent(){
       showEventPopup(
         "🐦",
@@ -1589,7 +1725,7 @@ document.addEventListener("DOMContentLoaded",()=>{
             r.className="rain";r.textContent="💧";
             r.style.left=Math.random()*100+"%";
             field.appendChild(r);
-            setTimeout(()=>r.remove(),2000);
+            setTimeout(()=>r.remove(),3500);
           }
           updateUI();saveGame();
         }
@@ -1631,9 +1767,9 @@ document.addEventListener("DOMContentLoaded",()=>{
           totalCarrotCollected += 1;
           const drop=document.createElement("div");
           drop.className="rain";drop.textContent="💧";
-          drop.style.left="50%";drop.style.animationDuration="1s";
+          drop.style.left="50%";drop.style.animationDuration="3.5s";
           field.appendChild(drop);
-          setTimeout(()=>drop.remove(),1000);
+          setTimeout(()=>drop.remove(),3500);
           updateUI();saveGame();
         }
       );
