@@ -71,8 +71,8 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   color:#ff5b5b;
   text-shadow:0 0 12px rgba(255,120,120,0.7);
   z-index:100;
-  animation:xmasFloatIn 1.2s ease-out forwards,
-           xmasGlow 2.5s ease-in-out infinite alternate;
+  animation:xmasFloatIn 1.2s.ease-out forwards,
+           xmasGlow 2.5s.ease-in-out infinite alternate;
 }
 @keyframes xmasFloatIn{
   from{opacity:0;transform:translate(-50%,-12px) scale(0.96);}
@@ -122,11 +122,10 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   cursor:pointer;margin-top:6px;
 }
 #eventBox{margin-top:8px;min-height:24px;font-weight:bold;color:#333;}
-.bible-text{color:#c33;font-weight:bold;animation:shine 1s ease-in-out infinite alternate;}
+.bible-text{color:#c33;font-weight:bold;animation:shine 1s.ease-in-out infinite alternate;}
 @keyframes shine{0%{color:#c33;}100%{color:#f66;}}
 
 /* ---------- Intro：白色對白框 + 黃色BTN ---------- */
-/* 只保留文字，不再有粉紅貓 / 藍兔圖片 */
 #introCharacters{
   position:absolute;
   inset:0;
@@ -150,7 +149,6 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   align-items:center;
   gap:14px;
 }
-/* 對白氣泡 */
 #introSpeech{
   background:#ffffffee;
   border-radius:20px;
@@ -169,7 +167,6 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   opacity:1;
   transform:translateY(0);
 }
-/* 黃色按鈕 */
 #introStartBtn{
   padding:9px 26px;
   font-size:15px;
@@ -206,8 +203,21 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   }
 }
 
+/* ---------- 田下面 Banner 圖片 ---------- */
+#bottomBanner{
+  margin-top:10px;
+  border-radius:16px;
+  overflow:hidden;
+  background:#ffc0d9;        /* 想純圖片可刪 */
+}
+#bottomBanner img{
+  display:block;
+  width:100%;
+  height:auto;
+}
+
 /* ---------- 天氣 & 特效 ---------- */
-.star{position:absolute;width:2px;height:2px;background:white;border-radius:50%;animation:twinkle 2s infinite ease-in-out;}
+.star{position:absolute;width:2px;height:2px;background:white;border-radius:50%;animation:twinkle 2s infinite.ease-in-out;}
 @keyframes twinkle{0%,100%{opacity:0.5;}50%{opacity:1;}}
 .meteor{
   position:absolute;width:100px;height:2px;
@@ -233,7 +243,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   100%{ right:110%; opacity:0; }
 }
 
-.sun{position:absolute;top:10px;right:10px;font-size:2em;animation:shineSun 2s ease-in-out infinite alternate;}
+.sun{position:absolute;top:10px;right:10px;font-size:2em;animation:shineSun 2s.ease-in-out infinite alternate;}
 @keyframes shineSun{from{filter:brightness(1);}to{filter:brightness(1.5);}}
 .snowflake{position:absolute;color:white;animation:dropSnow 4s linear;}
 @keyframes dropSnow{0%{top:-10px;opacity:1;}100%{top:100%;opacity:0;}}
@@ -471,24 +481,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   transition:width 0.4s.ease;
   border-radius:999px;
 }
-/* ----------  banner Frame ---------- */
-/* 田下面嗰張 JPG Banner */
-#bottomBanner{
-  margin-top:10px;
-  border-radius:12px;
-  overflow:hidden;
-  /* 同 container 寬度對齊 */
-  max-width:520px;
-  margin-left:auto;
-  margin-right:auto;
-}
 
-#bottomBanner img{
-  display:block;
-  width:100%;
-  height:auto;
-}
-  
 /* ---------- 🎁 聖誕禮物展示 Frame ---------- */
 #xmasOwnedFrame{
   margin-top:8px;
@@ -709,7 +702,6 @@ for(let i=0;i<25;i++){
   </div>
 
   <div id="field">
-    
     <div class="ground"></div>
     <div class="icon" id="rabbit">🐇</div>
     <div class="icon" id="cat">🐈</div>
@@ -725,24 +717,9 @@ for(let i=0;i<25;i++){
     </div>
   </div>
 
-  <!-- 🔻 新增：田下面的 JPG 圖片區塊 -->
+  <!-- 田下面 Banner：初時 bann1.png，之後轉 bann2.png -->
   <div id="bottomBanner">
-    <img src="bann1.png" alt="兔兔貓貓Banner">
-  </div>
-   
-    <div class="ground"></div>
-    <div class="icon" id="rabbit">🐇</div>
-    <div class="icon" id="cat">🐈</div>
-
-    <!-- 首次登入 / 行長事件：白氣泡 + 黃掣 -->
-    <div id="introCharacters">
-      <div class="intro-layout">
-        <div class="intro-top">
-          <div id="introSpeech"></div>
-          <button id="introStartBtn">開始種蘿蔔</button>
-        </div>
-      </div>
-    </div>
+    <img id="bottomBannerImg" src="bann1.png" alt="兔兔貓貓 Banner">
   </div>
 
   <div class="controls">
@@ -755,7 +732,6 @@ for(let i=0;i<25;i++){
    <button id="resetBtn" style="background:#77bb77;">🔄 重新開始</button>
    <button id="testBtn" style="background:#59c;">🎄 聖誕測試</button>
    <button id="growTestBtn" style="background:#ffaa00;">🧪 下一階段測試</button>
-   <!-- 測試貓兔出場個掣已移除 -->
   </div>
   <button id="toggle-rule">🌱 種植規則</button>
   <div id="rule-box">
@@ -917,13 +893,19 @@ document.addEventListener("DOMContentLoaded",()=>{
     const introWrap   = document.getElementById("introCharacters");
     const introSpeech = document.getElementById("introSpeech");
     const introStartBtn = document.getElementById("introStartBtn");
+    const bannerImg = document.getElementById("bottomBannerImg");
 
     gameEl.style.display = "block";
 
     if(seen){
       introWrap.style.display = "none";
+      // 已睇過 intro：直接用 bann2.png
+      if (bannerImg) bannerImg.src = "bann2.png";
       return;
     }
+
+    // 第一次進入：顯示 intro + bann1.png
+    if (bannerImg) bannerImg.src = "bann1.png";
 
     introWrap.style.display = "block";
 
@@ -944,6 +926,8 @@ document.addEventListener("DOMContentLoaded",()=>{
     introStartBtn.addEventListener("click",()=>{
       localStorage.setItem(INTRO_FLAG_KEY,"1");
       introWrap.style.display="none";
+      // 關閉 intro 嗰下，轉做 bann2.png
+      if (bannerImg) bannerImg.src = "bann2.png";
     },{once:true});
   }
 
@@ -1740,6 +1724,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       }
     },45000);
 
+    /* === 以下係所有事件 func（略，用返你原本啲，已保留） === */
     function birdEvent(){
       showEventPopup(
         "🐦",
