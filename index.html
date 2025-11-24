@@ -98,7 +98,6 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 .plant{position:absolute;transition:all .5s ease;font-size:2em;opacity:0;}
 .plant.show{opacity:1;}
 .icon{position:absolute;font-size:2em;opacity:0;}
-/* 由右至左：由畫面右側走入畫面左邊 */
 #rabbit,#cat{bottom:40px;}
 #rabbit.run{animation:rabbit 4s linear;}
 #cat.run{animation:cat 4s linear;}
@@ -136,7 +135,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 }
 .intro-char{
   position:absolute;
-  bottom:8%;               /* 放低少少 */
+  bottom:8%;
   width:120px;
   height:auto;
   opacity:0;
@@ -148,25 +147,21 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
     bottom:6%;
   }
 }
-.intro-cat{
-  left:-160px;
-}
-.intro-rabbit{
-  right:-180px;
-}
+.intro-cat{left:-160px;}
+.intro-rabbit{right:-180px;}
 
-/* ⭐ 對白框縮細一半（重點修改） */
+/* 對白框（縮細） */
 #introSpeech{
   position:absolute;
   left:50%;
-  top:10%;                 /* 略微靠上 */
+  top:10%;
   transform:translateX(-50%) scale(0.9);
-  min-width:38%;           /* 原本大約一半，收窄 */
-  max-width:50%;           /* 控制唔好太闊 */
+  min-width:38%;
+  max-width:50%;
   background:#ffffff;
   border-radius:14px;
-  padding:8px 10px 6px;    /* 較細 padding */
-  font-size:11px;          /* 字體縮細 */
+  padding:8px 10px 6px;
+  font-size:11px;
   line-height:1.4;
   box-shadow:0 5px 14px rgba(0,0,0,0.18);
   opacity:0;
@@ -184,25 +179,24 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   background:#ffffff;
   clip-path:polygon(50% 100%,0 0,100% 0);
 }
-
-/* 對白框彈出動畫 */
+#introSpeech p{margin:2px 0;}
 #introSpeech.show{
   animation:introSpeechPop 0.55s cubic-bezier(0.18,0.89,0.32,1.28) forwards;
 }
 
-/* ⭐ 對白框下方「開始種蘿蔔」按鈕（新樣式） */
+/* ⭐ 首次「開始種蘿蔔」按鈕（改黃、落少少） */
 #introStartBtn{
   position:absolute;
   left:50%;
-  top:calc(10% + 70px);     /* 依據對白框位置向下少少 */
+  top:calc(10% + 80px);  /* 原本 70px，向下少少 */
   transform:translateX(-50%);
-  padding:6px 14px;
+  padding:7px 16px;
   font-size:12px;
   border-radius:999px;
-  background:#43a047;
-  color:#fff;
+  background:#ffd54f;    /* 黃色 */
+  color:#7b5a00;
   border:none;
-  box-shadow:0 3px 8px rgba(0,0,0,0.15);
+  box-shadow:0 3px 8px rgba(0,0,0,0.18);
   cursor:pointer;
   opacity:0;
   pointer-events:auto;
@@ -212,11 +206,6 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 }
 #introStartBtn:hover{
   filter:brightness(1.05);
-}
-
-/* 文字排版用內層（方便縮細對白框時控制行距） */
-#introSpeech p{
-  margin:2px 0;
 }
 
 /* 角色動畫 */
@@ -732,7 +721,7 @@ for(let i=0;i<25;i++){
         <p>希望你「種瓜得瓜，種蘿蔔得蘿蔔」。</p>
       </div>
 
-      <!-- 對白框下方開始按鈕 -->
+      <!-- 對白框下方開始按鈕（黃色） -->
       <button id="introStartBtn">開始種蘿蔔</button>
     </div>
   </div>
@@ -917,7 +906,7 @@ document.addEventListener("DOMContentLoaded",()=>{
         "introRabbitWalk 1.1s ease-out forwards, introBounce 0.6s ease-in-out 1.1s 3 alternate";
     });
 
-    // 行完先彈出對白框
+    // 行完先彈出對白框 + 黃色掣
     setTimeout(()=>{
       introSpeech.classList.add("show");
       introStartBtn.classList.add("show");
@@ -990,6 +979,10 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     let loginEventTimer=null;
     let loginEventCount=0;
+    let intervalEventTimer=null;
+
+    /* ⭐ 控制 FRFARMLAND BANK 銀行行長（藍兔+粉貓）事件獨佔 */
+    let managerEventActive = false;
 
     const field=document.getElementById("field");
     const eventBox=document.getElementById("eventBox");
@@ -1031,6 +1024,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     }
 
     function showEventPopup(emoji,title,text,finalText,onClose){
+      if(managerEventActive) return; // 經理事件期間唔再疊一般 Popup
       eventQueue.push({emoji,title,text,finalText,onClose});
       if(!showingEventPopup){
         displayNextEventPopup();
@@ -1384,30 +1378,36 @@ document.addEventListener("DOMContentLoaded",()=>{
       const fn = positive[Math.floor(Math.random()*positive.length)];
       fn();
     }
+
     function triggerEvent(){
       if(isEventDisabledToday()) return;
+      if(managerEventActive) return;       // ⭐ 經理事件期間停晒
       if(loginEventCount >= 2) return;
       loginEventCount++;
 
       const r=Math.random();
-      if(r<0.13)      birdEvent();
-      else if(r<0.26) sunEvent();
-      else if(r<0.36) lavaEvent();
-      else if(r<0.46) snowEvent();
-      else if(r<0.56) rainEvent();
-      else if(r<0.66) catSteal();
-      else if(r<0.76) catWater();
-      else if(r<0.86) rabbitHelp();
-      else if(r<0.96) rabbitEat();
-      else            quakeEvent();
+      if(r<0.11)          birdEvent();
+      else if(r<0.22)     sunEvent();
+      else if(r<0.30)     lavaEvent();
+      else if(r<0.38)     snowEvent();
+      else if(r<0.46)     rainEvent();
+      else if(r<0.54)     catSteal();
+      else if(r<0.62)     catWater();
+      else if(r<0.70)     rabbitHelp();
+      else if(r<0.78)     rabbitEat();
+      else if(r<0.86)     quakeEvent();
+      else if(r<0.93)     managerPraiseEvent();   // ⭐ 新事件：有作物 -> 行長滿意
+      else                managerHelpPlantEvent(); // ⭐ 新事件：冇作物 -> 幫你種子
     }
+
     function scheduleLoginEvent(){
       if(isEventDisabledToday()) return;
+      if(managerEventActive) return;
       if(loginEventTimer) clearTimeout(loginEventTimer);
       if(seeds.length===0) return;
       if(loginEventCount >= 2) return;
       loginEventTimer = setTimeout(()=>{
-        if(seeds.length>0 && Math.random() < 0.8){
+        if(!managerEventActive && seeds.length>0 && Math.random() < 0.8){
           triggerEvent();
         }
         loginEventTimer=null;
@@ -1526,7 +1526,6 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     document.getElementById("waterBtn").onclick=()=>{
       if(waterLimit<=0){
-        const now = new Date();
         if(isEventDisabledToday()){
           eventBox.textContent="💧 今日淋水次數用完，要等過咗 12 月 24 日先可以回復～";
         }else{
@@ -1702,8 +1701,10 @@ document.addEventListener("DOMContentLoaded",()=>{
       updateWaterRegen();
     },10000);
 
-    setInterval(()=>{
+    /* ⭐ 把 45 秒輪詢事件 handle 儲起嚟，方便暫停 / 恢復 */
+    intervalEventTimer = setInterval(()=>{
       if(isEventDisabledToday()) return;
+      if(managerEventActive) return;
       if(loginEventCount >= 2) return;
       if(Math.random()<0.3){
         triggerEvent();
@@ -1823,28 +1824,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       );
     }
 
-    function rainEvent(){
-      showEventPopup(
-        "💧",
-        "落雨好消息！",
-        "一場溫柔又持久嘅雨滋潤咗田裡所有蘿蔔，多咗十二根！",
-        "💧 落雨 蘿蔔 +12",
-        ()=>{
-          safeCarrot+=12;
-          bankStored+=12;
-          totalCarrotCollected += 12;
-          for(let i=0;i<20;i++){
-            const r=document.createElement("div");
-            r.className="rain";r.textContent="💧";
-            r.style.left=Math.random()*100+"%";
-            field.appendChild(r);
-            setTimeout(()=>r.remove(),3500);
-          }
-          updateUI();saveGame();
-        }
-      );
-    }
-
     function catSteal(){
       if(hasItem("cat_cookie") && Math.random()<0.5){
         catWater();
@@ -1952,6 +1931,129 @@ document.addEventListener("DOMContentLoaded",()=>{
           }
 
           updateUI();saveGame();
+        }
+      );
+    }
+
+    /* ⭐⭐⭐ FRFARMLAND BANK 銀行行長（藍兔 + 粉貓）事件控制 */
+
+    // 停止所有隨機事件（登入嗰個 + interval 嗰個）
+    function pauseRandomEvents(){
+      managerEventActive = true;
+      if(loginEventTimer){
+        clearTimeout(loginEventTimer);
+        loginEventTimer = null;
+      }
+      // intervalEventTimer 係 setInterval，唔好 clear 掉，喺 handler 裏面已經 check managerEventActive
+    }
+
+    // 恢復隨機事件（喺按完黃色 BTN 「謝謝」之後叫）
+    function resumeRandomEvents(){
+      managerEventActive = false;
+      scheduleLoginEvent();
+    }
+
+    // 共用：顯示「藍兔 + 粉貓 + 對白框 + 黃色謝謝掣」
+    function showManagerSpeech(lines, onThanks){
+      pauseRandomEvents();
+
+      const introWrap   = document.getElementById("introCharacters");
+      const introSpeech = document.getElementById("introSpeech");
+      const introCat    = document.getElementById("introCat");
+      const introRabbit = document.getElementById("introRabbit");
+      const introStartBtn = document.getElementById("introStartBtn");
+
+      // 令 introCharacters 顯示，用同一套動畫
+      introWrap.style.display = "block";
+
+      // 更新對白內容
+      introSpeech.innerHTML = "";
+      lines.forEach(t=>{
+        const p=document.createElement("p");
+        p.textContent = t;
+        introSpeech.appendChild(p);
+      });
+
+      // 先 reset 動畫
+      introCat.style.animation = "none";
+      introRabbit.style.animation = "none";
+      introSpeech.classList.remove("show");
+      introStartBtn.classList.remove("show");
+
+      // 更改黃色掣文字做「謝謝」
+      introStartBtn.textContent = "謝謝";
+
+      // 強制 reflow
+      void introCat.offsetWidth;
+
+      // 再播放動畫，角色行入場
+      introCat.style.animation =
+        "introCatWalk 1.1s ease-out forwards, introBounce 0.6s ease-in-out 1.1s 3 alternate";
+      introRabbit.style.animation =
+        "introRabbitWalk 1.1s ease-out forwards, introBounce 0.6s ease-in-out 1.1s 3 alternate";
+
+      // 少少 delay 彈出對白同黃色掣
+      setTimeout(()=>{
+        introSpeech.classList.add("show");
+        introStartBtn.classList.add("show");
+      },1100);
+
+      const clickHandler = ()=>{
+        introWrap.style.display="none";
+        introStartBtn.removeEventListener("click",clickHandler);
+        if(typeof onThanks === "function") onThanks();
+        resumeRandomEvents();
+      };
+      introStartBtn.addEventListener("click",clickHandler);
+    }
+
+    // 1️⃣ 有農作物：行長滿意 +100 銀行蘿蔔
+    function managerPraiseEvent(){
+      if(seeds.length === 0) return;  // 冇作物就唔出呢個，可能俾另一個事件用
+      showManagerSpeech(
+        [
+          "FRFARMLAND BANK 銀行行長經過，",
+          "我很滿意，決定加你 100 蘿蔔銀行蘿蔔儲值。"
+        ],
+        ()=>{
+          safeCarrot += 100;
+          bankStored += 100;
+          totalCarrotCollected += 100;
+          eventBox.textContent = "🏦 行長獎勵，你的銀行蘿蔔儲值 +100！";
+          updateUI();
+          saveGame();
+        }
+      );
+    }
+
+    // 2️⃣ 冇農作物：行長話田荒廢，幫你種 20 粒種子
+    function managerHelpPlantEvent(){
+      if(seeds.length > 0) return;  // 有作物唔出呢個
+      showManagerSpeech(
+        [
+          "FRFARMLAND BANK 銀行行長經過，",
+          "農地都荒廢了，我幫你種 20 粒種子。"
+        ],
+        ()=>{
+          const now = Date.now();
+          for(let i=0;i<20;i++){
+            const el=document.createElement("div");
+            el.className="plant show";
+            el.textContent="🌰";
+            el.style.left=random(5,85)+"%";
+            el.style.bottom=random(25,40)+"%";
+            field.appendChild(el);
+            seeds.push({
+              stage:"seed",
+              wateredSeed:false,
+              wateredSprout:false,
+              plantedAt:now,
+              el
+            });
+          }
+          eventBox.textContent = "🏦 行長出手，幫你重新種咗 20 粒種子！";
+          updateUI();
+          saveGame();
         }
       );
     }
