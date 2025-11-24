@@ -125,7 +125,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 .bible-text{color:#c33;font-weight:bold;animation:shine 1s ease-in-out infinite alternate;}
 @keyframes shine{0%{color:#c33;}100%{color:#f66;}}
 
-/* ---------- Intro：白色對白框置中 + 黃色BTN喺下面 + 右邊大兔貓 ---------- */
+/* ---------- Intro：白色對白框 + 黃色BTN + 右邊貓兔 ---------- */
 #introCharacters{
   position:absolute;
   inset:0;
@@ -134,27 +134,23 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   display:none;
 }
 
-/* 整個 layout：上面文字 + 按鈕，中間留空，右下係兔貓 */
+/* 上下分兩層：上面對白＋按鈕，下面兔兔貓貓 */
 .intro-layout{
   position:absolute;
   inset:0;
   display:flex;
   flex-direction:column;
   justify-content:space-between;
-  padding:18px 24px 26px;
+  padding:16px 20px 22px;   /* 想整個 intro 上移／落移就改呢度 */
   box-sizing:border-box;
 }
-
-/* 上半：對白 + 按鈕垂直排，置中 */
 .intro-top{
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:14px;
-  margin-top:4px;         /* ← 想對白再高少少 / 低少少可以調呢度 */
+  gap:12px;
+  margin-top:6px;           /* 對白高低 */
 }
-
-/* 對白氣泡 */
 #introSpeech{
   background:#ffffffee;
   border-radius:999px;
@@ -174,8 +170,6 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   transform:translateY(0);
 }
 #introSpeech p{margin:2px 0;}
-
-/* 黃色按鈕：喺對白下面置中 */
 #introStartBtn{
   padding:8px 22px;
   font-size:14px;
@@ -197,53 +191,50 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 #introStartBtn:hover{
   filter:brightness(1.05);
 }
-
-/* 下半：右邊大兔貓 */
 .intro-bottom{
   display:flex;
   justify-content:flex-end;
   align-items:flex-end;
-  gap:10px;
-  height:100px; /* 只控制下方高度，兔貓會自己貼地 */
+  gap:6px;
+  height:100px;
 }
 .intro-char{
   filter:drop-shadow(0 4px 6px rgba(0,0,0,0.25));
   opacity:0;
   transform-origin:bottom center;
+  object-fit:contain;
+  max-height:90px;   /* 如果你想完全用原圖高度，可以刪呢行 */
 }
-
-/* ★ 想放大 / 縮細兔貓：改呢兩個 width 即可 ★ */
 #introCat{
-  width:110px;   /* ← 粉紅貓大小 */
+  max-width:90px;    /* 粉紅貓最大闊度（可調） */
   z-index:2;
 }
 #introRabbit{
-  width:190px;   /* ← 藍兔大小（比貓大） */
+  max-width:140px;   /* 藍兔最大闊度（可調） */
   z-index:1;
   margin-left:2px;
 }
 
-/* 兔貓由右邊行入場 */
+/* 行入場一次 */
 @keyframes introCatWalk{
-  from{ transform:translateX(140px); opacity:0; }
+  from{ transform:translateX(120px); opacity:0; }
   to  { transform:translateX(0);     opacity:1; }
 }
 @keyframes introRabbitWalk{
-  from{ transform:translateX(180px); opacity:0; }
+  from{ transform:translateX(160px); opacity:0; }
   to  { transform:translateX(0);     opacity:1; }
 }
-
-/* 細小持續彈跳動畫 */
+/* 一直慢跳步 */
 @keyframes introSmallBounce{
   0%  { transform:translateY(0); }
   50% { transform:translateY(-6px); }
   100%{ transform:translateY(0); }
 }
 
-/* 手機窄屏處理 */
+/* 手機窄屏 */
 @media (max-width:700px){
   .intro-layout{
-    padding:12px 10px 20px;
+    padding:10px 10px 16px;
   }
   #introSpeech{
     font-size:12px;
@@ -254,10 +245,12 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
     font-size:13px;
   }
   #introCat{
-    width:80px;   /* ← 手機版貓大小 */
+    max-width:72px;
+    max-height:80px;
   }
   #introRabbit{
-    width:140px;  /* ← 手機版兔大小 */
+    max-width:115px;
+    max-height:85px;
   }
 }
 
@@ -523,7 +516,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   height:100%;
   width:0%;
   background:linear-gradient(90deg,#ffb74d,#f4511e);
-  transition:width 0.4s ease;
+  transition:width 0.4s.ease;
   border-radius:999px;
 }
 
@@ -730,7 +723,7 @@ for(let i=0;i<25;i++){
   <div class="value" id="backpack">🥕 背包：0</div>
   <div class="value" id="total">🥕🥕總收成：0根</div>
 
-  <!-- 1️⃣ 聖誕達標率 BAR -->
+  <!-- 聖誕達標率 BAR -->
   <div id="xmasProgress">
     <div id="xmasProgressLabel">
       <span id="xmasProgressTitleText">💳 換聖誕禮達標率：</span><span id="xmasProgressText">0/1888</span>
@@ -740,7 +733,7 @@ for(let i=0;i<25;i++){
     </div>
   </div>
 
-  <!-- 2️⃣ 已換到的聖誕禮物 Frame -->
+  <!-- 已換到的聖誕禮物 Frame -->
   <div id="xmasOwnedFrame">
     <div class="xmasOwnedTitle">🎄 換到的聖誕禮物 🎁</div>
     <div id="xmasOwnedList"></div>
@@ -751,7 +744,7 @@ for(let i=0;i<25;i++){
     <div class="icon" id="rabbit">🐇</div>
     <div class="icon" id="cat">🐈</div>
 
-    <!-- 首次登入 / 行長事件：白氣泡 + 黃掣 + 右下大兔貓 -->
+    <!-- 首次登入 / 行長事件：白氣泡 + 黃掣 + 右下貓兔 -->
     <div id="introCharacters">
       <div class="intro-layout">
         <div class="intro-top">
@@ -759,7 +752,7 @@ for(let i=0;i<25;i++){
           <button id="introStartBtn">開始種蘿蔔</button>
         </div>
         <div class="intro-bottom">
-          <img src="88.png" alt="pink cat" class="intro-char" id="introCat">
+          <img src="88.png"  alt="pink cat" class="intro-char" id="introCat">
           <img src="600.png" alt="blue rabbit" class="intro-char" id="introRabbit">
         </div>
       </div>
@@ -931,33 +924,25 @@ document.addEventListener("DOMContentLoaded",()=>{
     return `${y}-${m}-${d} ${hh}:${mm}`;
   }
 
-  /* ========= 首次登入：粉紅貓 + 藍兔 ========= */
+  /* ========= 首次登入：粉紅貓 + 藍兔，一直跳到撳掣 ========= */
   function showIntroIfFirstTime(){
     const seen = localStorage.getItem(INTRO_FLAG_KEY);
     const gameEl = document.getElementById("game");
-    const introWrap = document.getElementById("introCharacters");
+    const introWrap   = document.getElementById("introCharacters");
     const introSpeech = document.getElementById("introSpeech");
     const introStartBtn = document.getElementById("introStartBtn");
-    const introCat = document.getElementById("introCat");
+    const introCat    = document.getElementById("introCat");
     const introRabbit = document.getElementById("introRabbit");
-
-    function stopCharactersBounce(){
-      introCat.style.animation = "none";
-      introRabbit.style.animation = "none";
-      void introCat.offsetWidth;
-    }
 
     gameEl.style.display = "block";
 
     if(seen){
-      if(introWrap) introWrap.style.display = "none";
+      introWrap.style.display = "none";
       return;
     }
 
-    if(!introWrap) return;
     introWrap.style.display = "block";
 
-    // 首次登入歡迎對白
     introSpeech.innerHTML = `
       <p>歡迎嚟到 FRFARMLAND BANK 其下的聖誕蘿蔔農場，</p>
       <p>希望你「種瓜得瓜，種蘿蔔得蘿蔔」。</p>
@@ -970,26 +955,29 @@ document.addEventListener("DOMContentLoaded",()=>{
     introStartBtn.classList.remove("show");
     void introCat.offsetWidth;
 
+    // 先行入場
     requestAnimationFrame(()=>{
       introCat.style.animation =
         "introCatWalk 1.1s ease-out forwards";
       introRabbit.style.animation =
-        "introRabbitWalk 1.1s ease-out forwards";
+        "introRabbitWalk 1.1s.ease-out.forwards";
     });
 
+    // 然後轉成一直慢跳步
     setTimeout(()=>{
       introCat.style.animation =
-        "introSmallBounce 0.8s ease-in-out infinite";
+        "introSmallBounce 1s.ease-in-out.infinite";
       introRabbit.style.animation =
-        "introSmallBounce 0.8s ease-in-out infinite";
+        "introSmallBounce 1s.ease-in-out.infinite";
       introSpeech.classList.add("show");
       introStartBtn.classList.add("show");
-    },1200);
+    },1100);
 
     introStartBtn.addEventListener("click",()=>{
       localStorage.setItem(INTRO_FLAG_KEY,"1");
       introWrap.style.display="none";
-      stopCharactersBounce();
+      introCat.style.animation = "none";
+      introRabbit.style.animation = "none";
     },{once:true});
   }
 
@@ -1151,7 +1139,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     function random(min,max){return Math.random()*(max-min)+min;}
     function hasItem(id){return !!items[id];}
 
-    /* === 夜空 + 雪地，12月24 或 聖誕測試一致 === */
+    /* === 夜空 + 雪地外觀 === */
     function updateFieldStyle(forceNormal=false){
       const now=new Date();
       const hour=now.getHours();
@@ -1348,7 +1336,7 @@ document.addEventListener("DOMContentLoaded",()=>{
 
         seeds=(data.seeds||[]).map(p=>{
           const el=document.createElement("div");
-          el.className="plant show";
+          el.className="plant.show";
           el.style.left=p.left || (Math.random()*80+10)+"%";
           el.style.bottom=p.bottom || (Math.random()*15+25)+"%";
           el.textContent="🌰";
@@ -1421,7 +1409,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       const need = MIN_TREES - seeds.length;
       for(let i=0;i<need;i++){
         const el=document.createElement("div");
-        el.className="plant show";
+        el.className="plant.show";
         el.textContent="🎄";
         el.style.left=random(5,85)+"%";
         el.style.bottom=random(25,40)+"%";
@@ -1578,7 +1566,7 @@ document.addEventListener("DOMContentLoaded",()=>{
         plantRegenStart=Date.now();
       }
       const el=document.createElement("div");
-      el.className="plant show";el.textContent="🌰";
+      el.className="plant.show";el.textContent="🌰";
       el.style.left=random(5,85)+"%";
       el.style.bottom=random(25,40)+"%";
       field.appendChild(el);
@@ -1759,7 +1747,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       updateUI();
     };
 
-    // 🧪 測試貓兔出場按鈕
+    // 🧪 測試貓兔出場按鈕（同首次登入一樣，會一直跳到你按掣）
     document.getElementById("introTestBtn").onclick = ()=>{
       const introWrap   = document.getElementById("introCharacters");
       const introSpeech = document.getElementById("introSpeech");
@@ -1783,19 +1771,19 @@ document.addEventListener("DOMContentLoaded",()=>{
 
       requestAnimationFrame(()=>{
         introCat.style.animation =
-          "introCatWalk 1.1s ease-out forwards";
+          "introCatWalk 1.1s.ease-out.forwards";
         introRabbit.style.animation =
-          "introRabbitWalk 1.1s ease-out forwards";
+          "introRabbitWalk 1.1s.ease-out.forwards";
       });
 
       setTimeout(()=>{
         introCat.style.animation =
-          "introSmallBounce 0.8s ease-in-out infinite";
+          "introSmallBounce 1s.ease-in-out.infinite";
         introRabbit.style.animation =
-          "introSmallBounce 0.8s ease-in-out infinite";
+          "introSmallBounce 1s.ease-in-out.infinite";
         introSpeech.classList.add("show");
         introStartBtn.classList.add("show");
-      },1200);
+      },1100);
 
       const clickHandler = ()=>{
         introWrap.style.display="none";
@@ -2097,15 +2085,15 @@ document.addEventListener("DOMContentLoaded",()=>{
       void introCat.offsetWidth;
 
       introCat.style.animation =
-        "introCatWalk 1.1s ease-out forwards";
+        "introCatWalk 1.1s.ease-out.forwards";
       introRabbit.style.animation =
-        "introRabbitWalk 1.1s ease-out forwards";
+        "introRabbitWalk 1.1s.ease-out.forwards";
 
       setTimeout(()=>{
         introCat.style.animation =
-          "introSmallBounce 0.8s ease-in-out infinite";
+          "introSmallBounce 1s.ease-in-out.infinite";
         introRabbit.style.animation =
-          "introSmallBounce 0.8s ease-in-out infinite";
+          "introSmallBounce 1s.ease-in-out.infinite";
         introSpeech.classList.add("show");
         introStartBtn.classList.add("show");
       },1100);
@@ -2153,7 +2141,7 @@ document.addEventListener("DOMContentLoaded",()=>{
           const now = Date.now();
           for(let i=0;i<20;i++){
             const el=document.createElement("div");
-            el.className="plant show";
+            el.className="plant.show";
             el.textContent="🌰";
             el.style.left=random(5,85)+"%";
             el.style.bottom=random(25,40)+"%";
