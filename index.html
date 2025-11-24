@@ -213,7 +213,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   margin-top:10px;
   border-radius:16px;
   overflow:hidden;
-  background:#ffc0d9;        /* 想純圖片可刪 */
+  background:#ffc0d9;
 }
 #bottomBanner img{
   display:block;
@@ -1649,7 +1649,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       }
       const cost = getNextUpgradeCost(fieldUpgradeLevel);
       upgradePopupText.textContent =
-        `是否升級六八與花行長的場地？需要 ${cost} 蘿蔔（背包蘿蔔）。`;
+        `是否升級六八與花行長的場地？需要 ${cost} 個銀行蘿蔔。`;
       upgradePopupOverlay.style.display="flex";
     }
 
@@ -1668,15 +1668,17 @@ document.addEventListener("DOMContentLoaded",()=>{
         upgradePopupOverlay.style.display="none";
         return;
       }
-      if(backpackCarrot < cost){
-        eventBox.textContent="🥕 背包蘿蔔不足，未能升級場地～";
+      // 改用「銀行蘿蔔 safeCarrot」付款
+      if(safeCarrot < cost){
         upgradePopupOverlay.style.display="none";
+        eventBox.textContent = "銀行蘿蔔唔夠升級，請努力種蘿蔔！";
         return;
       }
-      backpackCarrot -= cost;
+      safeCarrot -= cost;
+      // bankStored 係「歷史累積存入」數字，為免改壞達標率，唔扣佢
       fieldUpgradeLevel++;
       applyFieldBannerByLevel();
-      eventBox.textContent=`🏗 場地已升級！已使用 ${cost} 蘿蔔。`;
+      eventBox.textContent=`🏗 場地已升級！已使用 ${cost} 個銀行蘿蔔。`;
       upgradePopupOverlay.style.display="none";
       updateUI();
       saveGame();
