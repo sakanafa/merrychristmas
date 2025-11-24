@@ -606,6 +606,53 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   font-size:13px;
   cursor:pointer;
 }
+
+/* ---------- 升級場地 Popup ---------- */
+#upgradePopupOverlay{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,0.45);
+  z-index:2700;
+}
+#upgradePopup{
+  width:min(380px,90vw);
+  background:#ffffff;
+  border-radius:16px;
+  padding:16px 18px 14px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.25);
+  text-align:center;
+}
+#upgradePopupTitle{
+  font-size:18px;
+  font-weight:bold;
+  margin-bottom:6px;
+}
+#upgradePopupText{
+  font-size:14px;
+  line-height:1.5;
+  margin-bottom:10px;
+}
+#upgradePopupBtns{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-top:6px;
+}
+#upgradePopupBtns button{
+  padding:6px 14px;
+  font-size:14px;
+  border-radius:999px;
+}
+#upgradeCancelBtn{
+  background:#aaa;
+}
+#upgradeConfirmBtn{
+  background:#ffb74d;
+  color:#5d3b00;
+}
 </style>
 </head>
 <body>
@@ -696,6 +743,18 @@ for(let i=0;i<25;i++){
   </div>
 </div>
 
+<!-- 升級場地 Popup -->
+<div id="upgradePopupOverlay">
+  <div id="upgradePopup">
+    <div id="upgradePopupTitle">升級場地</div>
+    <div id="upgradePopupText"></div>
+    <div id="upgradePopupBtns">
+      <button id="upgradeCancelBtn">取消</button>
+      <button id="upgradeConfirmBtn">升級</button>
+    </div>
+  </div>
+</div>
+
 <!-- 鎖屏 -->
 <div id="lockscreen">
  <h2>🎄 聖誕種蘿蔔特別活動 🥕</h2>
@@ -763,6 +822,7 @@ for(let i=0;i<25;i++){
    <button id="bankBtn">存入銀行 💳</button>
    <button id="toBackpackBtn" style="background:#ffb74d;">🥕 放入背包</button>
    <button id="exchangeGiftBtn" style="background:#ab47bc;">🎁 換購聖誕禮品</button>
+   <button id="upgradeFieldBtn" style="background:#6d4c41;">🏗 升級場地</button>
    <button id="setBackpackTestBtn" style="background:#00897b;">🧪 設定背包蘿蔔</button>
    <button id="resetBtn" style="background:#77bb77;">🔄 重新開始</button>
    <button id="testBtn" style="background:#59c;">🎄 聖誕測試</button>
@@ -803,6 +863,9 @@ document.addEventListener("DOMContentLoaded",()=>{
   const INTRO_FLAG_KEY = "frFarmIntroSeen";
 
   const XMAS_TARGET_CARROTS = 1888;
+
+  // 升級場地相關 key
+  const FIELD_UPGRADE_KEY = "fieldUpgradeLevel2025";
 
   const XMAS_GIFTS = [
     { id:"hat_rabbit",  name:"🎅 兔兔聖誕帽",   icon:"🎅", cost:100, type:"decor",
@@ -961,7 +1024,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     introStartBtn.addEventListener("click",()=>{
       localStorage.setItem(INTRO_FLAG_KEY,"1");
       introWrap.style.display="none";
-      // 關閉 intro 嗰下，轉做 bann2.png
+      // 關閉 intro 嗨下，轉做 bann2.png
       if (bannerImg) bannerImg.src = "bann2.png";
     },{once:true});
   }
@@ -1012,6 +1075,11 @@ document.addEventListener("DOMContentLoaded",()=>{
     const WATER_MAX = 2;
     const WATER_REGEN_INTERVAL = 6*60*60*1000;
 
+    // 場地升級：0~3
+    let fieldUpgradeLevel = parseInt(localStorage.getItem(FIELD_UPGRADE_KEY) || "0",10);
+    if(isNaN(fieldUpgradeLevel) || fieldUpgradeLevel<0) fieldUpgradeLevel=0;
+    if(fieldUpgradeLevel>3) fieldUpgradeLevel=3;
+
     let seeds=[];
     let safeCarrot=0;
     let bankStored=0;
@@ -1061,8 +1129,31 @@ document.addEventListener("DOMContentLoaded",()=>{
     const tooltipEffect=document.getElementById("tooltipEffect");
     const closeGiftTooltipBtn=document.getElementById("closeGiftTooltip");
 
+    const bottomBannerImg=document.getElementById("bottomBannerImg");
+
+    // 升級 Popup 元素
+    const upgradePopupOverlay=document.getElementById("upgradePopupOverlay");
+    const upgradePopupText=document.getElementById("upgradePopupText");
+    const upgradeCancelBtn=document.getElementById("upgradeCancelBtn");
+    const upgradeConfirmBtn=document.getElementById("upgradeConfirmBtn");
+    const upgradeFieldBtn=document.getElementById("upgradeFieldBtn");
+
     let eventQueue=[];
     let showingEventPopup=false;
+
+    // 根據場地升級 level 設定圖片
+    function applyFieldBannerByLevel(){
+      if(!bottomBannerImg) return;
+      // level 0: 正常流程係 intro 後用 bann2.png（已喺 showIntroIfFirstTime 控制）
+      // upgrade 1 → bann3, 2 → bann4, 3 → bann5
+      if(fieldUpgradeLevel===1){
+        bottomBannerImg.src="bann3.png";
+      }else if(fieldUpgradeLevel===2){
+        bottomBannerImg.src="bann4.png";
+      }else if(fieldUpgradeLevel===3){
+        bottomBannerImg.src="bann5.png";
+      }
+    }
 
     function isEventDisabledToday(){
       const now = new Date();
@@ -1295,6 +1386,7 @@ document.addEventListener("DOMContentLoaded",()=>{
         totalCarrotCollected
       };
       localStorage.setItem(GAME_SAVE_KEY,JSON.stringify(data));
+      localStorage.setItem(FIELD_UPGRADE_KEY,String(fieldUpgradeLevel));
     }
 
     function loadGame(){
@@ -1304,7 +1396,11 @@ document.addEventListener("DOMContentLoaded",()=>{
         raw=localStorage.getItem(OLD_GAME_KEY);
         if(raw) fromOld=true;
       }
-      if(!raw) return;
+      if(!raw) {
+        // 只係冇 game data，都要套返場地升級圖
+        applyFieldBannerByLevel();
+        return;
+      }
       try{
         const data=JSON.parse(raw);
         safeCarrot=data.safeCarrot??0;
@@ -1348,6 +1444,8 @@ document.addEventListener("DOMContentLoaded",()=>{
       }catch(e){
         console.error("Load game failed:",e);
       }
+
+      applyFieldBannerByLevel();
     }
 
     function recomputeGrowth(init=false){
@@ -1535,6 +1633,59 @@ document.addEventListener("DOMContentLoaded",()=>{
       if(e.target===giftShopOverlay) closeGiftShop();
     });
 
+    // ====== 升級場地相關 =======
+    function getNextUpgradeCost(level){
+      // level 0->1: 150, 1->2: 300, 2->3: 600
+      if(level===0) return 150;
+      if(level===1) return 300;
+      if(level===2) return 600;
+      return null;
+    }
+
+    function openUpgradePopup(){
+      if(fieldUpgradeLevel>=3){
+        eventBox.textContent="🏗 場地已經升級到最高級啦！";
+        return;
+      }
+      const cost = getNextUpgradeCost(fieldUpgradeLevel);
+      upgradePopupText.textContent =
+        `是否升級六八與花行長的場地？需要 ${cost} 蘿蔔（背包蘿蔔）。`;
+      upgradePopupOverlay.style.display="flex";
+    }
+
+    upgradeCancelBtn.addEventListener("click",()=>{
+      upgradePopupOverlay.style.display="none";
+    });
+    upgradePopupOverlay.addEventListener("click",(e)=>{
+      if(e.target === upgradePopupOverlay){
+        upgradePopupOverlay.style.display="none";
+      }
+    });
+
+    upgradeConfirmBtn.addEventListener("click",()=>{
+      const cost = getNextUpgradeCost(fieldUpgradeLevel);
+      if(cost == null){
+        upgradePopupOverlay.style.display="none";
+        return;
+      }
+      if(backpackCarrot < cost){
+        eventBox.textContent="🥕 背包蘿蔔不足，未能升級場地～";
+        upgradePopupOverlay.style.display="none";
+        return;
+      }
+      backpackCarrot -= cost;
+      fieldUpgradeLevel++;
+      applyFieldBannerByLevel();
+      eventBox.textContent=`🏗 場地已升級！已使用 ${cost} 蘿蔔。`;
+      upgradePopupOverlay.style.display="none";
+      updateUI();
+      saveGame();
+    });
+
+    upgradeFieldBtn.addEventListener("click", openUpgradePopup);
+
+    // =================================
+
     loadGame();
     updateFieldStyle(true);
     updatePlantRegen();
@@ -1697,6 +1848,7 @@ document.addEventListener("DOMContentLoaded",()=>{
         localStorage.removeItem(CHECKIN_KEY_OLD);
         localStorage.removeItem(LAST_LOGIN_KEY);
         localStorage.removeItem(INTRO_FLAG_KEY);
+        localStorage.removeItem(FIELD_UPGRADE_KEY);
         location.reload();
       }
     };
