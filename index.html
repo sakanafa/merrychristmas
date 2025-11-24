@@ -126,6 +126,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 @keyframes shine{0%{color:#c33;}100%{color:#f66;}}
 
 /* ---------- Intro：白色對白框 + 黃色BTN + 右邊貓兔 ---------- */
+/* ---------- Intro：白色對白框 + 黃色BTN + 右邊貓兔 ---------- */
 #introCharacters{
   position:absolute;
   inset:0;
@@ -134,45 +135,51 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   display:none;
 }
 
-/* 上下分兩層：上面對白＋按鈕，下面兔兔貓貓 */
+/* 整體 layout：上面對白 + 黃色掣，下面右邊貓兔 */
 .intro-layout{
   position:absolute;
   inset:0;
   display:flex;
   flex-direction:column;
   justify-content:space-between;
-  padding:16px 20px 22px;   /* 想整個 intro 上移／落移就改呢度 */
+  padding:18px 28px 24px;   /* 整個 intro 上下位置，可微調 */
   box-sizing:border-box;
 }
+
+/* 上半：對白 + 按鈕垂直置中 */
 .intro-top{
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:12px;
-  margin-top:6px;           /* 對白高低 */
+  gap:14px;
+  margin-top:4px;           /* 對白整體上移 / 下移 */
 }
+
+/* 對白氣泡 */
 #introSpeech{
   background:#ffffffee;
-  border-radius:999px;
-  padding:10px 22px;
+  border-radius:20px;
+  padding:12px 26px;
   font-size:13px;
-  line-height:1.5;
+  line-height:1.6;
   color:#2e7d32;
-  box-shadow:0 4px 12px rgba(0,0,0,0.2);
+  box-shadow:0 4px 12px rgba(0,0,0,0.18);
   opacity:0;
   transform:translateY(8px);
   transition:opacity .25s ease, transform .25s ease;
   pointer-events:auto;
-  max-width:88%;
+  max-width:92%;
 }
 #introSpeech.show{
   opacity:1;
   transform:translateY(0);
 }
 #introSpeech p{margin:2px 0;}
+
+/* 黃色按鈕 */
 #introStartBtn{
-  padding:8px 22px;
-  font-size:14px;
+  padding:9px 26px;
+  font-size:15px;
   border-radius:999px;
   background:#ffd54f;
   color:#7b5a00;
@@ -191,66 +198,75 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 #introStartBtn:hover{
   filter:brightness(1.05);
 }
+
+/* 下半：右邊大兔貓貼地 */
 .intro-bottom{
   display:flex;
   justify-content:flex-end;
   align-items:flex-end;
-  gap:6px;
-  height:100px;
+  gap:8px;
+  height:120px;             /* 下半高度，貓兔會貼住地 */
 }
+
+/* 兔貓圖本身 */
 .intro-char{
   filter:drop-shadow(0 4px 6px rgba(0,0,0,0.25));
   opacity:0;
   transform-origin:bottom center;
   object-fit:contain;
-  max-height:90px;   /* 如果你想完全用原圖高度，可以刪呢行 */
 }
+
+/* 依你提供尺寸比例來排位 */
 #introCat{
-  max-width:90px;    /* 粉紅貓最大闊度（可調） */
+  width:146px;              /* 貓約 146×134 */
+  height:134px;
   z-index:2;
 }
 #introRabbit{
-  max-width:140px;   /* 藍兔最大闊度（可調） */
+  width:160px;              /* 兔約 160×286，會比貓高好多 */
+  height:286px;
   z-index:1;
-  margin-left:2px;
+  margin-left:4px;
+  transform:translateY(-14px); /* 令兔腳貼地但耳仔高啲 */
 }
 
-/* 行入場一次 */
+/* 行入場一次：由右邊滑入 */
 @keyframes introCatWalk{
-  from{ transform:translateX(120px); opacity:0; }
-  to  { transform:translateX(0);     opacity:1; }
-}
-@keyframes introRabbitWalk{
   from{ transform:translateX(160px); opacity:0; }
   to  { transform:translateX(0);     opacity:1; }
 }
-/* 一直慢跳步 */
-@keyframes introSmallBounce{
-  0%  { transform:translateY(0); }
-  50% { transform:translateY(-6px); }
-  100%{ transform:translateY(0); }
+@keyframes introRabbitWalk{
+  from{ transform:translateX(200px); opacity:0; }
+  to  { transform:translateX(0);     opacity:1; }
 }
 
-/* 手機窄屏 */
+/* 一直慢慢跳 */
+@keyframes introSmallBounce{
+  0%  { transform:translateY(0) translateX(0); }
+  50% { transform:translateY(-6px) translateX(0); }
+  100%{ transform:translateY(0) translateX(0); }
+}
+
+/* 手機窄屏：同比例縮細 */
 @media (max-width:700px){
   .intro-layout{
-    padding:10px 10px 16px;
+    padding:12px 12px 18px;
   }
   #introSpeech{
     font-size:12px;
-    padding:8px 14px;
-    border-radius:18px;
+    padding:9px 16px;
   }
   #introStartBtn{
-    font-size:13px;
+    font-size:14px;
   }
   #introCat{
-    max-width:72px;
-    max-height:80px;
+    width:95px;
+    height:auto;
   }
   #introRabbit{
-    max-width:115px;
-    max-height:85px;
+    width:115px;
+    height:auto;
+    transform:translateY(-8px);
   }
 }
 
