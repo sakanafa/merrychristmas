@@ -88,7 +88,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 }
 .value{font-size:18px;margin:4px 0;}
 #field{
-  position:relative;width:100%;height:200px;border-radius:10px;overflow:hidden;margin-top:10px;
+  position:relative;width:100%;height:220px;border-radius:10px;overflow:hidden;margin-top:10px;
   transition:background 1s;z-index:1;
 }
 .ground{
@@ -126,7 +126,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 .bible-text{color:#c33;font-weight:bold;animation:shine 1s ease-in-out infinite alternate;}
 @keyframes shine{0%{color:#c33;}100%{color:#f66;}}
 
-/* ---------- 首次登入角色入場動畫 ---------- */
+/* ---------- 首次登入角色入場動畫 & 對白框 ---------- */
 #introCharacters{
   position:absolute;
   inset:0;
@@ -136,56 +136,80 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 }
 .intro-char{
   position:absolute;
-  bottom:18%;
-  width:110px;
+  bottom:8%;               /* 放低少少 */
+  width:120px;
   height:auto;
   opacity:0;
+  filter:drop-shadow(0 4px 6px rgba(0,0,0,0.25));
+}
+@media (max-width:420px){
+  .intro-char{
+    width:95px;
+    bottom:6%;
+  }
 }
 .intro-cat{
-  left:-140px;
+  left:-160px;
 }
 .intro-rabbit{
-  right:-160px;
+  right:-180px;
 }
 #introSpeech{
   position:absolute;
   left:50%;
-  bottom:60%;
-  transform:translateX(-50%);
-  min-width:70%;
-  max-width:90%;
-  background:rgba(255,255,255,0.96);
-  border-radius:14px;
-  padding:10px 14px;
+  top:12%;                 /* 對白框高少少 */
+  transform:translateX(-50%) scale(0.9);
+  min-width:72%;
+  max-width:88%;
+  background:#ffffff;
+  border-radius:18px;
+  padding:12px 16px 10px;
   font-size:14px;
-  line-height:1.4;
-  box-shadow:0 4px 12px rgba(0,0,0,0.18);
+  line-height:1.6;
+  box-shadow:0 6px 18px rgba(0,0,0,0.18);
   opacity:0;
   pointer-events:auto;
+  color:#2e7d32;           /* 綠字 */
 }
-#introSpeech.show{
-  animation:introSpeechIn 0.7s ease-out forwards;
+#introSpeech::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:-10px;
+  transform:translateX(-50%);
+  width:18px;
+  height:10px;
+  background:#ffffff;
+  clip-path:polygon(50% 100%,0 0,100% 0); /* 三角箭嘴 */
 }
 #introSpeech button{
-  margin-top:6px;
+  margin-top:8px;
   font-size:14px;
-  padding:6px 12px;
+  padding:6px 14px;
+  background:#43a047;
+}
+#introSpeech button:hover{
+  filter:brightness(1.05);
+}
+#introSpeech.show{
+  animation:introSpeechPop 0.55s cubic-bezier(0.18,0.89,0.32,1.28) forwards;
 }
 @keyframes introCatWalk{
-  from{ left:-140px; opacity:0; }
-  to  { left:8%;     opacity:1; }
+  from{ left:-160px; opacity:0; }
+  to  { left:5%;     opacity:1; }
 }
 @keyframes introRabbitWalk{
-  from{ right:-160px; opacity:0; }
-  to  { right:8%;     opacity:1; }
+  from{ right:-180px; opacity:0; }
+  to  { right:5%;     opacity:1; }
 }
 @keyframes introBounce{
   from{ transform:translateY(0); }
-  to  { transform:translateY(-8px); }
+  to  { transform:translateY(-6px); }
 }
-@keyframes introSpeechIn{
-  from{ opacity:0; transform:translate(-50%,10px); }
-  to  { opacity:1; transform:translate(-50%,0); }
+@keyframes introSpeechPop{
+  0%{ opacity:0; transform:translateX(-50%) scale(0.7) translateY(8px); }
+  60%{ opacity:1; transform:translateX(-50%) scale(1.03) translateY(0); }
+  100%{ opacity:1; transform:translateX(-50%) scale(1) translateY(0); }
 }
 
 /* ---------- 天氣 & 特效 ---------- */
@@ -666,13 +690,13 @@ for(let i=0;i<25;i++){
     <div class="icon" id="rabbit">🐇</div>
     <div class="icon" id="cat">🐈</div>
 
-    <!-- 首次登入：角色由左右彈入農田 + 對白 -->
+    <!-- 首次登入：角色由左右彈入農田 + 對白框 -->
     <div id="introCharacters">
       <img src="88.png" alt="粉紅貓" id="introCat" class="intro-char intro-cat">
       <img src="600.png" alt="藍色兔子" id="introRabbit" class="intro-char intro-rabbit">
       <div id="introSpeech">
-        <p>歡迎嚟到 <strong>FRFARMLAND BANK</strong> 其下嘅聖誕蘿蔔農場！</p>
-        <p>希望你「種瓜得瓜，種蘿蔔得蘿蔔」。ENJOY！</p>
+        <p>歡迎嚟到 <strong>FRFARMLAND BANK</strong> 其下的聖誕蘿蔔農場，</p>
+        <p>希望你「種瓜得瓜，種蘿蔔得蘿蔔」。</p>
         <button id="introStartBtn">開始種蘿蔔</button>
       </div>
     </div>
@@ -852,17 +876,18 @@ document.addEventListener("DOMContentLoaded",()=>{
     if(!introWrap) return;
     introWrap.style.display = "block";
 
-    // 開始角色入場動畫
+    // 角色先行入場
     requestAnimationFrame(()=>{
       introCat.style.animation =
-        "introCatWalk 1.2s ease-out forwards, introBounce 0.6s ease-in-out infinite alternate 1.2s";
+        "introCatWalk 1.1s ease-out forwards, introBounce 0.6s ease-in-out 1.1s 3 alternate";
       introRabbit.style.animation =
-        "introRabbitWalk 1.2s ease-out forwards, introBounce 0.6s ease-in-out infinite alternate 1.2s";
+        "introRabbitWalk 1.1s ease-out forwards, introBounce 0.6s ease-in-out 1.1s 3 alternate";
     });
 
+    // 行完先彈出對白框
     setTimeout(()=>{
       introSpeech.classList.add("show");
-    },1300);
+    },1200);
 
     introStartBtn.addEventListener("click",()=>{
       localStorage.setItem(INTRO_FLAG_KEY,"1");
@@ -914,7 +939,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     const PLANT_REGEN_INTERVAL=5*60*1000;
 
     const WATER_MAX = 2;
-    const WATER_REGEN_INTERVAL = 6*60*60*1000; // 6 小時重置
+    const WATER_REGEN_INTERVAL = 6*60*60*1000;
 
     let seeds=[];
     let safeCarrot=0;
@@ -1033,7 +1058,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       field.querySelectorAll('.star,.meteor').forEach(e=>e.remove());
 
       if(isXmas){
-        field.style.background="linear-gradient(#001633 0%, #223355 40%, #eef5ff 40%, #eef5ff 100%)";
+        field.style.background="linear-gradient(#aee7ff 0%, #aee7ff 40%, #eef5ff 40%, #eef5ff 100%)";
         field.querySelector(".ground").style.background=
           "repeating-linear-gradient(45deg,#ccd,#eef 12px)";
         for(let i=0;i<40;i++){
