@@ -57,6 +57,25 @@ button{padding:10px 14px;margin:6px 5px;border:none;border-radius:8px;background
 button:hover{filter:brightness(1.08);}
 button:disabled{opacity:0.5;cursor:not-allowed;}
 
+/* 語言切換 */
+#langSwitch{
+  margin-top:4px;
+  display:flex;
+  justify-content:center;
+  gap:6px;
+}
+#langSwitch button{
+  padding:4px 10px;
+  font-size:12px;
+  border-radius:999px;
+  background:#eceff1;
+  color:#333;
+}
+#langSwitch button.active{
+  background:#ffb74d;
+  color:#fff;
+}
+
 /* ---------- 遊戲主畫面 ---------- */
 #game{display:none;position:relative;z-index:1000;}
 #merryTitle{
@@ -314,7 +333,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 }
 .gift-left{
   display:flex;
-  alignments:flex-start;
+  align-items:flex-start;
   gap:8px;
 }
 .gift-icon{font-size:22px;margin-top:2px;}
@@ -548,6 +567,13 @@ for(let i=0;i<25;i++){
  <div id="countdown">載入中...</div>
  <div class="daylabel">🐰🎄 聖誕打卡日曆（12月1–24）</div>
  <div id="calendar" class="calendar"></div>
+
+ <!-- 語言切換 -->
+ <div id="langSwitch">
+   <button data-lang="zh" class="active">繁體中文</button>
+   <button data-lang="jp">日本語</button>
+ </div>
+
  <p>請輸入銀行咭密碼：</p>
  <input type="password" id="pwd" placeholder="輸入密碼"><br>
  <button id="loginBtn">登入</button>
@@ -568,7 +594,7 @@ for(let i=0;i<25;i++){
   <!-- 1️⃣ 聖誕達標率 BAR -->
   <div id="xmasProgress">
     <div id="xmasProgressLabel">
-      💳 換聖誕禮達標率：<span id="xmasProgressText">0/1888</span>
+      <span id="xmasProgressTitleText">💳 換聖誕禮達標率：</span><span id="xmasProgressText">0/1888</span>
     </div>
     <div class="xmasProgressOuter">
       <div id="xmasProgressBarFill"></div>
@@ -599,7 +625,7 @@ for(let i=0;i<25;i++){
   </div>
   <button id="toggle-rule">🌱 種植規則</button>
   <div id="rule-box">
-    <!-- 規則文字同你原本一樣，就唔重貼 -->
+    <!-- 規則內容同你原本一樣，略 -->
   </div>
   <div id="eventBox">🌤 歡迎回來，小農夫～</div>
  </div>
@@ -634,6 +660,36 @@ document.addEventListener("DOMContentLoaded",()=>{
   ];
 
   const cal=document.getElementById("calendar");
+
+  // 語言切換資料
+  let currentLang = "zh";
+  const translations = {
+    zh: {
+      progressTitle: "💳 換聖誕禮達標率："
+    },
+    jp: {
+      progressTitle: "💳 クリスマスプレゼント達成率："
+    }
+  };
+
+  function applyLanguage(lang){
+    currentLang = lang;
+    const titleSpan = document.getElementById("xmasProgressTitleText");
+    titleSpan.textContent = translations[lang].progressTitle;
+
+    // 切換按鈕樣式
+    document.querySelectorAll("#langSwitch button").forEach(btn=>{
+      if(btn.getAttribute("data-lang")===lang) btn.classList.add("active");
+      else btn.classList.remove("active");
+    });
+  }
+
+  document.querySelectorAll("#langSwitch button").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const lang = btn.getAttribute("data-lang");
+      applyLanguage(lang);
+    });
+  });
 
   function loadCheckin(){
     let raw=localStorage.getItem(CHECKIN_KEY_NEW);
@@ -768,18 +824,18 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     let seeds=[];
     let safeCarrot=0;
-    let bankStored=0;
+    let bankStored=0;        // 用嚟計達標率（銀行累計）
     let plantLimit=PLANT_MAX;
     let waterLimit=1;
     let plantRegenStart=null;
     let xmasTest=false;
-    let dailyEvents=0;
 
     let backpackCarrot=0;
     let items={};
     let totalCarrotCollected=0;
 
     let loginEventTimer=null;
+    let loginEventCount=0;   // ✅ 每次登入最多 2 次隨機事件（不計道具）
 
     const field=document.getElementById("field");
     const eventBox=document.getElementById("eventBox");
@@ -814,8 +870,9 @@ document.addEventListener("DOMContentLoaded",()=>{
     let eventQueue=[];
     let showingEventPopup=false;
 
-    function showEventPopup(emoji,title,text,finalText){
-      eventQueue.push({emoji,title,text,finalText});
+    // showEventPopup 支援 onClose callback，熔岩 / 地震用
+    function showEventPopup(emoji,title,text,finalText,onClose){
+      eventQueue.push({emoji,title,text,finalText,onClose});
       if(!showingEventPopup){
         displayNextEventPopup();
       }
@@ -836,6 +893,10 @@ document.addEventListener("DOMContentLoaded",()=>{
         eventPopupOverlay.style.display="none";
         eventPopupOverlay.removeEventListener("click",closeHandler);
         eventBox.textContent=ev.finalText;
+        // 🔥 事件真正效果（如果有）喺呢度執行
+        if(typeof ev.onClose === "function"){
+          ev.onClose();
+        }
         showingEventPopup=false;
         displayNextEventPopup();
       };
@@ -908,10 +969,11 @@ document.addEventListener("DOMContentLoaded",()=>{
       }
     }
 
+    // ✅ 進度只用銀行累計 bankStored
     function getDisplayProgress(){
       const now=new Date();
       const isAfterXmasEve = (now.getMonth()===11 && now.getDate()>=24);
-      let current = totalCarrotCollected;
+      let current = bankStored;
       const target = XMAS_TARGET_CARROTS;
       if(isAfterXmasEve){
         current = target;
@@ -1082,7 +1144,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       let baseSeedToGrown  = ONE_AND_HALF_HOUR * 2;
 
       if (hasItem("tree_cat")) {
-        baseSeedToSprout *= 0.5;  // 成長時間減半
+        baseSeedToSprout *= 0.5;
         baseSeedToGrown  *= 0.5;
       }
 
@@ -1106,7 +1168,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       updateUI();
     }
 
-    // 聖誕畫面：至少 50 棵聖誕樹 + BAR 滿
     function ensureXmasVisuals(){
       const MIN_TREES = 50;
       const now = Date.now();
@@ -1133,7 +1194,7 @@ document.addEventListener("DOMContentLoaded",()=>{
         });
       }
 
-      totalCarrotCollected = Math.max(totalCarrotCollected, XMAS_TARGET_CARROTS);
+      // 24 號之後視覺上滿條，但真實數值仍用 bankStored 控制
       updateXmasProgressUI();
     }
 
@@ -1149,11 +1210,15 @@ document.addEventListener("DOMContentLoaded",()=>{
     }
 
     function triggerPositiveEvent(){
+      // 道具好事：唔計入 loginEventCount
       const positive = [sunEvent, rainEvent, catWater, rabbitHelp];
       const fn = positive[Math.floor(Math.random()*positive.length)];
       fn();
     }
     function triggerEvent(){
+      if(loginEventCount >= 2) return;   // ✅ 超過 2 次就唔再觸發
+      loginEventCount++;
+
       const r=Math.random();
       if(r<0.13)      birdEvent();
       else if(r<0.26) sunEvent();
@@ -1169,6 +1234,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     function scheduleLoginEvent(){
       if(loginEventTimer) clearTimeout(loginEventTimer);
       if(seeds.length===0) return;
+      if(loginEventCount >= 2) return;
       loginEventTimer = setTimeout(()=>{
         if(seeds.length>0 && Math.random() < 0.8){
           triggerEvent();
@@ -1254,6 +1320,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     updatePlantRegen();
     updateUI();
     scheduleLoginEvent();
+    applyLanguage(currentLang);   // 初始化語言顯示
 
     document.getElementById("plantBtn").onclick=()=>{
       if(plantLimit<=0){
@@ -1279,7 +1346,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       eventBox.textContent="🌱 新蘿蔔種下～";
 
       if(hasItem("star_lights") && Math.random() < 0.05){
-        triggerPositiveEvent();
+        triggerPositiveEvent(); // ✅ 不計入 loginEventCount
       }
 
       updateUI();
@@ -1320,7 +1387,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       });
       if(harvested>0){
         safeCarrot+=harvested;
-        bankStored+=harvested;
+        bankStored+=harvested;           // ✅ 達標率只加銀行
         totalCarrotCollected += harvested;
 
         if(hasItem("rabbit_box") && Math.random()<0.2){
@@ -1358,7 +1425,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       }
 
       backpackCarrot += harvested;
-      totalCarrotCollected += harvested;
+      totalCarrotCollected += harvested;   // 只是統計，達標率唔會加
 
       if(hasItem("rabbit_box") && Math.random()<0.2){
         backpackCarrot += 20;
@@ -1449,16 +1516,14 @@ document.addEventListener("DOMContentLoaded",()=>{
     setInterval(()=>{updatePlantRegen();},10000);
 
     setInterval(()=>{
-      if(dailyEvents>=2) return;
+      if(loginEventCount >= 2) return;   // ✅ 45 秒輪詢都受限制
       if(Math.random()<0.3){
-        dailyEvents++;
         triggerEvent();
       }
     },45000);
 
-    /* ---------- 各種事件（已更新數值） ---------- */
+    /* ---------- 各種事件（已更新數值 & 延後效果） ---------- */
     function birdEvent(){
-      // 最多刪 5 棵
       let removed = 0;
       while(seeds.length>0 && removed<5){
         const p = seeds.pop();
@@ -1470,14 +1535,16 @@ document.addEventListener("DOMContentLoaded",()=>{
       field.appendChild(b);
       setTimeout(()=>b.remove(),4000);
       updateUI();saveGame();
-      showEventPopup("🐦","小鳥嚟咗！","一群小鳥飛過嚟，一口氣偷走咗幾棵蘿蔔！","🐦 小鳥吃掉蘿蔔 -5（最多）");
+      showEventPopup("🐦","小鳥嚟咗！","一群小鳥飛過嚟，一口氣偷走咗幾棵蘿蔔！","🐦 小鳥吃掉蘿蔔（最多 5 棵）");
     }
 
     function sunEvent(){
+      // ☀️ 仍然係即時效果
       const s=document.createElement("div");
       s.className="sun";s.textContent="☀️";
       field.appendChild(s);
       safeCarrot+=10;
+      bankStored+=10;               // 照計入銀行達標
       totalCarrotCollected += 10;
       setTimeout(()=>s.remove(),4000);
       updateUI();saveGame();
@@ -1485,31 +1552,39 @@ document.addEventListener("DOMContentLoaded",()=>{
     }
 
     function lavaEvent(){
-      const grownIndices = seeds
-        .map((p,i)=>p.stage==="grown" ? i : -1)
-        .filter(i=>i!==-1);
+      // 🔥 Popup 關閉之後先真正燒田
+      showEventPopup(
+        "🌋",
+        "熔岩警報！",
+        "遠處嘅火山突然噴發，熔岩慢慢逼近你嘅田地……",
+        "🌋 熔岩燒了蘿蔔，只剩一棵！",
+        () => {
+          const grownIndices = seeds
+            .map((p,i)=>p.stage==="grown" ? i : -1)
+            .filter(i=>i!==-1);
 
-      if(grownIndices.length===0){
-        seeds.forEach(p=>p.el.remove());
-        seeds=[];
-      }else{
-        const keepIndex = grownIndices[Math.floor(Math.random()*grownIndices.length)];
-        seeds.forEach((p,i)=>{
-          if(i===keepIndex){
-            p.stage="grown";
-            p.el.textContent="🥕";
+          if(grownIndices.length===0){
+            seeds.forEach(p=>p.el.remove());
+            seeds=[];
           }else{
-            p.el.remove();
+            const keepIndex = grownIndices[Math.floor(Math.random()*grownIndices.length)];
+            seeds.forEach((p,i)=>{
+              if(i===keepIndex){
+                p.stage="grown";
+                p.el.textContent="🥕";
+              }else{
+                p.el.remove();
+              }
+            });
+            seeds = [seeds[keepIndex]];
           }
-        });
-        seeds = [seeds[keepIndex]];
-      }
 
-      document.body.classList.add("flash");
-      setTimeout(()=>document.body.classList.remove("flash"),10000);
+          document.body.classList.add("flash");
+          setTimeout(()=>document.body.classList.remove("flash"),10000);
 
-      updateUI();saveGame();
-      showEventPopup("🌋","熔岩警報！","熔岩經過，把大部分蘿蔔同種子都燒走，只剩返一棵！","🌋 熔岩燒了蘿蔔，只剩一棵！");
+          updateUI();saveGame();
+        }
+      );
     }
 
     function snowEvent(){
@@ -1517,7 +1592,6 @@ document.addEventListener("DOMContentLoaded",()=>{
         showEventPopup("🕯️","貓貓暖爐發功！","本來要落雪傷害蘿蔔，但有貓貓暖爐幫你擋住，今次冇損失～","🕯️ 暖爐保護，雪災免疫！");
         return;
       }
-      // 最多刪 10 棵
       let removed = 0;
       while(seeds.length>0 && removed<10){
         const p = seeds.pop();
@@ -1532,11 +1606,12 @@ document.addEventListener("DOMContentLoaded",()=>{
         setTimeout(()=>s.remove(),4000);
       }
       updateUI();saveGame();
-      showEventPopup("❄️","下雪了！","天氣突然變冷，下起大雪，有好多蘿蔔被雪埋咗。","❄️ 下雪 蘿蔔 -10（最多）");
+      showEventPopup("❄️","下雪了！","天氣突然變冷，下起大雪，有好多蘿蔔被雪埋咗。","❄️ 下雪 蘿蔔 最多 -10 棵");
     }
 
     function rainEvent(){
       safeCarrot+=12;
+      bankStored+=12;               // 一樣入銀行
       totalCarrotCollected += 12;
       for(let i=0;i<20;i++){
         const r=document.createElement("div");
@@ -1567,6 +1642,7 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     function catWater(){
       safeCarrot+=1;
+      bankStored+=1;
       totalCarrotCollected += 1;
       const drop=document.createElement("div");
       drop.className="rain";drop.textContent="💧";
@@ -1579,6 +1655,7 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     function rabbitHelp(){
       safeCarrot+=5;
+      bankStored+=5;
       totalCarrotCollected += 5;
       const r=document.getElementById("rabbit");
       r.classList.add("run");
@@ -1600,27 +1677,35 @@ document.addEventListener("DOMContentLoaded",()=>{
     }
 
     function quakeEvent(){
-      document.body.classList.add("shake");
-      setTimeout(()=>document.body.classList.remove("shake"),1500);
+      // 🌏 Popup 後先震＋減半
+      showEventPopup(
+        "🌏",
+        "地震發生！",
+        "地面開始微微震動，好似有啲唔對路……",
+        "🌏 地震令農作物減少一半",
+        () => {
+          document.body.classList.add("shake");
+          setTimeout(()=>document.body.classList.remove("shake"),1500);
 
-      if(seeds.length>0){
-        const original = [...seeds];
-        const half = Math.floor(original.length/2);
-        for(let i=original.length-1;i>0;i--){
-          const j = Math.floor(Math.random()*(i+1));
-          [original[i],original[j]]=[original[j],original[i]];
+          if(seeds.length>0){
+            const original = [...seeds];
+            const half = Math.floor(original.length/2);
+            for(let i=original.length-1;i>0;i--){
+              const j = Math.floor(Math.random()*(i+1));
+              [original[i],original[j]]=[original[j],original[i]];
+            }
+            const removed = original.slice(0,half);
+            const remain  = original.slice(half);
+
+            removed.forEach(p=>{
+              if(p && p.el) p.el.remove();
+            });
+            seeds = remain;
+          }
+
+          updateUI();saveGame();
         }
-        const removed = original.slice(0,half);
-        const remain  = original.slice(half);
-
-        removed.forEach(p=>{
-          if(p && p.el) p.el.remove();
-        });
-        seeds = remain;
-      }
-
-      updateUI();saveGame();
-      showEventPopup("🌏","地震發生！","大地震令田裡搖來搖去，大約一半農作物被震走咗！","🌏 地震令農作物減少一半");
+      );
     }
   }
 });
