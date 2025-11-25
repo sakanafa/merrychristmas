@@ -219,6 +219,7 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
   display:block;
   width:100%;
   height:auto;
+  cursor:pointer;
 }
 
 /* ---------- 天氣 & 特效 ---------- */
@@ -637,8 +638,9 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 }
 #upgradePopupBtns{
   display:flex;
+  flex-wrap:wrap;
   justify-content:center;
-  gap:10px;
+  gap:8px;
   margin-top:6px;
 }
 #upgradePopupBtns button{
@@ -652,6 +654,74 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 #upgradeConfirmBtn{
   background:#ffb74d;
   color:#5d3b00;
+}
+#upgradeTestBtn{
+  background:#00897b;
+  color:#fff;
+}
+
+/* ---------- 場地資訊 Popup（點 Banner 圖） ---------- */
+#fieldInfoOverlay{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,0.45);
+  z-index:2700;
+}
+#fieldInfo{
+  width:min(380px,90vw);
+  background:#ffffff;
+  border-radius:16px;
+  padding:16px 18px 14px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.25);
+  text-align:left;
+  font-size:14px;
+}
+#fieldInfo h3{
+  margin-top:0;
+  margin-bottom:6px;
+  text-align:center;
+}
+#fieldInfoClose{
+  display:block;
+  margin:10px auto 4px;
+  background:#888;
+  font-size:14px;
+  padding:6px 14px;
+  border-radius:999px;
+}
+
+/* ---------- 升級爆星星層 ---------- */
+#fieldStarLayer{
+  pointer-events:none;
+  position:fixed;
+  inset:0;
+  overflow:visible;
+  z-index:2800;
+}
+.star-burst{
+  position:absolute;
+  width:8px;
+  height:8px;
+  background:radial-gradient(circle,#fff 0,#ffeb3b 50%,rgba(255,235,59,0) 70%);
+  border-radius:50%;
+  opacity:0;
+  animation:starBurst 700ms ease-out forwards;
+}
+@keyframes starBurst{
+  0%{
+    transform:translate(0,0) scale(0.2);
+    opacity:1;
+  }
+  70%{
+    opacity:1;
+  }
+  100%{
+    transform:translate(var(--tx),var(--ty)) scale(0.5);
+    opacity:0;
+  }
 }
 </style>
 </head>
@@ -751,9 +821,31 @@ for(let i=0;i<25;i++){
     <div id="upgradePopupBtns">
       <button id="upgradeCancelBtn">取消</button>
       <button id="upgradeConfirmBtn">升級</button>
+      <button id="upgradeTestBtn">測試升級</button>
     </div>
   </div>
 </div>
+
+<!-- 場地資訊 Popup（按 Banner 圖） -->
+<div id="fieldInfoOverlay">
+  <div id="fieldInfo">
+    <h3>🏗 場地等級資訊</h3>
+    <p>目前等級：<span id="fieldInfoLevel"></span></p>
+    <p>現時種植速度加成：<span id="fieldInfoSpeed"></span></p>
+    <p>下一級效果：<span id="fieldInfoNext"></span></p>
+    <p>升級成本：<span id="fieldInfoCost"></span></p>
+    <hr>
+    <p style="margin-top:6px;">
+      場地等級會按百分比加快
+      <strong>🌰→🌿→🥕</strong> 所需時間，
+      並且會同聖誕禮物（例如 🎄 貓貓聖誕樹）嘅加成 <strong>一齊生效</strong>。
+    </p>
+    <button id="fieldInfoClose">關閉</button>
+  </div>
+</div>
+
+<!-- 升級爆星星層 -->
+<div id="fieldStarLayer"></div>
 
 <!-- 鎖屏 -->
 <div id="lockscreen">
@@ -811,7 +903,7 @@ for(let i=0;i<25;i++){
     </div>
   </div>
 
-  <!-- 田下面 Banner：初時 bann1.png，之後轉 bann2.png -->
+  <!-- 田下面 Banner：初時 bann1.png，之後轉 bann2/3/4/5.png -->
   <div id="bottomBanner">
     <img id="bottomBannerImg" src="bann1.png" alt="兔兔貓貓 Banner">
   </div>
@@ -830,6 +922,7 @@ for(let i=0;i<25;i++){
   </div>
   <button id="toggle-rule">🌱 種植規則</button>
   <div id="rule-box">
+    <!-- 你可以把上面那段「完整規則」文字貼入來 -->
     <p><strong>【基本種植】</strong></p>
     <ul>
       <li>最初你有 <strong>20 粒種子</strong>（按「種蘿蔔 🌰」會用 1 粒）。</li>
@@ -843,6 +936,7 @@ for(let i=0;i<25;i++){
       </li>
       <li>正常情況下，約 <strong>1.5 小時</strong>由 🌰 變 🌿，再多 <strong>1.5 小時</strong>由 🌿 變 🥕。</li>
       <li>如果你之後買咗 <strong>🎄 貓貓聖誕樹</strong>，成長時間會縮短一半。</li>
+      <li>場地升級後，種植速度仲會再加快（詳情按下面 Banner 圖睇說明）。</li>
     </ul>
   </div>
   <div id="eventBox">🌤 歡迎回來，小農夫～</div>
@@ -866,6 +960,9 @@ document.addEventListener("DOMContentLoaded",()=>{
 
   // 升級場地相關 key
   const FIELD_UPGRADE_KEY = "fieldUpgradeLevel2025";
+
+  // 暫時測試等級（只影響速度計算，不存檔）
+  let tempFieldLevel = null;
 
   const XMAS_GIFTS = [
     { id:"hat_rabbit",  name:"🎅 兔兔聖誕帽",   icon:"🎅", cost:100, type:"decor",
@@ -1080,6 +1177,14 @@ document.addEventListener("DOMContentLoaded",()=>{
     if(isNaN(fieldUpgradeLevel) || fieldUpgradeLevel<0) fieldUpgradeLevel=0;
     if(fieldUpgradeLevel>3) fieldUpgradeLevel=3;
 
+    // 計算實際使用等級（會考慮暫時測試）
+    function getEffectiveFieldLevel(){
+      if(tempFieldLevel != null){
+        return tempFieldLevel;
+      }
+      return fieldUpgradeLevel;
+    }
+
     let seeds=[];
     let safeCarrot=0;
     let bankStored=0;
@@ -1137,15 +1242,47 @@ document.addEventListener("DOMContentLoaded",()=>{
     const upgradeCancelBtn=document.getElementById("upgradeCancelBtn");
     const upgradeConfirmBtn=document.getElementById("upgradeConfirmBtn");
     const upgradeFieldBtn=document.getElementById("upgradeFieldBtn");
+    const upgradeTestBtn=document.getElementById("upgradeTestBtn");
+
+    // 場地資訊 Popup
+    const fieldInfoOverlay=document.getElementById("fieldInfoOverlay");
+    const fieldInfoLevel=document.getElementById("fieldInfoLevel");
+    const fieldInfoSpeed=document.getElementById("fieldInfoSpeed");
+    const fieldInfoNext=document.getElementById("fieldInfoNext");
+    const fieldInfoCost=document.getElementById("fieldInfoCost");
+    const fieldInfoClose=document.getElementById("fieldInfoClose");
+
+    const fieldStarLayer=document.getElementById("fieldStarLayer");
 
     let eventQueue=[];
     let showingEventPopup=false;
 
-    // 根據場地升級 level 設定圖片
+    // 場地升級速度加成設定
+    // Lv0: +0%, Lv1: +15%, Lv2: +35%, Lv3: +60% 速度
+    function getFieldSpeedPercent(level){
+      if(level<=0) return 0;
+      if(level===1) return 15;
+      if(level===2) return 35;
+      if(level>=3) return 60;
+      return 0;
+    }
+    function getFieldSpeedFactor(level){
+      const p = getFieldSpeedPercent(level);
+      return 1 + p/100;   // 速度倍率
+    }
+
+    // 由場地等級算出顯示用文字
+    function getFieldLevelName(level){
+      return `Lv.${level}`;
+    }
+
+    // 根據場地升級 level 設定 Banner 圖片
     function applyFieldBannerByLevel(){
       if(!bottomBannerImg) return;
-      // level 0: intro 之後 bann2.png（由 showIntroIfFirstTime 控制）
-      if(fieldUpgradeLevel===1){
+      if(fieldUpgradeLevel===0){
+        // 0 級：由 intro 控制 bann1/2
+        return;
+      }else if(fieldUpgradeLevel===1){
         bottomBannerImg.src="bann3.png";
       }else if(fieldUpgradeLevel===2){
         bottomBannerImg.src="bann4.png";
@@ -1446,25 +1583,34 @@ document.addEventListener("DOMContentLoaded",()=>{
       applyFieldBannerByLevel();
     }
 
+    // 根據場地升級 + 禮物，加速成長時間
     function recomputeGrowth(init=false){
       const now = Date.now();
-      const ONE_AND_HALF_HOUR = 1.5 * 60 * 60;
 
-      let baseSeedToSprout = ONE_AND_HALF_HOUR;
-      let baseSeedToGrown  = ONE_AND_HALF_HOUR * 2;
+      // 基礎時間（秒）
+      const ONE_AND_HALF_HOUR_S = 1.5 * 60 * 60;
+      let seedToSproutBase = ONE_AND_HALF_HOUR_S;
+      let seedToGrownBase  = ONE_AND_HALF_HOUR_S * 2;
 
+      // 🎄 貓貓聖誕樹：時間減半（所有階段）
       if (hasItem("tree_cat")) {
-        baseSeedToSprout *= 0.5;
-        baseSeedToGrown  *= 0.5;
+        seedToSproutBase *= 0.5;
+        seedToGrownBase  *= 0.5;
       }
+
+      // 場地等級：速度加成 → 時間除以速度倍率
+      const effectiveLevel = getEffectiveFieldLevel();
+      const speedFactor = getFieldSpeedFactor(effectiveLevel); // 例如 1.35
+      seedToSproutBase /= speedFactor;
+      seedToGrownBase  /= speedFactor;
 
       let changed=false;
       seeds.forEach(p=>{
         const elapsedSec=(now-p.plantedAt)/1000;
 
         let newStage="seed";
-        if (elapsedSec >= baseSeedToGrown)        newStage="grown";
-        else if (elapsedSec >= baseSeedToSprout)  newStage="sprout";
+        if (elapsedSec >= seedToGrownBase)        newStage="grown";
+        else if (elapsedSec >= seedToSproutBase)  newStage="sprout";
 
         if(newStage!==p.stage || init){
           p.stage=newStage;
@@ -1632,8 +1778,9 @@ document.addEventListener("DOMContentLoaded",()=>{
     });
 
     // ====== 升級場地相關 =======
+
+    // 升級成本：0->1:600, 1->2:300, 2->3:600
     function getNextUpgradeCost(level){
-      // level 0->1: 600, 1->2: 300, 2->3: 600
       if(level===0) return 600;
       if(level===1) return 300;
       if(level===2) return 600;
@@ -1646,8 +1793,14 @@ document.addEventListener("DOMContentLoaded",()=>{
         return;
       }
       const cost = getNextUpgradeCost(fieldUpgradeLevel);
-      upgradePopupText.textContent =
-        `是否升級 600 與花行長的場地？需要 ${cost} 個銀行蘿蔔。`;
+      const nextLevel = fieldUpgradeLevel + 1;
+      const currentSpeed = getFieldSpeedPercent(fieldUpgradeLevel);
+      const nextSpeed = getFieldSpeedPercent(nextLevel);
+      upgradePopupText.innerHTML =
+        `目前場地等級：<strong>${getFieldLevelName(fieldUpgradeLevel)}</strong><br>`+
+        `現時速度加成：<strong>+${currentSpeed}%</strong><br>`+
+        `升級到 <strong>${getFieldLevelName(nextLevel)}</strong> 後速度加成：<strong>+${nextSpeed}%</strong><br><br>`+
+        `是否升級 600 與花行長的場地？需要 <strong>${cost} 個銀行蘿蔔</strong>。`;
       upgradePopupOverlay.style.display="flex";
     }
 
@@ -1660,29 +1813,106 @@ document.addEventListener("DOMContentLoaded",()=>{
       }
     });
 
+    // 升級爆星星
+    function spawnUpgradeStarEffect(atElement){
+      const rect = atElement.getBoundingClientRect();
+      const centerX = (rect.left + rect.right) / 2;
+      const centerY = (rect.top + rect.bottom) / 2;
+
+      const count = 18;
+      const radius = Math.min(window.innerWidth, window.innerHeight) * 0.15;
+
+      for (let i = 0; i < count; i++) {
+        const angle = (Math.PI * 2 * i) / count;
+        const tx = Math.cos(angle) * radius;
+        const ty = Math.sin(angle) * radius;
+
+        const star = document.createElement("div");
+        star.className = "star-burst";
+        star.style.left = `${centerX}px`;
+        star.style.top = `${centerY}px`;
+        star.style.setProperty("--tx", `${tx}px`);
+        star.style.setProperty("--ty", `${ty}px`);
+
+        fieldStarLayer.appendChild(star);
+
+        star.addEventListener("animationend", () => {
+          star.remove();
+        });
+      }
+    }
+
+    // 真正升級
     upgradeConfirmBtn.addEventListener("click",()=>{
       const cost = getNextUpgradeCost(fieldUpgradeLevel);
       if(cost == null){
         upgradePopupOverlay.style.display="none";
         return;
       }
-      // 撳「升級」先檢查銀行蘿蔔
       if(safeCarrot < cost){
         upgradePopupOverlay.style.display="none";
         eventBox.textContent = "銀行蘿蔔唔夠升級，請努力種蘿蔔！";
         return;
       }
       safeCarrot -= cost;
-      // bankStored 係歷史累積存入數字，唔扣，避免影響達標率
       fieldUpgradeLevel++;
+      tempFieldLevel = null; // 真升級後，清除暫時測試
       applyFieldBannerByLevel();
-      eventBox.textContent=`🏗 場地已升級！已使用 ${cost} 個銀行蘿蔔。`;
+      eventBox.textContent=`🏗 場地已升級到 ${getFieldLevelName(fieldUpgradeLevel)}！已使用 ${cost} 個銀行蘿蔔。`;
       upgradePopupOverlay.style.display="none";
+      spawnUpgradeStarEffect(bottomBannerImg);
+      recomputeGrowth(true);
       updateUI();
       saveGame();
     });
 
+    // 測試升級：只改 tempFieldLevel，不扣資源，不存檔
+    upgradeTestBtn.addEventListener("click",()=>{
+      let testLevel = fieldUpgradeLevel;
+      if(tempFieldLevel != null){
+        testLevel = tempFieldLevel;
+      }
+      if(testLevel >= 3){
+        alert("已經係最高等級，無得再升測試。");
+        return;
+      }
+      testLevel++;
+      tempFieldLevel = testLevel;
+      spawnUpgradeStarEffect(bottomBannerImg);
+      recomputeGrowth(true);
+      const sp = getFieldSpeedPercent(testLevel);
+      alert(`（測試模式）暫時使用場地 ${getFieldLevelName(testLevel)}，種植速度加成：+${sp}%。\n重新整理頁面或真正升級會還原。`);
+    });
+
     upgradeFieldBtn.addEventListener("click", openUpgradePopup);
+
+    // 場地資訊 Popup：按 Banner 圖會彈出
+    function openFieldInfo(){
+      const level = getEffectiveFieldLevel();
+      const realLevel = fieldUpgradeLevel;
+      const displayLevel = getFieldLevelName(level);
+      const speedNow = getFieldSpeedPercent(level);
+
+      let nextText = "已達最高等級";
+      let costText = "—";
+      if(realLevel < 3){
+        const nextLevel = realLevel + 1;
+        const nextSpeed = getFieldSpeedPercent(nextLevel);
+        nextText = `升級到 ${getFieldLevelName(nextLevel)}：速度加成 +${nextSpeed}%`;
+        const c = getNextUpgradeCost(realLevel);
+        costText = `${c} 個銀行蘿蔔`;
+      }
+
+      fieldInfoLevel.textContent = `${displayLevel}（實際已升級：Lv.${realLevel}）`;
+      fieldInfoSpeed.textContent = `+${speedNow}%`;
+      fieldInfoNext.textContent = nextText;
+      fieldInfoCost.textContent = costText;
+
+      fieldInfoOverlay.style.display="flex";
+    }
+    bottomBannerImg.addEventListener("click", openFieldInfo);
+    fieldInfoClose.addEventListener("click",()=>{ fieldInfoOverlay.style.display="none"; });
+    fieldInfoOverlay.addEventListener("click",(e)=>{ if(e.target===fieldInfoOverlay) fieldInfoOverlay.style.display="none"; });
 
     // =================================
 
