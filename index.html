@@ -115,6 +115,12 @@ button:disabled{opacity:0.5;cursor:not-allowed;}
 .controls{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:10px;}
 .controls button{flex:1 1 45%;min-width:110px;}
 @media(max-width:420px){.controls button{flex:1 1 100%;width:90%;}}
+
+/* dev 控制鈕：預設隱藏 */
+.dev-only{
+  display:none;
+}
+
 #rule-box{
   background:#eef;padding:8px;border-radius:8px;margin-top:6px;font-size:15px;
   line-height:1.4;display:none;text-align:left;
@@ -888,11 +894,14 @@ for(let i=0;i<25;i++){
    <button id="toBackpackBtn" style="background:#ffb74d;">🥕 放入背包</button>
    <button id="exchangeGiftBtn" style="background:#ab47bc;">🎁 換購聖誕禮品</button>
    <button id="upgradeFieldBtn" style="background:#6d4c41;">🏗 升級場地</button>
-   <button id="setBackpackTestBtn" style="background:#00897b;">🧪 設定背包蘿蔔</button>
-   <button id="resetBtn" style="background:#77bb77;">🔄 重新開始</button>
-   <button id="testBtn" style="background:#59c;">🎄 聖誕測試</button>
-   <button id="growTestBtn" style="background:#ffaa00;">🧪 下一階段測試</button>
-   <button id="upgradeTestBtn" style="background:#4e342e;">🧪 場地升級測試</button>
+
+   <!-- 以下 dev-only：預設隱藏，按 T 三次先顯示 -->
+   <button id="setBackpackTestBtn" class="dev-only" style="background:#00897b;">🧪 設定背包蘿蔔</button>
+   <button id="resetBtn" class="dev-only" style="background:#77bb77;">🔄 重新開始</button>
+   <button id="testBtn" class="dev-only" style="background:#59c;">🎄 聖誕測試</button>
+   <button id="growTestBtn" class="dev-only" style="background:#ffaa00;">🧪 下一階段測試</button>
+   <button id="upgradeTestBtn" class="dev-only" style="background:#4e342e;">🧪 場地升級測試</button>
+   <button id="setSafeCarrotTestBtn" class="dev-only" style="background:#4caf50;">🧪 設定銀行蘿蔔</button>
   </div>
   <button id="toggle-rule">🌱 種植規則</button>
   <div id="rule-box">
@@ -977,7 +986,7 @@ for(let i=0;i<25;i++){
 
 <script>
 document.addEventListener("DOMContentLoaded",()=>{
-  const PASSWORD="600lovefafa";
+  const PASSWORD="600";
 
   const CHECKIN_KEY_NEW="checkin2025";
   const CHECKIN_KEY_OLD="adventCheckin2025";
@@ -1270,6 +1279,11 @@ document.addEventListener("DOMContentLoaded",()=>{
     const closeFieldInfoBtn = document.getElementById("closeFieldInfoBtn");
 
     const upgradeTestBtn = document.getElementById("upgradeTestBtn");
+    const setBackpackTestBtn = document.getElementById("setBackpackTestBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const testBtn = document.getElementById("testBtn");
+    const growTestBtn = document.getElementById("growTestBtn");
+    const setSafeCarrotTestBtn = document.getElementById("setSafeCarrotTestBtn");
 
     let eventQueue=[];
     let showingEventPopup=false;
@@ -1900,7 +1914,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       }
     });
 
-    // 場地升級測試 BTN
+    // 場地升級測試 BTN（dev）
     upgradeTestBtn.addEventListener("click", ()=>{
       const current = fieldUpgradeLevel;
       const next = (current + 1) % 4; // 0→1→2→3→0
@@ -2053,7 +2067,8 @@ document.addEventListener("DOMContentLoaded",()=>{
       openGiftShop();
     };
 
-    document.getElementById("setBackpackTestBtn").onclick=()=>{
+    // ===== dev-only 按鈕行為 =====
+    setBackpackTestBtn.onclick=()=>{
       const v = prompt("輸入背包蘿蔔數量（只做測試用）：", backpackCarrot);
       if(v===null) return;
       const n = parseInt(v,10);
@@ -2067,7 +2082,21 @@ document.addEventListener("DOMContentLoaded",()=>{
       saveGame();
     };
 
-    document.getElementById("resetBtn").onclick=()=>{
+    setSafeCarrotTestBtn.onclick = () => {
+      const v = prompt("輸入銀行蘿蔔數量（只做測試用）：", safeCarrot);
+      if(v===null) return;
+      const n = parseInt(v,10);
+      if(isNaN(n) || n<0){
+        alert("請輸入 0 或以上嘅整數。");
+        return;
+      }
+      safeCarrot = n;
+      eventBox.textContent="🧪 已更新銀行蘿蔔數量（測試模式）。";
+      updateUI();
+      saveGame();
+    };
+
+    resetBtn.onclick=()=>{
       if(confirm("確定要重設？（包括清除本機紀錄）")){
         localStorage.removeItem(GAME_SAVE_KEY);
         localStorage.removeItem(OLD_GAME_KEY);
@@ -2080,7 +2109,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       }
     };
 
-    document.getElementById("testBtn").onclick=()=>{
+    testBtn.onclick=()=>{
       xmasTest=!xmasTest;
       setGlobalXmasTest(xmasTest);
       const now=new Date();
@@ -2101,7 +2130,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       if(musicOn) tryPlayBgm(false);
     };
 
-    document.getElementById("growTestBtn").onclick=()=>{
+    growTestBtn.onclick=()=>{
       seeds.forEach(p=>{
         if(p.stage==="seed"){p.stage="sprout";p.el.textContent="🌿";}
         else if(p.stage==="sprout"){p.stage="grown";p.el.textContent="🥕";}
@@ -2459,9 +2488,43 @@ document.addEventListener("DOMContentLoaded",()=>{
         }
       );
     }
+
+    /* ========== T 鍵三按開 / 關 dev-only 按鈕 ========== */
+    (function setupDevToggle(){
+      let tCount = 0;
+      let lastTime = 0;
+      let devVisible = false;
+      const devButtons = document.querySelectorAll(".dev-only");
+
+      function applyDevVisible(){
+        devButtons.forEach(btn=>{
+          btn.style.display = devVisible ? "block" : "none";
+        });
+      }
+      applyDevVisible(); // 預設隱藏
+
+      window.addEventListener("keydown",e=>{
+        if(e.key !== "t" && e.key !== "T") return;
+        const now = Date.now();
+        if(now - lastTime > 1000){
+          // 超過一秒，重新計
+          tCount = 0;
+        }
+        tCount++;
+        lastTime = now;
+
+        if(tCount >= 3){
+          tCount = 0;
+          devVisible = !devVisible;
+          applyDevVisible();
+          eventBox.textContent = devVisible
+            ? "🧪 已開啟開發者測試按鈕（此設定不會被儲存）。"
+            : "🧪 已關閉開發者測試按鈕。";
+        }
+      });
+    })();
   }
 });
 </script>
 </body>
 </html>
-
